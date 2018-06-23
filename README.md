@@ -20,8 +20,15 @@ Server-side client of ISA Rankings
         * AWS CloudFormation (infrastructure as a code)
         * AWS IAM Management (user, roles, policies)
 
+**Understanding this repo:**
 
-## Getting Started
+It uses serverless-offline for local testing the APIGateway/Lambda combination. So it looks, on practice, its not different than hosting a node server at localhost:3000. Good to keep in mind that the underlying runtime and developer experience is Node but the the underlying logic is different than traditional node servers. 
+
+Lambda is about microservices but in this repo Web API is bundled into a single function via webpack. This isn't exactly a microservice approach but considering the simplicity and scale of this project, doing such thing is very handy. 
+
+Serverless is used because it is extremely low cost, pratically free, scalable, easily maintainable etc...
+
+# Getting Started
 
 Following npm packages are assumed to be installed globally
 

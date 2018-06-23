@@ -88,7 +88,6 @@ functions:
           method: any
           path: /{proxy+}
           cors: true
-
 resources:
   Resources:
     SnsNotificationTopic:
