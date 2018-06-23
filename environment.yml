@@ -1,1 +1,3 @@
+# Environment variables for lambda
+
 ENVIRONMENT: ${self:provider.stage}

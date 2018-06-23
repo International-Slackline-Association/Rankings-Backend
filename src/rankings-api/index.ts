@@ -15,7 +15,7 @@ function bootstrap(): Promise<any> {
 export const handler = serverlessHttp(express, {
     request: async (request: Request, event: APIGatewayEvent, context: Context) => {
         if (!isBoostrapped) {
-            console.log('Bootstraping server');
+            console.log('Bootstraping NestJS');
             await bootstrap();
             isBoostrapped = true;
         }
