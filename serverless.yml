@@ -80,7 +80,7 @@ package:
     
 functions:
   RankingsAPI:
-    handler: src/RankingsAPI/index.handler
+    handler: src/rankings-api/index.handler
     description: Rankings WebAPI service
     environment: ${file(environment.yml)}
     events:
