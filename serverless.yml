@@ -1,0 +1,113 @@
+service: Rankings-Backend
+
+plugins:
+  - serverless-webpack
+  - serverless-prune-plugin
+  - serverless-offline
+  - serverless-dynamodb-autoscaling
+
+custom:
+  defaultStage: Dev
+  defaultProfile: Rankings_Serverless
+  defaultRegion: eu-west-1
+  
+  currentStage: ${opt:stage, 'Dev'}
+  secrets: ${file(./secrets.yml):${self:custom.currentStage}}
+
+  profiles:
+    Dev: Rankings_Serverless
+    Prod: Rankings_Serverless
+  regions:
+    Dev: eu-west-1
+    Prod: eu-central-1
+  prune:
+    automatic: true
+    number: 5
+  webpack:
+    includeModules:
+      forceExclude:
+        - aws-sdk
+        - typescript
+    webpackConfig: ./webpack/webpack.config.${self:custom.currentStage}.js
+    package:
+      individually: true
+
+provider:
+  name: aws
+  runtime: nodejs8.10
+  memorySize: 512
+  timeout: 10
+  logRetentionInDays: 30
+  stage: ${self:custom.currentStage}
+  region: ${self:custom.regions.${self:custom.currentStage}, self:custom.defaultRegion}
+  profile: ${self:custom.profiles.${self:custom.currentStage}, self:custom.defaultProfile}
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:BatchReadItem
+        - dynamodb:BatchWriteItem
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:Scan
+        - dynamodb:Query
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+        - dynamodb:DescribeStream
+        - dynamodb:GetRecords
+        - dynamodb:GetShardIterator
+        - dynamodb:ListStreams
+      Resource: arn:aws:dynamodb:${self:provider.region}:*:table/Rankings_*
+    - Effect: Allow
+      Action:
+        - logs:PutLogEvents
+        - logs:DescribeLogStreams
+        - logs:DescribeLogGroups
+        - logs:CreateLogStream
+        - logs:CreateLogGroup
+        - logs:PutRetentionPolicy
+      Resource: arn:aws:logs:${self:provider.region}:*:log-group:Rankings*
+    - Effect: Allow
+      Action:
+        - cloudwatch:PutMetricData
+      Resource: '*'
+  deploymentBucket:
+    name: isa.serverless.${self:provider.region}.deploys
+
+package:
+  exclude:
+    - secrets.yml
+    - .env
+    
+functions:
+  RankingsAPI:
+    handler: src/RankingsAPI/index.handler
+    description: Rankings WebAPI service
+    environment: ${file(environment.yml)}
+    events:
+      - http:
+          method: any
+          path: /{proxy+}
+          cors: true
+
+resources:
+  Resources:
+    SnsNotificationTopic:
+      Type: AWS::SNS::Topic
+      Properties:
+        DisplayName: ISA Rankings Notifications
+        TopicName: Rankings-Notifications
+    SnsTopicPolicy:
+      Type: AWS::SNS::TopicPolicy
+      Properties:
+        PolicyDocument:
+          Statement:
+          # - Sid: SnsTopicPolicy
+            Effect: Allow
+            Principal:
+              AWS: '*'
+              # Service: lambda.amazonaws.com
+            Action: sns:Publish
+            Resource: 
+              Ref: SnsNotificationTopic
+        Topics:
+          - Ref: SnsNotificationTopic
