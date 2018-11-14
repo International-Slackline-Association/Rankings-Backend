@@ -9,18 +9,14 @@ require('source-map-support').install();
 // const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
 const rootDir = path.join(__dirname, "../");
-const node_externals = {
-    // empty for now
-};
-const externals = process.env.ENVIRONMENT === 'Local' ? [nodeExternals()] : node_externals;
+
 
 const defaults = {
     entry: slsw.lib.entries,
     target: 'node',
     // mode: slsw.lib.webpack.isLocal ? "development" : "production",
     mode: 'none',
-    devtool: 'source-map',
-    externals: externals,
+    externals: nodeExternals({ whitelist: ['winston-cloudwatch'] }),
     plugins: [
         // new BundleAnalyzerPlugin()
         // new UglifyJsPlugin({
