@@ -1,4 +1,4 @@
-service: Rankings-Backend
+service: ISA-Rankings
 
 plugins:
   - serverless-webpack
@@ -8,15 +8,15 @@ plugins:
 
 custom:
   defaultStage: Dev
-  defaultProfile: Rankings_Serverless
+  defaultProfile: ISA-Rankings_Serverless
   defaultRegion: eu-west-1
   
   currentStage: ${opt:stage, 'Dev'}
-  secrets: ${file(./secrets.yml):${self:custom.currentStage}}
+  secrets: ${file(./serverless/secrets.yml):${self:custom.currentStage}}
 
   profiles:
-    Dev: Rankings_Serverless
-    Prod: Rankings_Serverless
+    Dev: ISA-Rankings_Serverless
+    Prod: ISA-Rankings_Serverless
   regions:
     Dev: eu-west-1
     Prod: eu-central-1
@@ -56,7 +56,7 @@ provider:
         - dynamodb:GetRecords
         - dynamodb:GetShardIterator
         - dynamodb:ListStreams
-      Resource: arn:aws:dynamodb:${self:provider.region}:*:table/Rankings_*
+      Resource: arn:aws:dynamodb:${self:provider.region}:*:table/ISA-Rankings_*
     - Effect: Allow
       Action:
         - logs:PutLogEvents
@@ -65,7 +65,7 @@ provider:
         - logs:CreateLogStream
         - logs:CreateLogGroup
         - logs:PutRetentionPolicy
-      Resource: arn:aws:logs:${self:provider.region}:*:log-group:Rankings*
+      Resource: arn:aws:logs:${self:provider.region}:*:log-group:ISA-Rankings*
     - Effect: Allow
       Action:
         - cloudwatch:PutMetricData
@@ -80,9 +80,9 @@ package:
     
 functions:
   RankingsAPI:
-    handler: src/rankings-api/index.handler
+    handler: src/api/index.handler
     description: Rankings WebAPI service
-    environment: ${file(environment.yml)}
+    environment: ${file(./serverless/environment.yml)}
     events:
       - http:
           method: any
@@ -90,11 +90,17 @@ functions:
           cors: true
 resources:
   Resources:
+    CloudWatchApplicationLogs:
+      Type: AWS::Logs::LogGroup
+      DeletionPolicy: Retain
+      Properties:
+        LogGroupName: ISA_Rankings/ApplicationLogs
+        RetentionInDays: 60    
     SnsNotificationTopic:
       Type: AWS::SNS::Topic
       Properties:
         DisplayName: ISA Rankings Notifications
-        TopicName: Rankings-Notifications
+        TopicName: ISA-Rankings-Notifications
     SnsTopicPolicy:
       Type: AWS::SNS::TopicPolicy
       Properties:

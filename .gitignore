@@ -43,3 +43,5 @@ Session.vim
 # Serverless
 .webpack
 .serverless
+serverless/secrets.yml
+ISA-Rankings_Serverless_Policy.json

@@ -1,0 +1,29 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Debug Offline",
+            "cwd": "${workspaceFolder}",
+            "program": "/usr/local/bin/serverless",
+            "args": [ "offline", "--noTimeout", "--dontPrintOutput" ],
+            "sourceMaps": true,
+            "runtimeArgs": [
+              "--lazy"
+            ],
+            "outFiles": [
+              "${workspaceFolder}/.webpack/**/*.js"
+            ],
+            "protocol": "inspector",
+            "runtimeExecutable": "node",
+            "console": "integratedTerminal",
+            "windows": {
+              "program": "${workspaceRoot}\\node_modules\\serverless\\bin\\serverless",
+            }
+        }
+    ]
+}
