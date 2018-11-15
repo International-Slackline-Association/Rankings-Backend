@@ -23,7 +23,7 @@
     "arrow-parens": false,
     "object-literal-sort-keys": false,
     "no-unused-expression": false,
-    "max-classes-per-file": [false],
+    // "max-classes-per-file": [false],
     "variable-name": [false],
     "one-line": [false],
     "one-variable-per-declaration": [false]

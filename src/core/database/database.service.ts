@@ -8,7 +8,7 @@ export class DatabaseService {
     ) {}
 
     public test() {
-        return this.athleteDetailsRepo.get('a');
+        return this.athleteDetailsRepo.test();
         // return 'test';
     }
 }

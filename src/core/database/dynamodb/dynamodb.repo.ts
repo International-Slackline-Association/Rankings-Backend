@@ -1,6 +1,6 @@
 import { DocumentClient } from 'aws-sdk/clients/dynamodb';
 import { DynamoDB } from 'aws-sdk';
-import { IAWSServices } from 'core/aws/aws.services.interface';
+import { IDynamoDBService } from 'core/aws/aws.services.interface';
 
 export abstract class DDBRepository {
     protected client: DocumentClient;
@@ -8,8 +8,8 @@ export abstract class DDBRepository {
 
     protected abstract _tableName;
 
-    constructor(awsServices: IAWSServices) {
-        this.client = awsServices.DynamoDocumentClient;
-        this.db = awsServices.DynamoDB;
+    constructor(dynamodbService: IDynamoDBService) {
+        this.client = dynamodbService.DynamoDocumentClient;
+        this.db = dynamodbService.DynamoDB;
     }
 }

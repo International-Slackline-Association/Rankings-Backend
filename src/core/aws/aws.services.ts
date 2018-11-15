@@ -6,7 +6,7 @@ import {
     DynamoDB as AWSDynamoDB,
     S3 as AWSS3,
 } from 'aws-sdk';
-import { IAWSServices } from './aws.services.interface';
+import { IAWSServices, IDynamoDBService } from './aws.services.interface';
 
 @Injectable()
 export class AWSServices implements IAWSServices {
@@ -21,4 +21,15 @@ export class AWSServices implements IAWSServices {
     public DynamoDocumentClient = new AWSDynamoDB.DocumentClient();
 
     public S3 = new AWSS3();
+}
+
+// tslint:disable-next-line:max-classes-per-file
+@Injectable()
+export class DynamoDBServices implements IDynamoDBService {
+    constructor() {}
+
+    public DynamoDB = new AWSDynamoDB();
+
+    public DynamoDocumentClient = new AWSDynamoDB.DocumentClient();
+
 }

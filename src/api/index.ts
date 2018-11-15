@@ -14,12 +14,18 @@ import { AllExceptionsFilter } from 'shared/filters/exception.filter';
 dotenv.config({ override: true });
 
 async function bootstrap(): Promise<any> {
-    return NestFactory.create(AppModule, express, { bodyParser: true }).then(
-        app => {
+    return NestFactory.create(AppModule, express, { bodyParser: true, logger: false })
+        .then(app => {
+            app.useGlobalFilters(new AllExceptionsFilter());
             return app.init();
-            // app.useGlobalFilters(new AllExceptionsFilter());
-        },
-    );
+        })
+        .then((app) => {
+            isBoostrapped = true;
+            return app;
+        })
+        .catch(err => {
+            console.log('Bootstrap Error: ', err);
+        });
 }
 
 export const handler = serverlessHttp(express, {
@@ -29,9 +35,8 @@ export const handler = serverlessHttp(express, {
         context: Context,
     ) => {
         if (!isBoostrapped) {
-            // console.log('Bootstraping NestJS');
+            console.log('Bootstraping NestJS');
             await bootstrap();
-            isBoostrapped = true;
         }
     },
     response: async (response, event, context) => {

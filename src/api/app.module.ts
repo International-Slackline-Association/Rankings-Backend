@@ -7,19 +7,12 @@ import { MorganMiddleware } from '@nest-middlewares/morgan';
 import { MethodOverrideMiddleware } from '@nest-middlewares/method-override';
 
 import env_variables from 'shared/env_variables';
-import { APP_FILTER } from '@nestjs/core';
-import { AllExceptionsFilter } from 'shared/filters/exception.filter';
+import { DynamoDBServices } from 'core/aws/aws.services';
 
 @Module({
-    imports: [DatabaseModule],
+    imports: [DatabaseModule.withConfig(new DynamoDBServices())],
     controllers: [AppController],
-    providers: [
-        AppService,
-        {
-            provide: APP_FILTER,
-            useClass: AllExceptionsFilter,
-        },
-    ],
+    providers: [AppService],
 })
 export class AppModule {
     configure(consumer: MiddlewareConsumer) {
@@ -27,6 +20,5 @@ export class AppModule {
         consumer.apply(MorganMiddleware).forRoutes('*');
         consumer.apply(MethodOverrideMiddleware).forRoutes('*');
         consumer.apply(HelmetMiddleware).forRoutes('*');
-
     }
 }
