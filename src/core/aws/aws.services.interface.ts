@@ -1,17 +1,17 @@
 import {
-    CloudWatch as AWSCloudWatch,
-    CloudWatchLogs as AWSCloudWatchLogs,
-    DynamoDB as AWSDynamoDB,
-    S3 as AWSS3,
+  CloudWatch as AWSCloudWatch,
+  CloudWatchLogs as AWSCloudWatchLogs,
+  DynamoDB as AWSDynamoDB,
+  S3 as AWSS3,
 } from 'aws-sdk';
 
 export interface IAWSServices extends IDynamoDBService {
-    CloudWatch: AWSCloudWatch;
-    CloudWatchLogs: AWSCloudWatchLogs;
-    S3: AWSS3;
+  CloudWatch: AWSCloudWatch;
+  CloudWatchLogs: AWSCloudWatchLogs;
+  S3: AWSS3;
 }
 
 export interface IDynamoDBService {
-    DynamoDB: AWSDynamoDB;
-    DynamoDocumentClient: AWSDynamoDB.DocumentClient;
+  DynamoDB: AWSDynamoDB;
+  DynamoDocumentClient: AWSDynamoDB.DocumentClient;
 }
