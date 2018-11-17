@@ -10,15 +10,15 @@ import env_variables from 'shared/env_variables';
 import { DynamoDBServices } from 'core/aws/aws.services';
 
 @Module({
-    imports: [DatabaseModule.withConfig(new DynamoDBServices())],
-    controllers: [AppController],
-    providers: [AppService],
+  imports: [DatabaseModule.withConfig(new DynamoDBServices())],
+  controllers: [AppController],
+  providers: [AppService],
 })
 export class AppModule {
-    configure(consumer: MiddlewareConsumer) {
-        MorganMiddleware.configure(env_variables.morganConfig);
-        consumer.apply(MorganMiddleware).forRoutes('*');
-        consumer.apply(MethodOverrideMiddleware).forRoutes('*');
-        consumer.apply(HelmetMiddleware).forRoutes('*');
-    }
+  configure(consumer: MiddlewareConsumer) {
+    MorganMiddleware.configure(env_variables.morganConfig);
+    consumer.apply(MorganMiddleware).forRoutes('*');
+    consumer.apply(MethodOverrideMiddleware).forRoutes('*');
+    consumer.apply(HelmetMiddleware).forRoutes('*');
+  }
 }

@@ -14,32 +14,35 @@ import { AllExceptionsFilter } from 'shared/filters/exception.filter';
 dotenv.config({ override: true });
 
 async function bootstrap(): Promise<any> {
-    return NestFactory.create(AppModule, express, { bodyParser: true, logger: false })
-        .then(app => {
-            app.useGlobalFilters(new AllExceptionsFilter());
-            return app.init();
-        })
-        .then((app) => {
-            isBoostrapped = true;
-            return app;
-        })
-        .catch(err => {
-            console.log('Bootstrap Error: ', err);
-        });
+  return NestFactory.create(AppModule, express, {
+    bodyParser: true,
+    logger: false,
+  })
+    .then(app => {
+      app.useGlobalFilters(new AllExceptionsFilter());
+      return app.init();
+    })
+    .then(app => {
+      isBoostrapped = true;
+      return app;
+    })
+    .catch(err => {
+      console.log('Bootstrap Error: ', err);
+    });
 }
 
 export const handler = serverlessHttp(express, {
-    request: async (
-        request: Request,
-        event: APIGatewayEvent,
-        context: Context,
-    ) => {
-        if (!isBoostrapped) {
-            console.log('Bootstraping NestJS');
-            await bootstrap();
-        }
-    },
-    response: async (response, event, context) => {
-        await waitForLogger();
-    },
+  request: async (
+    request: Request,
+    event: APIGatewayEvent,
+    context: Context,
+  ) => {
+    if (!isBoostrapped) {
+      console.log('Bootstraping NestJS');
+      await bootstrap();
+    }
+  },
+  response: async (response, event, context) => {
+    await waitForLogger();
+  },
 });
