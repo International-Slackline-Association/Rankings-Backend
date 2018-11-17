@@ -10,7 +10,6 @@ require('source-map-support').install();
 
 const rootDir = path.join(__dirname, "../");
 
-
 const defaults = {
     entry: slsw.lib.entries,
     target: 'node',
