@@ -6,11 +6,17 @@
   },
   "rules": {
     // "ter-indent": [true, 4, { "SwitchCase": true }],
+    "trailing-comma": [
+      true,
+      {
+        "esSpecCompliant": true
+      }
+    ],
     "object-literal-shorthand": false,
     "no-console": [false, "log", "error"],
     "eofline": false,
     "quotemark": [true, "single"],
-    "indent": false,
+    // "indent": false,
     "member-access": [false],
     "ordered-imports": [false],
     // "max-line-length": [true, 150],

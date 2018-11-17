@@ -1,20 +1,22 @@
 {
   "compilerOptions": {
+    "moduleResolution": "node",
     "module": "commonjs",
     "declaration": false,
     "noImplicitAny": false,
     "removeComments": true,
-    "noLib": false,
-    "noEmit": false,
+    // "noLib": false,
+    // "noEmit": false,
     "allowSyntheticDefaultImports": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "target": "es6",
     "types": [
+      "node",
       "jest"
     ],
     "sourceMap": true,
-    "allowJs": true,
+    // "allowJs": true,
     // "outDir": "./dist",
     "baseUrl": "./src"
   },
@@ -24,6 +26,7 @@
   "exclude": [
     "node_modules",
     "webpack",
-    "**/*.spec.ts"
+
+    // "**/*.spec.ts"
   ]
 }
