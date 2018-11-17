@@ -1,4 +1,5 @@
 service: ISA-Rankings
+description: ISA-Rankings Application Serverless template
 
 plugins:
   - serverless-webpack
@@ -11,6 +12,12 @@ custom:
   defaultProfile: ISA-Rankings_Serverless
   defaultRegion: eu-west-1
   
+  isProdCase:
+    Dev: false
+    Prod: true
+    other: false
+  
+  isProd: ${self:custom.isProdCase.${self:custom.currentStage}, self:custom.isProdCase.other}
   currentStage: ${opt:stage, 'Dev'}
   secrets: ${file(./serverless/secrets.yml):${self:custom.currentStage}}
 
@@ -90,6 +97,53 @@ functions:
           cors: true
 resources:
   Resources:
+    ISARankingsTable:
+      Type: AWS::DynamoDB::Table
+      DeletionPolicy: Retain
+      Properties:
+        TableName: 'ISA-Rankings'
+        AttributeDefinitions:
+          - AttributeName: PK
+            AttributeType: S
+          - AttributeName: SK_GSI
+            AttributeType: S
+          - AttributeName: LSI
+            AttributeType: S
+          - AttributeName: GSI_SK
+            AttributeType: S
+        KeySchema:
+          - AttributeName: PK
+            KeyType: HASH
+          - AttributeName: SK_GSI
+            KeyType: RANGE
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        LocalSecondaryIndexes: 
+          - IndexName: 'PK-LSI-index'
+            KeySchema: 
+              - AttributeName: PK
+                KeyType: HASH
+              - AttributeName: LSI
+                KeyType: RANGE
+            Projection: 
+              ProjectionType: ALL
+        GlobalSecondaryIndexes: 
+          - IndexName: 'GSI-GSI_SK-index'
+            KeySchema: 
+              - AttributeName: SK_GSI
+                KeyType: HASH
+              - AttributeName: GSI_SK
+                KeyType: RANGE
+            Projection: 
+              ProjectionType: ALL
+            ProvisionedThroughput:
+              ReadCapacityUnits: 1
+              WriteCapacityUnits: 1
+        StreamSpecification:
+          StreamViewType: NEW_AND_OLD_IMAGES
+        # PointInTimeRecoverySpecification:
+          # PointInTimeRecoveryEnabled: ${self:custom.isProd} No need for now
     CloudWatchApplicationLogs:
       Type: AWS::Logs::LogGroup
       DeletionPolicy: Retain
