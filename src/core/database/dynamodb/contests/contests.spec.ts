@@ -3,7 +3,7 @@ import { DynamoDBServices } from 'core/aws/aws.services';
 import { DDBContestsRepository } from './contests.repo';
 import { DDBContestsRepoModule } from './contests.module';
 import { DDBContestItem } from './contests.interface';
-import { Discipline, ContestSize } from 'shared/enums';
+import { Discipline, ContestCategory } from 'shared/enums';
 
 describe('Contests', () => {
     let repo: DDBContestsRepository;

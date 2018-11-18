@@ -1,5 +1,5 @@
 import { DDBTableKeyAttrs, NumberSet } from '../../interfaces/table.interface';
-import { Discipline, ContestSize } from 'shared/enums';
+import { Discipline, ContestCategory } from 'shared/enums';
 
 type KeyAttrs = DDBTableKeyAttrs;
 

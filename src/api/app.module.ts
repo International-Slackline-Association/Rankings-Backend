@@ -8,9 +8,10 @@ import { MethodOverrideMiddleware } from '@nest-middlewares/method-override';
 
 import env_variables from 'shared/env_variables';
 import { DynamoDBServices } from 'core/aws/aws.services';
+import { SubmitApiModule } from './submit/submit.module';
 
 @Module({
-  imports: [DatabaseModule.withConfig(new DynamoDBServices())],
+  imports: [DatabaseModule.withConfig(new DynamoDBServices()), SubmitApiModule],
   controllers: [AppController],
   providers: [AppService],
 })

@@ -2,21 +2,70 @@ import {
   Catch,
   ExceptionFilter,
   ArgumentsHost,
+  HttpStatus,
   HttpException,
 } from '@nestjs/common';
+import { APIError, APIErrorAlias } from 'shared/exceptions/api.error';
+import env_variables from 'shared/env_variables';
+import { logger } from 'shared/logger';
 
 @Catch()
 export class AllExceptionsFilter implements ExceptionFilter {
   catch(exception: any, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse();
-    const request = ctx.getRequest();
-    const status = exception.getStatus();
 
-    response.status(status).json({
-      statusCode: status,
-      timestamp: new Date().toISOString(),
-      path: request.url,
+    let apiError = exception;
+
+    if (exception instanceof APIError) {
+      logger.debug('Expected API Exception', { ...exception });
+    } else if (exception instanceof HttpException) {
+      logger.warn('Unexpected HttpException', { ...exception });
+      apiError = this.transformHttpExceptionToAPIError(exception);
+    } else {
+      logger.error(exception);
+      apiError = this.transformToAPIError(exception);
+    }
+
+    const status = apiError.getStatus();
+    const rsp = {
+      alias: apiError.alias,
+      code: apiError.status,
+      message: apiError.message,
+      stack: apiError.stack,
+      data: apiError.data,
+    };
+    response.status(status).json(rsp);
+  }
+
+  private transformHttpExceptionToAPIError(exception: HttpException): APIError {
+    let errMessage = env_variables.isProd ? 'Unknow error' : exception.message;
+
+    if (errMessage.message) {
+      errMessage = errMessage.message;
+    }
+
+    const convertedError = new APIError({
+      alias: APIErrorAlias.Unknown,
+      message: errMessage,
+      stack: exception.stack,
+      status: exception.getStatus() || HttpStatus.INTERNAL_SERVER_ERROR,
+      // data: exception.data,
     });
+    return convertedError;
+  }
+
+  private transformToAPIError(exception: any): APIError {
+    const errMessage = env_variables.isProd
+      ? 'Unknow error'
+      : exception.message;
+    const convertedError = new APIError({
+      alias: APIErrorAlias.Unknown,
+      message: errMessage,
+      stack: exception.stack,
+      status: exception.status || HttpStatus.INTERNAL_SERVER_ERROR,
+      data: exception.data,
+    });
+    return convertedError;
   }
 }

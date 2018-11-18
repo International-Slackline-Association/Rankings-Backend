@@ -21,6 +21,10 @@ class EnvironmentVariables {
   get morganConfig(): string {
     return process.env.NODE_ENV === 'production' ? 'tiny' : 'combined';
   }
+
+  get adminRoleSecret(): string {
+    return process.env.ADMIN_ROLE_SECRET;
+  }
 }
 
 export default new EnvironmentVariables();

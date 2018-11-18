@@ -22,11 +22,15 @@ export enum AgeCategory {
   Youth = 0,
 }
 
-export enum ContestSize {
+export enum ContestCategory {
   WorldGames = 0,
   WorldCup = 1,
   Master = 2,
   NationalChampionship = 3,
   Open = 4,
   Challenge = 5,
+}
+
+export enum AuthenticationRole {
+  admin = 'admin',
 }
