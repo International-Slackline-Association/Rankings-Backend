@@ -6,6 +6,8 @@ import { DDBAthleteContestsRepoModule } from './dynamodb/athlete/contests/athlet
 import { DDBAthleteRankingsRepoModule } from './dynamodb/athlete/rankings/athlete.rankings.module';
 import { DDBContestsRepoModule } from './dynamodb/contests/contests.module';
 import { DDBDisciplineContestRepoModule } from './dynamodb/contests/discipline/discipline.contest.module';
+import { DDBAthleteDetailsAttrsTransformers } from './dynamodb/athlete/details/transformers/attributes.transformer';
+import { ModuleMetadata } from '@nestjs/common/interfaces';
 
 @Module({
   imports: [],
@@ -23,6 +25,19 @@ export class DatabaseModule {
         DDBContestsRepoModule.withConfig(dynamodbService),
         DDBDisciplineContestRepoModule.withConfig(dynamodbService),
       ],
+    };
+  }
+  static forTest(dynamodbService: IDynamoDBService): ModuleMetadata {
+    return {
+      imports: [
+        DDBAthleteDetailsRepoModule.withConfig(dynamodbService),
+        DDBAthleteContestsRepoModule.withConfig(dynamodbService),
+        DDBAthleteRankingsRepoModule.withConfig(dynamodbService),
+        DDBContestsRepoModule.withConfig(dynamodbService),
+        DDBDisciplineContestRepoModule.withConfig(dynamodbService),
+      ],
+      providers: [DatabaseService],
+      exports: [],
     };
   }
 }

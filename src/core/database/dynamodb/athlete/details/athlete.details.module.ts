@@ -1,6 +1,6 @@
 import { Module, DynamicModule } from '@nestjs/common';
 import { DDBAthleteDetailsRepository } from './athlete.details.repo';
-import { DDBAthleteDetailsAttrsTransformers } from './athlete.details.transformers';
+import { DDBAthleteDetailsAttrsTransformers } from './transformers/attributes.transformer';
 import { IDynamoDBService } from 'core/aws/aws.services.interface';
 import { repositoryFactory } from '../../utils/utils';
 import { ModuleMetadata } from '@nestjs/common/interfaces';

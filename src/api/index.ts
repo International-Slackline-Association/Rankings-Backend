@@ -4,7 +4,7 @@ dotenv.config({ override: true });
 
 import serverlessHttp = require('serverless-http');
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
+import { AppModule } from './api.module';
 import { APIGatewayEvent, Callback, Context, Handler } from 'aws-lambda';
 import { waitForLogger } from 'shared/logger';
 import { AllExceptionsFilter } from 'shared/filters/exception.filter';
@@ -17,7 +17,6 @@ let isBoostrapped: boolean = false;
 async function bootstrap(): Promise<any> {
   return NestFactory.create(AppModule, express, {
     bodyParser: true,
-    logger: false,
   })
     .then(app => {
       app.useGlobalFilters(new AllExceptionsFilter());
@@ -27,9 +26,6 @@ async function bootstrap(): Promise<any> {
     .then(app => {
       isBoostrapped = true;
       return app;
-    })
-    .catch(err => {
-      console.log('Bootstrap Error: ', err);
     });
 }
 

@@ -3,7 +3,7 @@ import { DDBRepository, LocalSecondaryIndexName } from '../dynamodb.repo';
 import { DocumentClient } from 'aws-sdk/clients/dynamodb';
 import { IDynamoDBService } from 'core/aws/aws.services.interface';
 import { logDynamoDBError, logThrowDynamoDBError } from '../utils/utils';
-import { DDBContestsAttrsTransformers } from './contests.transformers';
+import { DDBContestsAttrsTransformers } from './transformers/attributes.transformers';
 import {
   AllAttrs,
   DDBContestItem,

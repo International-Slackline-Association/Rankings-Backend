@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { DDBOverloadedTableTransformers } from '../../dynamodb.table.transformers';
-import { AllAttrs, DDBAthleteDetailItem } from './athlete.details.interface';
-import { destructCompositeKey, buildCompositeKey } from '../../utils/utils';
+import { DDBOverloadedTableTransformers } from '../../../dynamodb.table.transformers';
+import { AllAttrs, DDBAthleteDetailItem } from '../athlete.details.interface';
+import { destructCompositeKey, buildCompositeKey } from '../../../utils/utils';
 
 /**
  * Transformers define how the application level DTO objects transforms to DynamoDB attributes in a table

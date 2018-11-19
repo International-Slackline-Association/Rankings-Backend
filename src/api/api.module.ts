@@ -1,19 +1,16 @@
 import { Module, MiddlewareConsumer } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { DatabaseModule } from 'core/database/database.module';
 import { HelmetMiddleware } from '@nest-middlewares/helmet';
 import { MorganMiddleware } from '@nest-middlewares/morgan';
 import { MethodOverrideMiddleware } from '@nest-middlewares/method-override';
 
 import env_variables from 'shared/env_variables';
-import { DynamoDBServices } from 'core/aws/aws.services';
-import { SubmitApiModule } from './submit/submit.module';
+import { SubmitContestModule } from './submit/contest/submit-contest.module';
 
 @Module({
-  imports: [DatabaseModule.withConfig(new DynamoDBServices()), SubmitApiModule],
-  controllers: [AppController],
-  providers: [AppService],
+  imports: [SubmitContestModule],
+  controllers: [],
+  providers: [],
+  exports: [],
 })
 export class AppModule {
   configure(consumer: MiddlewareConsumer) {

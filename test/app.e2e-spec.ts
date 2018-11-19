@@ -1,6 +1,6 @@
 import request from 'supertest';
 import { Test } from '@nestjs/testing';
-import { AppModule } from '../src/api/app.module';
+import { AppModule } from '../src/api/api.module';
 import { INestApplication } from '@nestjs/common';
 
 describe('AppController (e2e)', () => {

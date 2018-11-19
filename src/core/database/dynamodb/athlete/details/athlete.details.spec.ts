@@ -28,8 +28,8 @@ describe('AthleteDetails', () => {
 
   describe('put athlete', () => {
     it('should put item', async () => {
-      const x = await repo.put(athlete);
-      console.log(x);
+      // const x = await repo.put(athlete);
+      // console.log(x);
     });
   });
 });

@@ -31,6 +31,11 @@ export enum ContestCategory {
   Challenge = 5,
 }
 
+export enum PrizeUnit{
+  Euro = '€',
+  USD = '$'
+}
+
 export enum AuthenticationRole {
   admin = 'admin',
 }

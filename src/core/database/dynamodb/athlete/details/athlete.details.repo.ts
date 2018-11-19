@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { DDBRepository } from '../../dynamodb.repo';
-import { DDBAthleteDetailsAttrsTransformers } from './athlete.details.transformers';
+import { DDBAthleteDetailsAttrsTransformers } from './transformers/attributes.transformer';
 import { DDBAthleteDetailItem, AllAttrs } from './athlete.details.interface';
 import { DocumentClient } from 'aws-sdk/clients/dynamodb';
 import { IDynamoDBService } from 'core/aws/aws.services.interface';
