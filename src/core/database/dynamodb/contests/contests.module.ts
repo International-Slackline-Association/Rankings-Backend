@@ -4,20 +4,21 @@ import { repositoryFactory } from '../utils/utils';
 import { ModuleMetadata } from '@nestjs/common/interfaces';
 import { DDBContestsRepository } from './contests.repo';
 import { DDBContestsAttrsTransformers } from './transformers/attributes.transformers';
-import { ContestInfoItemTransformer } from './transformers/contest.entity.transformer';
+import { ContestInfoItemTransformer } from './transformers/entity.transformer';
 
 @Module({
   imports: [],
   providers: [DDBContestsAttrsTransformers, ContestInfoItemTransformer],
-  exports: [DDBContestsAttrsTransformers, ContestInfoItemTransformer],
+  exports: [],
 })
 export class DDBContestsRepoModule {
   static withConfig(dynamodbService: IDynamoDBService): DynamicModule {
     const repo = repositoryFactory(
       DDBContestsRepository,
-      DDBContestsAttrsTransformers,
+      [DDBContestsAttrsTransformers, ContestInfoItemTransformer],
       dynamodbService,
     );
+
     return {
       module: DDBContestsRepoModule,
       providers: [repo],
@@ -27,7 +28,7 @@ export class DDBContestsRepoModule {
   static forTest(dynamodbService: IDynamoDBService): ModuleMetadata {
     const repo = repositoryFactory(
       DDBContestsRepository,
-      DDBContestsAttrsTransformers,
+      [DDBContestsAttrsTransformers, ContestInfoItemTransformer],
       dynamodbService,
     );
     return {

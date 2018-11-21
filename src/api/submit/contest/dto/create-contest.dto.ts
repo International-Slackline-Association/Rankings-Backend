@@ -8,11 +8,11 @@ const wrappedDiscipline = $enum(Discipline);
 const wrappedPrizeUnit = $enum(PrizeUnit);
 
 export class CreateContestDto {
-  public name: string;
-  public date: number;
-  public city: string;
-  public country: string;
-  public disciplines: {
+  name: string;
+  date: number;
+  city: string;
+  country: string;
+  disciplines: {
     discipline: Discipline;
     category: ContestCategory;
     prize: {
@@ -20,7 +20,7 @@ export class CreateContestDto {
       unit: PrizeUnit;
     };
   }[];
-  public profilePictureUrl: string;
+  profilePictureUrl: string;
 }
 
 export const createContestDtoSchema = Joi.object().keys({

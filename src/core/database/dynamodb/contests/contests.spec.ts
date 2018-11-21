@@ -17,6 +17,7 @@ describe('Contests', () => {
     disciplines: [Discipline.Blind, Discipline.Contact],
     categories: [ContestCategory.Challenge],
     name: 'contest2',
+    normalizedName: 'contest2',
     totalprize: 200,
     prizeUnit: PrizeUnit.Euro,
     profilePictureUrl: '',

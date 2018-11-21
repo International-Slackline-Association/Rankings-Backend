@@ -25,4 +25,5 @@ export interface DDBContestItem extends Attrs {
   readonly categories: ContestCategory[];
   readonly year: number;
   readonly date: number;
+  readonly normalizedName: string;
 }

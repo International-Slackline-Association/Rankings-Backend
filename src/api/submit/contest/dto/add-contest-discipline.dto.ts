@@ -7,10 +7,10 @@ const wrappedContestCategory = $enum(ContestCategory);
 const wrappedDiscipline = $enum(Discipline);
 
 export class AddContestDisciplineDto {
-  public id: string;
-  public prize: string;
-  public category: ContestCategory;
-  public discipline: Discipline;
+  id: string;
+  prize: string;
+  category: ContestCategory;
+  discipline: Discipline;
 }
 
 export const addContestDisciplineDtoSchema = Joi.object().keys({

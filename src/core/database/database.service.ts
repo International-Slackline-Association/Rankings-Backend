@@ -4,8 +4,12 @@ import { DDBAthleteContestsRepository } from './dynamodb/athlete/contests/athlet
 import { DDBAthleteRankingsRepository } from './dynamodb/athlete/rankings/athlete.rankings.repo';
 import { DDBContestsRepository } from './dynamodb/contests/contests.repo';
 import { DDBDisciplineContestRepository } from './dynamodb/contests/discipline/discipline.contest.repo';
-import { ContestInfoItemTransformer } from './dynamodb/contests/transformers/contest.entity.transformer';
-import { IContestInfo, ContestInfo } from 'core/contest/entity/contestInfo';
+import { ContestInfoItemTransformer } from './dynamodb/contests/transformers/entity.transformer';
+import { ContestInfo } from 'core/contest/entity/contestInfo';
+import { ContestDiscipline } from 'core/contest/entity/contest-discipline';
+// tslint:disable-next-line:max-line-length
+import { DisciplineContestItemTransformer } from './dynamodb/contests/discipline/transformers/entity.transformer';
+import { AthleteDetail } from 'core/athlete/entity/athlete-detail';
 
 @Injectable()
 export class DatabaseService {
@@ -15,15 +19,31 @@ export class DatabaseService {
     private readonly athleteRankingsRepo: DDBAthleteRankingsRepository,
     private readonly contestsRepo: DDBContestsRepository,
     private readonly disciplineContestRepo: DDBDisciplineContestRepository,
-    private readonly transformer: ContestInfoItemTransformer,
   ) {}
 
   public async putContestInfo(contestInfo: ContestInfo) {
-    const dbItem = this.transformer.toDBItem(contestInfo);
+    const dbItem = this.contestsRepo.entityTransformer.toDBItem(contestInfo);
     await this.contestsRepo.put(dbItem);
   }
   public async getContestInfo(contestId: string, year: number) {
     const dbItem = await this.contestsRepo.get(contestId, year);
-    return this.transformer.fromDBItem(dbItem);
+    return this.contestsRepo.entityTransformer.fromDBItem(dbItem);
+  }
+
+  public async putContestDiscipline(contestDiscipline: ContestDiscipline) {
+    const dbItem = this.disciplineContestRepo.entityTransformer.toDBItem(
+      contestDiscipline,
+    );
+    await this.disciplineContestRepo.put(dbItem);
+  }
+
+  public async getAthleteDetails(athleteId: string) {
+    const dbItem = await this.athleteDetailsRepo.get(athleteId);
+    return this.athleteDetailsRepo.entityTransformer.fromDBItem(dbItem);
+  }
+
+  public async putAthlete(athlete: AthleteDetail) {
+    const dbItem = this.athleteDetailsRepo.entityTransformer.toDBItem(athlete);
+    return this.athleteDetailsRepo.put(dbItem);
   }
 }

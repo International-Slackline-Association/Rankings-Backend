@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { DDBRepository, LocalSecondaryIndexName } from '../../dynamodb.repo';
 import { IDynamoDBService } from 'core/aws/aws.services.interface';
 import { logThrowDynamoDBError } from '../../utils/utils';
-import { DDBAthleteContestsAttrsTransformers } from './athlete.contests.transformers';
+import { DDBAthleteContestsAttrsTransformers } from './transformers/attributes.transformers';
 import { AllAttrs, DDBAthleteContestItem } from './athlete.contests.interface';
 import { LastEvaluatedKey } from '../../interfaces/table.interface';
 import { Discipline } from 'shared/enums';

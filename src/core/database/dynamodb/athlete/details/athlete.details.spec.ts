@@ -17,7 +17,9 @@ describe('AthleteDetails', () => {
     createdAt: 1234,
     gender: Gender.Men,
     name: 'name1',
+    normalizedName: 'name1',
     surname: 'surname2',
+    profilePictureUrl: '',
   };
   beforeAll(async () => {
     const module = await Test.createTestingModule(

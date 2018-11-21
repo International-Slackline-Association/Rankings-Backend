@@ -1,10 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { DatabaseService } from 'core/database/database.service';
-import { CreateContestDto } from './dto/create-contest';
+import { CreateContestDto } from './dto/create-contest.dto';
 import { IdGenerator } from 'shared/generators/id.generator';
 import { unixToDate } from 'shared/utils';
 import { ContestInfo } from 'core/contest/entity/contestInfo';
 import { Contest } from 'core/contest/entity/contest';
+import { ContestDiscipline } from 'core/contest/entity/contest-discipline';
 
 @Injectable()
 export class SubmitContestService {
@@ -23,5 +24,17 @@ export class SubmitContestService {
       prizeUnit: contest.prizeUnit,
     };
     await this.db.putContestInfo(contestInfo);
+
+    for (const disciplineGroup of contest.disciplines) {
+      const contestDiscipline: ContestDiscipline = {
+        ...contest,
+        category: disciplineGroup.category,
+        discipline: disciplineGroup.discipline,
+        prize: disciplineGroup.prize.value,
+        prizeUnit: disciplineGroup.prize.unit,
+      };
+      await this.db.putContestDiscipline(contestDiscipline);
+    }
+    return id;
   }
 }

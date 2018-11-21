@@ -5,9 +5,10 @@ import { MethodOverrideMiddleware } from '@nest-middlewares/method-override';
 
 import env_variables from 'shared/env_variables';
 import { SubmitContestModule } from './submit/contest/submit-contest.module';
+import { SubmitAthleteModule } from './submit/athlete/submit-athlete.module';
 
 @Module({
-  imports: [SubmitContestModule],
+  imports: [SubmitContestModule, SubmitAthleteModule],
   controllers: [],
   providers: [],
   exports: [],

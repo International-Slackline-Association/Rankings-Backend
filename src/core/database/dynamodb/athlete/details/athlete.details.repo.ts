@@ -5,6 +5,7 @@ import { DDBAthleteDetailItem, AllAttrs } from './athlete.details.interface';
 import { DocumentClient } from 'aws-sdk/clients/dynamodb';
 import { IDynamoDBService } from 'core/aws/aws.services.interface';
 import { logDynamoDBError, logThrowDynamoDBError } from '../../utils/utils';
+import { AthleteDetailItemTransformer } from './transformers/entity.transformer';
 
 @Injectable()
 export class DDBAthleteDetailsRepository extends DDBRepository {
@@ -12,6 +13,7 @@ export class DDBAthleteDetailsRepository extends DDBRepository {
   constructor(
     dynamodbService: IDynamoDBService,
     private readonly transformers: DDBAthleteDetailsAttrsTransformers,
+    public readonly entityTransformer: AthleteDetailItemTransformer,
   ) {
     super(dynamodbService);
   }
@@ -24,7 +26,10 @@ export class DDBAthleteDetailsRepository extends DDBRepository {
       .get(params)
       .promise()
       .then(data => {
-        return this.transformers.transformAttrsToItem(data.Item as AllAttrs);
+        if (data.Item) {
+          return this.transformers.transformAttrsToItem(data.Item as AllAttrs);
+        }
+        return null;
       })
       .catch<null>(err => {
         logDynamoDBError('DDBAthleteDetailsRepository get', err, params);
@@ -49,7 +54,9 @@ export class DDBAthleteDetailsRepository extends DDBRepository {
           return this.transformers.transformAttrsToItem(item);
         });
       })
-      .catch(logThrowDynamoDBError('DDBAthleteDetailsRepository batchGet', params));
+      .catch(
+        logThrowDynamoDBError('DDBAthleteDetailsRepository batchGet', params),
+      );
   }
   public async put(athlete: DDBAthleteDetailItem) {
     const params = {

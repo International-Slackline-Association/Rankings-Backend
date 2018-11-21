@@ -24,6 +24,7 @@
         "dotenv-override": "^5.0.1",
         "fastify-formbody": "^2.0.0",
         "joi": "^14.0.6",
+        "latinize": "^0.4.0",
         "lodash": "^4.17.10",
         "moment": "^2.22.2",
         "reflect-metadata": "^0.1.12",

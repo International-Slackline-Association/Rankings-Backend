@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import { DDBOverloadedTableTransformers } from '../../dynamodb.table.transformers';
+import { DDBOverloadedTableTransformers } from '../../../dynamodb.table.transformers';
 import {
   AllAttrs,
   DDBDisciplineContestItem,
-} from './discipline.contest.interface';
+} from '../discipline.contest.interface';
 import { DocumentClient } from 'aws-sdk/clients/dynamodb';
-import { buildCompositeKey, destructCompositeKey } from '../../utils/utils';
+import { buildCompositeKey, destructCompositeKey } from '../../../utils/utils';
 import { Discipline } from 'shared/enums';
 
 /**
@@ -33,15 +33,15 @@ export class DDBDisciplineContestAttrsTransformers extends DDBOverloadedTableTra
     SK_GSI: (year: number, discipline: Discipline, contestId: string) =>
       buildCompositeKey(
         'Contest',
-        discipline && discipline.toString(),
         year && year.toString(),
+        discipline !== undefined && discipline.toString(),
         contestId,
       ),
     LSI: (year: number, discipline: Discipline, date: number) =>
       buildCompositeKey(
         'Contest',
-        discipline && discipline.toString(),
         year && year.toString(),
+        discipline !== undefined && discipline.toString(),
         date && date.toString(),
       ),
     GSI_SK: () => undefined,

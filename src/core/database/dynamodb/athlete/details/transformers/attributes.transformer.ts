@@ -17,7 +17,6 @@ export class DDBAthleteDetailsAttrsTransformers extends DDBOverloadedTableTransf
 
   protected attrsToItemTransformer = {
     athleteId: (pk: string) => destructCompositeKey(pk, 1),
-    name: (gsi_sk: string) => gsi_sk,
   };
 
   protected itemToAttrsTransformer = {
@@ -31,18 +30,18 @@ export class DDBAthleteDetailsAttrsTransformers extends DDBOverloadedTableTransf
     const { PK, SK_GSI, LSI, GSI_SK, ...rest } = dynamodbItem;
     return {
       athleteId: this.attrsToItemTransformer.athleteId(PK),
-      name: this.attrsToItemTransformer.name(GSI_SK),
+      normalizedName: GSI_SK,
       ...rest,
     };
   }
 
   public transformItemToAttrs(item: DDBAthleteDetailItem): AllAttrs {
-    const { athleteId, name, ...rest } = item;
+    const { athleteId, normalizedName, ...rest } = item;
     return {
       PK: this.itemToAttrsTransformer.PK(item.athleteId),
       SK_GSI: this.itemToAttrsTransformer.SK_GSI(),
       LSI: this.itemToAttrsTransformer.LSI(),
-      GSI_SK: this.itemToAttrsTransformer.GSI_SK(name),
+      GSI_SK: this.itemToAttrsTransformer.GSI_SK(normalizedName),
       ...rest,
     };
   }

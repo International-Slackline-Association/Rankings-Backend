@@ -3,7 +3,7 @@ import { IDynamoDBService } from 'core/aws/aws.services.interface';
 import { repositoryFactory } from '../../utils/utils';
 import { ModuleMetadata } from '@nestjs/common/interfaces';
 import { DDBAthleteContestsRepository } from './athlete.contests.repo';
-import { DDBAthleteContestsAttrsTransformers } from './athlete.contests.transformers';
+import { DDBAthleteContestsAttrsTransformers } from './transformers/attributes.transformers';
 
 @Module({
   imports: [],

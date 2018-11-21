@@ -32,7 +32,7 @@ export class DDBContestsAttrsTransformers extends DDBOverloadedTableTransformers
         year && year.toString(),
         date && date.toString(),
       ),
-    GSI_SK: () => undefined,
+    GSI_SK: (name: string) => name,
   };
 
   public transformAttrsToItem(dynamodbItem: AllAttrs): DDBContestItem {
@@ -51,6 +51,7 @@ export class DDBContestsAttrsTransformers extends DDBOverloadedTableTransformers
       categories: disciplines.values as number[],
       year: this.attrsToItemTransformer.year(SK_GSI),
       date: this.attrsToItemTransformer.date(LSI),
+      normalizedName: GSI_SK,
       ...rest,
     };
   }
@@ -59,12 +60,20 @@ export class DDBContestsAttrsTransformers extends DDBOverloadedTableTransformers
     item: DDBContestItem,
     client: DocumentClient,
   ): AllAttrs {
-    const { contestId, disciplines, categories, year, date, ...rest } = item;
+    const {
+      contestId,
+      disciplines,
+      categories,
+      year,
+      date,
+      normalizedName,
+      ...rest
+    } = item;
     return {
       PK: this.itemToAttrsTransformer.PK(),
       SK_GSI: this.itemToAttrsTransformer.SK_GSI(year, contestId),
       LSI: this.itemToAttrsTransformer.LSI(year, date),
-      GSI_SK: this.itemToAttrsTransformer.GSI_SK(),
+      GSI_SK: this.itemToAttrsTransformer.GSI_SK(normalizedName),
       disciplines: client.createSet(disciplines),
       categories: client.createSet(categories),
       ...rest,

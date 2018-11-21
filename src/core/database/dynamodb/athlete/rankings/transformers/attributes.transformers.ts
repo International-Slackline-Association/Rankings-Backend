@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { DDBOverloadedTableTransformers } from '../../dynamodb.table.transformers';
-import { AllAttrs, DDBAthleteRankingsItem } from './athlete.rankings.interface';
-import { buildCompositeKey, destructCompositeKey } from '../../utils/utils';
+import { DDBOverloadedTableTransformers } from '../../../dynamodb.table.transformers';
+import { AllAttrs, DDBAthleteRankingsItem } from '../athlete.rankings.interface';
+import { buildCompositeKey, destructCompositeKey } from '../../../utils/utils';
 import { Discipline } from 'shared/enums';
 
 /**
@@ -29,8 +29,8 @@ export class DDBAthleteRankingsAttrsTransformers extends DDBOverloadedTableTrans
     SK_GSI: (year: number, discipline: Discipline) =>
       buildCompositeKey(
         'Rankings',
-        discipline && discipline.toString(),
         year && year.toString(),
+        discipline !== undefined && discipline.toString(),
       ),
     LSI: () => undefined,
     GSI_SK: (points: number) => points.toString(),
@@ -58,11 +58,7 @@ export class DDBAthleteRankingsAttrsTransformers extends DDBOverloadedTableTrans
     };
   }
 
-  public primaryKey(
-    athleteId: string,
-    year: number,
-    discipline: Discipline,
-  ) {
+  public primaryKey(athleteId: string, year: number, discipline: Discipline) {
     return {
       [this.attrName('PK')]: this.itemToAttrsTransformer.PK(athleteId),
       [this.attrName('SK_GSI')]: this.itemToAttrsTransformer.SK_GSI(

@@ -8,8 +8,9 @@ import {
   DDBDisciplineContestItem,
 } from './discipline.contest.interface';
 import { LastEvaluatedKey } from '../../interfaces/table.interface';
-import { DDBDisciplineContestAttrsTransformers } from './discipline.contest.transformers';
+import { DDBDisciplineContestAttrsTransformers } from './transformers/attributes.transformers';
 import { Discipline } from 'shared/enums';
+import { DisciplineContestItemTransformer } from './transformers/entity.transformer';
 
 @Injectable()
 export class DDBDisciplineContestRepository extends DDBRepository {
@@ -17,6 +18,7 @@ export class DDBDisciplineContestRepository extends DDBRepository {
   constructor(
     dynamodbService: IDynamoDBService,
     private readonly transformers: DDBDisciplineContestAttrsTransformers,
+    public readonly entityTransformer: DisciplineContestItemTransformer,
   ) {
     super(dynamodbService);
   }
@@ -30,7 +32,10 @@ export class DDBDisciplineContestRepository extends DDBRepository {
       .get(params)
       .promise()
       .then(data => {
-        return this.transformers.transformAttrsToItem(data.Item as AllAttrs);
+        if (data.Item) {
+          return this.transformers.transformAttrsToItem(data.Item as AllAttrs);
+        }
+        return null;
       })
       .catch<null>(err => {
         logDynamoDBError('DDBDisciplineContestRepository get', err, params);
@@ -47,7 +52,9 @@ export class DDBDisciplineContestRepository extends DDBRepository {
       .put(params)
       .promise()
       .then(data => data)
-      .catch(logThrowDynamoDBError('DDBDisciplineContestRepository Put', params));
+      .catch(
+        logThrowDynamoDBError('DDBDisciplineContestRepository Put', params),
+      );
   }
 
   public async queryDisciplineContestsByDate(
@@ -68,7 +75,11 @@ export class DDBDisciplineContestRepository extends DDBRepository {
           discipline,
           after.contestId,
         ),
-        LSI: this.transformers.itemToAttrsTransformer.LSI(year, discipline, after.date),
+        LSI: this.transformers.itemToAttrsTransformer.LSI(
+          year,
+          discipline,
+          after.date,
+        ),
       };
     }
     const params: AWS.DynamoDB.DocumentClient.QueryInput = {
@@ -100,6 +111,9 @@ export class DDBDisciplineContestRepository extends DDBRepository {
           return this.transformers.transformAttrsToItem(item);
         });
         return items;
-      }).catch(logThrowDynamoDBError('DDBDisciplineContestRepository query', params));
-    }
+      })
+      .catch(
+        logThrowDynamoDBError('DDBDisciplineContestRepository query', params),
+      );
+  }
 }

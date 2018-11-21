@@ -4,11 +4,9 @@ import { DocumentClient } from 'aws-sdk/clients/dynamodb';
 import { IDynamoDBService } from 'core/aws/aws.services.interface';
 import { logDynamoDBError, logThrowDynamoDBError } from '../utils/utils';
 import { DDBContestsAttrsTransformers } from './transformers/attributes.transformers';
-import {
-  AllAttrs,
-  DDBContestItem,
-} from './contests.interface';
+import { AllAttrs, DDBContestItem } from './contests.interface';
 import { LastEvaluatedKey } from '../interfaces/table.interface';
+import { ContestInfoItemTransformer } from './transformers/entity.transformer';
 
 @Injectable()
 export class DDBContestsRepository extends DDBRepository {
@@ -16,6 +14,7 @@ export class DDBContestsRepository extends DDBRepository {
   constructor(
     dynamodbService: IDynamoDBService,
     private readonly transformers: DDBContestsAttrsTransformers,
+    public readonly entityTransformer: ContestInfoItemTransformer,
   ) {
     super(dynamodbService);
   }
@@ -29,7 +28,10 @@ export class DDBContestsRepository extends DDBRepository {
       .get(params)
       .promise()
       .then(data => {
-        return this.transformers.transformAttrsToItem(data.Item as AllAttrs);
+        if (data.Item) {
+          return this.transformers.transformAttrsToItem(data.Item as AllAttrs);
+        }
+        return null;
       })
       .catch<null>(err => {
         logDynamoDBError('DDBContestsRepository get', err, params);
@@ -117,6 +119,7 @@ export class DDBContestsRepository extends DDBRepository {
           return this.transformers.transformAttrsToItem(item);
         });
         return items;
-      }).catch(logThrowDynamoDBError('DDBContestsRepository query', params));
-    }
+      })
+      .catch(logThrowDynamoDBError('DDBContestsRepository query', params));
+  }
 }

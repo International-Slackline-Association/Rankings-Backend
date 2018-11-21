@@ -4,17 +4,18 @@ import { DDBAthleteDetailsAttrsTransformers } from './transformers/attributes.tr
 import { IDynamoDBService } from 'core/aws/aws.services.interface';
 import { repositoryFactory } from '../../utils/utils';
 import { ModuleMetadata } from '@nestjs/common/interfaces';
+import { AthleteDetailItemTransformer } from './transformers/entity.transformer';
 
 @Module({
   imports: [],
-  providers: [DDBAthleteDetailsAttrsTransformers],
-  exports: [DDBAthleteDetailsAttrsTransformers],
+  providers: [DDBAthleteDetailsAttrsTransformers, AthleteDetailItemTransformer],
+  exports: [],
 })
 export class DDBAthleteDetailsRepoModule {
   static withConfig(dynamodbService: IDynamoDBService): DynamicModule {
     const repo = repositoryFactory(
       DDBAthleteDetailsRepository,
-      DDBAthleteDetailsAttrsTransformers,
+      [DDBAthleteDetailsAttrsTransformers, AthleteDetailItemTransformer],
       dynamodbService,
     );
     return {
@@ -26,7 +27,7 @@ export class DDBAthleteDetailsRepoModule {
   static forTest(dynamodbService: IDynamoDBService): ModuleMetadata {
     const repo = repositoryFactory(
       DDBAthleteDetailsRepository,
-      DDBAthleteDetailsAttrsTransformers,
+      [DDBAthleteDetailsAttrsTransformers, AthleteDetailItemTransformer],
       dynamodbService,
     );
     return {

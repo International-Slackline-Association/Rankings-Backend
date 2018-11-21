@@ -4,6 +4,7 @@ import { DDBContestItem } from '../contests.interface';
 import * as moment from 'moment';
 import { unixToDate } from 'shared/utils';
 import { ContestInfo } from 'core/contest/entity/contestInfo';
+import latinize = require('latinize');
 
 @Injectable()
 export class ContestInfoItemTransformer {
@@ -15,7 +16,7 @@ export class ContestInfoItemTransformer {
       categories: contest.categories,
       city: contest.city,
       country: contest.country,
-      createdAt: contest.createdAt || moment().unix(),
+      createdAt: contest.createdAt,
       date: contest.date,
       disciplines: contest.disciplines,
       name: contest.name,
@@ -23,10 +24,12 @@ export class ContestInfoItemTransformer {
       prizeUnit: contest.prizeUnit,
       profilePictureUrl: contest.profilePictureUrl,
       year: unixToDate(contest.date).year(),
+      normalizedName: latinize(contest.name),
     };
   }
 
   public fromDBItem(contest: DDBContestItem): ContestInfo {
+    if (!contest) return null;
     return {
       id: contest.contestId,
       city: contest.city,

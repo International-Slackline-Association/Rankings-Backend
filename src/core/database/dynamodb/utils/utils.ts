@@ -1,6 +1,7 @@
 import { IDynamoDBService } from 'core/aws/aws.services.interface';
 import { logger } from 'shared/logger';
 import { AWSError } from 'aws-sdk';
+import { stringify } from 'querystring';
 
 /**
  * Create dynamodb repository with transformers via dynamodb configuration
@@ -10,15 +11,15 @@ import { AWSError } from 'aws-sdk';
  */
 export function repositoryFactory(
   Repo,
-  Transformer,
+  Transformers,
   dynamodbService: IDynamoDBService,
 ) {
   return {
     provide: Repo,
-    useFactory: transformer => {
-      return new Repo(dynamodbService, transformer);
+    useFactory: (...transformers) => {
+      return new Repo(dynamodbService, ...transformers);
     },
-    inject: [Transformer],
+    inject: Transformers instanceof Array ? Transformers : [Transformers],
   };
 }
 
@@ -27,9 +28,13 @@ export function logDynamoDBError(
   err: AWSError,
   params: any,
 ) {
+  let errMessage;
+  if (!err.requestId) { // Not AWSError
+    errMessage = err.message;
+  }
   logger.error(`DynamoDB Error: ${errorDesc}`, {
     params: params,
-    error: err,
+    error: errMessage || err,
   });
 }
 
@@ -53,6 +58,9 @@ export function buildCompositeKey(base: string, ...params: string[]) {
 }
 
 export function destructCompositeKey(key: string, index: number): string {
+  if (!key) {
+    return null;
+  }
   const token = key.split(':')[index];
   return token;
 }
