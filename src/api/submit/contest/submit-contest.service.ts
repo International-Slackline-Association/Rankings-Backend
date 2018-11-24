@@ -15,19 +15,15 @@ export class SubmitContestService {
       createContestDto.name,
       unixToDate(createContestDto.date).year(),
     );
-    const contest = new Contest({ id, ...createContestDto });
-    const contestInfo: ContestInfo = {
-      ...contest,
-      categories: contest.disciplines.map(d => d.category),
-      disciplines: contest.disciplines.map(d => d.discipline),
-      totalPrize: contest.totalPrize,
-      prizeUnit: contest.prizeUnit,
-    };
-    await this.db.putContestInfo(contestInfo);
 
-    for (const disciplineGroup of contest.disciplines) {
+    for (const disciplineGroup of createContestDto.disciplines) {
       const contestDiscipline: ContestDiscipline = {
-        ...contest,
+        city: createContestDto.city,
+        country: createContestDto.country,
+        date: createContestDto.date,
+        id: id,
+        name: createContestDto.name,
+        profilePictureUrl: createContestDto.profilePictureUrl,
         category: disciplineGroup.category,
         discipline: disciplineGroup.discipline,
         prize: disciplineGroup.prize.value,

@@ -10,5 +10,6 @@ export class ContestDiscipline {
   category: ContestCategory;
   prize: number;
   prizeUnit: PrizeUnit;
+  profilePictureUrl: string;
   createdAt?: number;
 }

@@ -17,16 +17,16 @@ export class SubmitAthleteService {
 
   private async generateValidAthleteId(name: string, surname: string) {
     let id = IdGenerator.generateAthleteId(name, surname);
-    let athlete = await this.db.getAthleteDetails(id);
+    let exists = await this.db.isAthleteExists(id);
     let suffix = 1;
-    while (athlete) {
+    while (exists) {
       if (suffix > 10) {
         throw new Error(
           'Cannot create athlete id. Name + Surname appears more than 10 times',
         );
       }
       id = IdGenerator.generateAthleteId(name, surname, suffix.toString());
-      athlete = await this.db.getAthleteDetails(id);
+      exists = await this.db.isAthleteExists(id);
       suffix++;
     }
     return id;

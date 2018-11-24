@@ -8,7 +8,6 @@ import {
   CreateAthleteDto,
 } from './dto/create-athlete.dto';
 import { SubmitAthleteService } from './submit-athlete.service';
-import { CreateContestDto } from '../contest/dto/create-contest.dto';
 
 @Controller('submit/athlete')
 export class SubmitAthleteController {
