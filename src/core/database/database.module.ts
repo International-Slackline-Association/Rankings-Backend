@@ -4,9 +4,7 @@ import { IDynamoDBService } from 'core/aws/aws.services.interface';
 import { DDBAthleteDetailsRepoModule } from './dynamodb/athlete/details/athlete.details.module';
 import { DDBAthleteContestsRepoModule } from './dynamodb/athlete/contests/athlete.contests.module';
 import { DDBAthleteRankingsRepoModule } from './dynamodb/athlete/rankings/athlete.rankings.module';
-import { DDBContestsRepoModule } from './dynamodb/contests/contests.module';
-import { DDBDisciplineContestRepoModule } from './dynamodb/contests/discipline/discipline.contest.module';
-import { DDBAthleteDetailsAttrsTransformers } from './dynamodb/athlete/details/transformers/attributes.transformer';
+import { DDBDisciplineContestRepoModule } from './dynamodb/contests/discipline.contest.module';
 import { ModuleMetadata } from '@nestjs/common/interfaces';
 
 @Module({
@@ -22,7 +20,6 @@ export class DatabaseModule {
         DDBAthleteDetailsRepoModule.withConfig(dynamodbService),
         DDBAthleteContestsRepoModule.withConfig(dynamodbService),
         DDBAthleteRankingsRepoModule.withConfig(dynamodbService),
-        DDBContestsRepoModule.withConfig(dynamodbService),
         DDBDisciplineContestRepoModule.withConfig(dynamodbService),
       ],
     };
@@ -33,7 +30,6 @@ export class DatabaseModule {
         DDBAthleteDetailsRepoModule.withConfig(dynamodbService),
         DDBAthleteContestsRepoModule.withConfig(dynamodbService),
         DDBAthleteRankingsRepoModule.withConfig(dynamodbService),
-        DDBContestsRepoModule.withConfig(dynamodbService),
         DDBDisciplineContestRepoModule.withConfig(dynamodbService),
       ],
       providers: [DatabaseService],

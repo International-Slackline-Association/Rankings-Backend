@@ -1,5 +1,5 @@
 import { Discipline, ContestCategory, PrizeUnit } from 'shared/enums';
-import { DDBTableKeyAttrs } from '../../interfaces/table.interface';
+import { DDBTableKeyAttrs } from '../interfaces/table.interface';
 
 type KeyAttrs = DDBTableKeyAttrs;
 
@@ -10,11 +10,12 @@ interface Attrs {
   readonly prize: number;
   readonly prizeUnit: PrizeUnit;
   readonly category: ContestCategory;
+  readonly profilePictureUrl: string;
   readonly createdAt: number;
 }
 
-interface NonKeyAttrs extends Attrs {
-}
+interface NonKeyAttrs extends Attrs {}
+
 export type AllAttrs = KeyAttrs & NonKeyAttrs;
 
 export interface DDBDisciplineContestItem extends Attrs {

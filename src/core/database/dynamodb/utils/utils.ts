@@ -1,7 +1,6 @@
 import { IDynamoDBService } from 'core/aws/aws.services.interface';
 import { logger } from 'shared/logger';
 import { AWSError } from 'aws-sdk';
-import { stringify } from 'querystring';
 
 /**
  * Create dynamodb repository with transformers via dynamodb configuration
@@ -9,17 +8,12 @@ import { stringify } from 'querystring';
  * @param Transformer TransformerClass
  * @param dynamodbService dynamodb configuration
  */
-export function repositoryFactory(
-  Repo,
-  Transformers,
-  dynamodbService: IDynamoDBService,
-) {
+export function repositoryFactory(Repo, dynamodbService: IDynamoDBService) {
   return {
     provide: Repo,
-    useFactory: (...transformers) => {
-      return new Repo(dynamodbService, ...transformers);
+    useFactory: () => {
+      return new Repo(dynamodbService);
     },
-    inject: Transformers instanceof Array ? Transformers : [Transformers],
   };
 }
 
@@ -29,7 +23,8 @@ export function logDynamoDBError(
   params: any,
 ) {
   let errMessage;
-  if (!err.requestId) { // Not AWSError
+  if (!err.requestId) {
+    // Not AWSError
     errMessage = err.message;
   }
   logger.error(`DynamoDB Error: ${errorDesc}`, {

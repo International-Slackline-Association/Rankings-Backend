@@ -21,5 +21,4 @@ export type AllAttrs = KeyAttrs & NonKeyAttrs;
 export interface DDBAthleteDetailItem extends Attrs {
   readonly athleteId: string;
   readonly normalizedName: string;
-
 }

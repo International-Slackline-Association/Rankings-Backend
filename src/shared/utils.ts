@@ -1,15 +1,15 @@
 import * as moment from 'moment';
-import ltnz = require('latinize');
+import latinize = require('latinize');
 
 export function unixToDate(unix: number): moment.Moment {
   return moment.unix(unix);
 }
 
-export function latinize(str: string) {
-  return ltnz(str);
+export function normalizeStringForSearching(str: string) {
+  return (latinize(str) as string).toLowerCase();
 }
 
-export function csvToObject(csvString: string) {
+export function csvToObject<T = any>(csvString: string) {
   const nestedDelimeter = '__';
   const csv = csvString.split('\n');
 
@@ -23,6 +23,8 @@ export function csvToObject(csvString: string) {
     });
     return obj;
   });
+
+  return result;
 
   function constructObj(attr, parentObj, data) {
     if (attr.split(nestedDelimeter).length === 1) {

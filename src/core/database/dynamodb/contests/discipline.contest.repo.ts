@@ -1,39 +1,38 @@
 import { Injectable } from '@nestjs/common';
-import { DDBRepository, LocalSecondaryIndexName } from '../../dynamodb.repo';
+import { DDBRepository, LocalSecondaryIndexName } from '../dynamodb.repo';
 import { DocumentClient } from 'aws-sdk/clients/dynamodb';
 import { IDynamoDBService } from 'core/aws/aws.services.interface';
-import { logDynamoDBError, logThrowDynamoDBError } from '../../utils/utils';
+import { logDynamoDBError, logThrowDynamoDBError } from '../utils/utils';
 import {
   AllAttrs,
   DDBDisciplineContestItem,
 } from './discipline.contest.interface';
-import { LastEvaluatedKey } from '../../interfaces/table.interface';
-import { DDBDisciplineContestAttrsTransformers } from './transformers/attributes.transformers';
+import { LastEvaluatedKey } from '../interfaces/table.interface';
 import { Discipline } from 'shared/enums';
-import { DisciplineContestItemTransformer } from './transformers/entity.transformer';
+import { EntityTransformer } from './transformers/entity.transformer';
+import { AttrsTransformer } from './transformers/attributes.transformer';
 
 @Injectable()
 export class DDBDisciplineContestRepository extends DDBRepository {
-  protected _tableName = 'ISA-Rankings';
-  constructor(
-    dynamodbService: IDynamoDBService,
-    private readonly transformers: DDBDisciplineContestAttrsTransformers,
-    public readonly entityTransformer: DisciplineContestItemTransformer,
-  ) {
+  protected readonly _tableName = 'ISA-Rankings';
+  private readonly transformer = new AttrsTransformer();
+  public readonly entityTransformer = new EntityTransformer();
+
+  constructor(dynamodbService: IDynamoDBService) {
     super(dynamodbService);
   }
 
   public async get(contestId: string, discipline: Discipline, year: number) {
     const params: DocumentClient.GetItemInput = {
       TableName: this._tableName,
-      Key: this.transformers.primaryKey(year, discipline, contestId),
+      Key: this.transformer.primaryKey(year, discipline, contestId),
     };
     return this.client
       .get(params)
       .promise()
       .then(data => {
         if (data.Item) {
-          return this.transformers.transformAttrsToItem(data.Item as AllAttrs);
+          return this.transformer.transformAttrsToItem(data.Item as AllAttrs);
         }
         return null;
       })
@@ -44,12 +43,24 @@ export class DDBDisciplineContestRepository extends DDBRepository {
   }
 
   public async put(contest: DDBDisciplineContestItem) {
-    const params = {
-      TableName: this._tableName,
-      Item: this.transformers.transformItemToAttrs(contest),
+    const params: DocumentClient.BatchWriteItemInput = {
+      RequestItems: {
+        [this._tableName]: [
+          {
+            PutRequest: {
+              Item: this.transformer.transformItemToAttrs(contest),
+            },
+          },
+          {
+            PutRequest: {
+              Item: this.transformer.byDate.transformItemToAttrs(contest),
+            },
+          },
+        ],
+      },
     };
     return this.client
-      .put(params)
+      .batchWrite(params)
       .promise()
       .then(data => data)
       .catch(
@@ -69,13 +80,13 @@ export class DDBDisciplineContestRepository extends DDBRepository {
     let startKey: LastEvaluatedKey;
     if (after && after.contestId && after.date) {
       startKey = {
-        PK: this.transformers.itemToAttrsTransformer.PK(),
-        SK_GSI: this.transformers.itemToAttrsTransformer.SK_GSI(
+        PK: this.transformer.itemToAttrsTransformer.PK(),
+        SK_GSI: this.transformer.itemToAttrsTransformer.SK_GSI(
           year,
           discipline,
           after.contestId,
         ),
-        LSI: this.transformers.itemToAttrsTransformer.LSI(
+        LSI: this.transformer.itemToAttrsTransformer.LSI(
           year,
           discipline,
           after.date,
@@ -91,12 +102,12 @@ export class DDBDisciplineContestRepository extends DDBRepository {
       KeyConditionExpression:
         '#pk = :pk and begins_with(#lsi, :sortKeyPrefix) ',
       ExpressionAttributeNames: {
-        '#pk': this.transformers.attrName('PK'),
-        '#lsi': this.transformers.attrName('LSI'),
+        '#pk': this.transformer.attrName('PK'),
+        '#lsi': this.transformer.attrName('LSI'),
       },
       ExpressionAttributeValues: {
-        ':pk': this.transformers.itemToAttrsTransformer.PK(),
-        ':sortKeyPrefix': this.transformers.itemToAttrsTransformer.LSI(
+        ':pk': this.transformer.itemToAttrsTransformer.PK(),
+        ':sortKeyPrefix': this.transformer.itemToAttrsTransformer.LSI(
           year,
           discipline,
           undefined,
@@ -108,7 +119,7 @@ export class DDBDisciplineContestRepository extends DDBRepository {
       .promise()
       .then(data => {
         const items = data.Items.map((item: AllAttrs) => {
-          return this.transformers.transformAttrsToItem(item);
+          return this.transformer.transformAttrsToItem(item);
         });
         return items;
       })

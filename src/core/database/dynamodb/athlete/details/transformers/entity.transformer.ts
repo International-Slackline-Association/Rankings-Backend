@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import latinize = require('latinize');
 import { DDBAthleteDetailItem } from '../athlete.details.interface';
 import { AthleteDetail } from 'core/athlete/entity/athlete-detail';
+import { normalizeStringForSearching } from 'shared/utils';
 
 @Injectable()
-export class AthleteDetailItemTransformer {
+export class EntityTransformer {
   constructor() {}
 
   public toDBItem(athlete: AthleteDetail): DDBAthleteDetailItem {
@@ -17,7 +17,7 @@ export class AthleteDetailItemTransformer {
       createdAt: athlete.createdAt,
       gender: athlete.gender,
       name: athlete.name,
-      normalizedName: latinize(athlete.name),
+      normalizedName: normalizeStringForSearching(athlete.name),
       profilePictureUrl: athlete.profilePictureUrl,
       surname: athlete.surname,
     };

@@ -1,47 +1,49 @@
-import { Injectable } from '@nestjs/common';
-import { DDBOverloadedTableTransformers } from '../../../dynamodb.table.transformers';
-import {
-  AllAttrs,
-  DDBDisciplineContestItem,
-} from '../discipline.contest.interface';
-import { DocumentClient } from 'aws-sdk/clients/dynamodb';
 import { buildCompositeKey, destructCompositeKey } from '../../../utils/utils';
 import { Discipline } from 'shared/enums';
+import { DefaultAttrsTransformer } from './default-transformer';
+import {
+  DDBDisciplineContestItem,
+  AllAttrs,
+} from '../../discipline.contest.interface';
+import { DDBOverloadedTableTransformer } from 'core/database/dynamodb/dynamodb.table.transformers';
 
 /**
  * Transformers define how the application level DTO objects transforms to DynamoDB attributes in a table
  */
-@Injectable()
-export class DDBDisciplineContestAttrsTransformers extends DDBOverloadedTableTransformers<
+export class ByDateAttrsTransformer extends DDBOverloadedTableTransformer<
   AllAttrs,
   DDBDisciplineContestItem
 > {
-  constructor() {
+  constructor(private readonly base: DefaultAttrsTransformer) {
     super();
   }
 
+  public prefixes = {
+    PK: 'Contests',
+    SK_GSI: 'ContestByDate',
+    LSI: 'ContestByDate',
+  };
+
   public attrsToItemTransformer = {
-    contestId: (sk_gsi: string) => destructCompositeKey(sk_gsi, 3),
-    year: (sk_gsi: string) => parseInt(destructCompositeKey(sk_gsi, 1), 10),
-    discipline: (sk_gsi: string) =>
-      parseInt(destructCompositeKey(sk_gsi, 2), 10),
-    date: (lsi: string) => parseInt(destructCompositeKey(lsi, 3), 10),
+    contestId: this.base.attrsToItemTransformer.contestId,
+    year: this.base.attrsToItemTransformer.year,
+    discipline: this.base.attrsToItemTransformer.discipline,
+    date: (lsi: string) => parseInt(destructCompositeKey(lsi, 2), 10),
   };
 
   public itemToAttrsTransformer = {
-    PK: () => `Contests`,
+    PK: this.base.itemToAttrsTransformer.PK,
     SK_GSI: (year: number, discipline: Discipline, contestId: string) =>
       buildCompositeKey(
-        'Contest',
+        this.prefixes.SK_GSI,
         year && year.toString(),
         discipline !== undefined && discipline.toString(),
         contestId,
       ),
-    LSI: (year: number, discipline: Discipline, date: number) =>
+    LSI: (year: number, date: number) =>
       buildCompositeKey(
-        'Contest',
+        this.prefixes.LSI,
         year && year.toString(),
-        discipline !== undefined && discipline.toString(),
         date && date.toString(),
       ),
     GSI_SK: () => undefined,
@@ -59,13 +61,12 @@ export class DDBDisciplineContestAttrsTransformers extends DDBOverloadedTableTra
       ...rest,
     };
   }
-
   public transformItemToAttrs(item: DDBDisciplineContestItem): AllAttrs {
     const { contestId, discipline, year, date, ...rest } = item;
     return {
       PK: this.itemToAttrsTransformer.PK(),
       SK_GSI: this.itemToAttrsTransformer.SK_GSI(year, discipline, contestId),
-      LSI: this.itemToAttrsTransformer.LSI(year, discipline, date),
+      LSI: this.itemToAttrsTransformer.LSI(year, date),
       GSI_SK: this.itemToAttrsTransformer.GSI_SK(),
       ...rest,
     };

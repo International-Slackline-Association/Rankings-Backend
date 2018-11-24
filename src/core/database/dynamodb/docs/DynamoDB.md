@@ -1,9 +1,10 @@
 ## DynamoDB Design
 
-| PK           | SK_GSI                           | LSI                                | GSI_SK           | ...Attributes                                                                    |
-| ------------ | -------------------------------- | ---------------------------------- | ---------------- | -------------------------------------------------------------------------------- |
-| Athlete:{id} | AthleteDetails                   |                                    | {normalizedName} | name, surname, birth, gender, country, continent, ageCategory, createdAt         |
-| Athlete:{id} | Contest:{year}:{discipline}:{id} | Contest:{year}:{discipline}:{date} | {point}          | rank                                                                             |
-| Athlete:{id} | Rankings:{year}:{discipline}     |                                    | {point}          | gender, country, continent, ageCategory                                          |
-| Contests     | Contest:{year}:{id}              | Contest:{year}:{date}              | {normalizedName} | name, city, country, totalPrize, prizeUnit, categories[], disciplines[], profile, createdAt |
-| Contests     | Contest:{year}:{discipline}:{id} | Contest:{year}:{discipline}:{date} |                  | name, city, country, prize, prizeUnit, size                                                 |
+| PK                                                     | SK_GSI                                              | LSI                                | GSI_SK           | ...Attributes                                                            |
+| ------------------------------------------------------ | --------------------------------------------------- | ---------------------------------- | ---------------- | ------------------------------------------------------------------------ |
+| Athlete:{id}                                           | AthleteDetails                                      |                                    | {normalizedName} | name, surname, birth, gender, country, continent, ageCategory, createdAt |
+| Athlete:{id}                                           | Contest:{year}:{discipline}:{id}                    | Contest:{year}:{discipline}:{date} | {points}         | rank                                                                     |
+| Athlete:{id}                                           | ContestByDate:{year}:{discipline}:{id}              | ContestByDate:{year}:{date}        | {points}         | rank                                                                     |
+| Athlete:{id}                                           | Rankings:{year}:{discipline}:{gender}:{ageCategory} |                                    | {points}         | normalizedName, name, surname country, continent                         |
+| Contests                                               | Contest:{year}:{discipline}:{id}                    | Contest:{year}:{discipline}:{date} |                  | name, city, country, prize, prizeUnit, category, profile, createdAt      |
+| Contests                                               | ContestByDate:{year}:{discipline}:{id}              | ContestByDate:{year}:{date}        |                  | name, city, country, prize, prizeUnit, category, profile, createdAt      |

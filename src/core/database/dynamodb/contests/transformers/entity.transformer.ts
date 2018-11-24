@@ -1,34 +1,30 @@
 import { Injectable } from '@nestjs/common';
-import { Contest } from 'core/contest/entity/contest';
-import { DDBContestItem } from '../contests.interface';
 import * as moment from 'moment';
 import { unixToDate } from 'shared/utils';
-import { ContestInfo } from 'core/contest/entity/contestInfo';
-import latinize = require('latinize');
+import { ContestDiscipline } from 'core/contest/entity/contest-discipline';
+import { DDBDisciplineContestItem } from '../discipline.contest.interface';
 
-@Injectable()
-export class ContestInfoItemTransformer {
+export class EntityTransformer {
   constructor() {}
 
-  public toDBItem(contest: ContestInfo): DDBContestItem {
+  public toDBItem(contest: ContestDiscipline): DDBDisciplineContestItem {
     return {
       contestId: contest.id,
-      categories: contest.categories,
+      category: contest.category,
       city: contest.city,
       country: contest.country,
-      createdAt: contest.createdAt,
+      createdAt: contest.createdAt || moment().unix(),
       date: contest.date,
-      disciplines: contest.disciplines,
+      discipline: contest.discipline,
       name: contest.name,
-      totalprize: contest.totalPrize,
+      prize: contest.prize,
       prizeUnit: contest.prizeUnit,
-      profilePictureUrl: contest.profilePictureUrl,
       year: unixToDate(contest.date).year(),
-      normalizedName: latinize(contest.name),
+      profilePictureUrl: contest.profilePictureUrl,
     };
   }
 
-  public fromDBItem(contest: DDBContestItem): ContestInfo {
+  public fromDBItem(contest: DDBDisciplineContestItem): ContestDiscipline {
     if (!contest) return null;
     return {
       id: contest.contestId,
@@ -36,12 +32,12 @@ export class ContestInfoItemTransformer {
       country: contest.country,
       createdAt: contest.createdAt,
       date: contest.date,
-      categories: contest.categories,
-      disciplines: contest.disciplines,
+      category: contest.category,
+      discipline: contest.discipline,
       name: contest.name,
       prizeUnit: contest.prizeUnit,
+      prize: contest.prize,
       profilePictureUrl: contest.profilePictureUrl,
-      totalPrize: contest.totalprize,
     };
   }
 }

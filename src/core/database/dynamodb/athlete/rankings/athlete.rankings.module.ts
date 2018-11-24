@@ -3,18 +3,16 @@ import { IDynamoDBService } from 'core/aws/aws.services.interface';
 import { repositoryFactory } from '../../utils/utils';
 import { ModuleMetadata } from '@nestjs/common/interfaces';
 import { DDBAthleteRankingsRepository } from './athlete.rankings.repo';
-import { DDBAthleteRankingsAttrsTransformers } from './transformers/attributes.transformers';
 
 @Module({
   imports: [],
-  providers: [DDBAthleteRankingsAttrsTransformers],
-  exports: [DDBAthleteRankingsAttrsTransformers],
+  providers: [],
+  exports: [],
 })
 export class DDBAthleteRankingsRepoModule {
   static withConfig(dynamodbService: IDynamoDBService): DynamicModule {
     const repo = repositoryFactory(
       DDBAthleteRankingsRepository,
-      DDBAthleteRankingsAttrsTransformers,
       dynamodbService,
     );
     return {
@@ -26,11 +24,10 @@ export class DDBAthleteRankingsRepoModule {
   static forTest(dynamodbService: IDynamoDBService): ModuleMetadata {
     const repo = repositoryFactory(
       DDBAthleteRankingsRepository,
-      DDBAthleteRankingsAttrsTransformers,
       dynamodbService,
     );
     return {
-      providers: [repo, DDBAthleteRankingsAttrsTransformers],
+      providers: [repo],
       exports: [],
     };
   }

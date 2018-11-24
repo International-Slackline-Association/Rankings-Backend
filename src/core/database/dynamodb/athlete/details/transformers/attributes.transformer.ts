@@ -1,13 +1,11 @@
-import { Injectable } from '@nestjs/common';
-import { DDBOverloadedTableTransformers } from '../../../dynamodb.table.transformers';
+import { DDBOverloadedTableTransformer } from '../../../dynamodb.table.transformers';
 import { AllAttrs, DDBAthleteDetailItem } from '../athlete.details.interface';
 import { destructCompositeKey, buildCompositeKey } from '../../../utils/utils';
 
 /**
  * Transformers define how the application level DTO objects transforms to DynamoDB attributes in a table
  */
-@Injectable()
-export class DDBAthleteDetailsAttrsTransformers extends DDBOverloadedTableTransformers<
+export class AttrsTransformer extends DDBOverloadedTableTransformer<
   AllAttrs,
   DDBAthleteDetailItem
 > {
@@ -15,13 +13,18 @@ export class DDBAthleteDetailsAttrsTransformers extends DDBOverloadedTableTransf
     super();
   }
 
+  public prefixes = {
+    PK: 'Athlete',
+    SK_GSI: 'AthleteDetails',
+  };
+
   protected attrsToItemTransformer = {
     athleteId: (pk: string) => destructCompositeKey(pk, 1),
   };
 
   protected itemToAttrsTransformer = {
-    PK: (id: string) => buildCompositeKey('Athlete', id),
-    SK_GSI: () => 'AthleteDetails',
+    PK: (id: string) => buildCompositeKey(this.prefixes.PK, id),
+    SK_GSI: () => this.prefixes.SK_GSI,
     LSI: () => undefined,
     GSI_SK: (name: string) => name,
   };

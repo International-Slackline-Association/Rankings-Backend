@@ -1,8 +1,5 @@
 import { Test } from '@nestjs/testing';
 import { DynamoDBServices } from 'core/aws/aws.services';
-import { Discipline, ContestCategory, PrizeUnit } from 'shared/enums';
-import { DDBContestsRepository } from './dynamodb/contests/contests.repo';
-import { DDBContestsRepoModule } from './dynamodb/contests/contests.module';
 import { DatabaseService } from './database.service';
 import { DatabaseModule } from './database.module';
 import { logger } from 'shared/logger';

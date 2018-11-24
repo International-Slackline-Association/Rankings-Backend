@@ -12,7 +12,7 @@ export type ItemTransformerOptional<T> = {
   [P in keyof T]?: ((...params: any[]) => any)
 };
 
-export abstract class DDBOverloadedTableTransformers<
+export abstract class DDBOverloadedTableTransformer<
   TAllAttrs,
   TTransformedItem
 > {
