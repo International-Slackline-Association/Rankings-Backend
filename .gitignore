@@ -45,3 +45,4 @@ Session.vim
 .serverless
 serverless/secrets.yml
 ISA-Rankings_Serverless_Policy.json
+.env

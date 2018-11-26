@@ -95,6 +95,19 @@ functions:
           method: any
           path: /{proxy+}
           cors: true
+  Streams:
+    handler: src/dynamodb-streams/index.handler
+    description: DynamoDB Streams handler
+    environment: ${file(./serverless/environment.yml)}
+    timeout: 10
+    events:
+      - stream:
+          type: dynamodb
+          arn:
+            Fn::GetAtt:
+              - ISARankingsTable
+              - StreamArn
+          batchSize: 100
 resources:
   Resources:
     ISARankingsTable:
