@@ -1,6 +1,6 @@
 import { DDBOverloadedTableTransformer } from '../../../dynamodb.table.transformers';
+import { buildCompositeKey, destructCompositeKey } from '../../../utils/utils';
 import { AllAttrs, DDBAthleteDetailItem } from '../athlete.details.interface';
-import { destructCompositeKey, buildCompositeKey } from '../../../utils/utils';
 
 /**
  * Transformers define how the application level DTO objects transforms to DynamoDB attributes in a table

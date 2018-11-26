@@ -1,10 +1,10 @@
-import { DDBTableKeyAttrs, NumberSet } from '../../interfaces/table.interface';
-import { Discipline, ContestCategory } from 'shared/enums';
+import { Discipline } from 'shared/enums';
+import { DDBTableKeyAttrs } from '../../interfaces/table.interface';
 
-type KeyAttrs = DDBTableKeyAttrs;
+export type KeyAttrs = DDBTableKeyAttrs;
 
 interface Attrs {
-  readonly rank: number;
+  readonly place: number;
   readonly createdAt: number;
 }
 

@@ -1,52 +1,42 @@
-import {
-  ContestCategory,
-  Discipline,
-  PrizeUnit,
-  Gender,
-  AgeCategory,
-} from 'shared/enums';
 import * as Joi from 'joi';
-import { JoiValidationError } from 'shared/exceptions/api.exceptions';
-import { $enum } from 'ts-enum-util';
-
-const wrappedGender = $enum(Gender);
-const wrappedAgeCategory = $enum(AgeCategory);
+import { AgeCategory, Gender, ValidAgeCategories, ValidGenders } from 'shared/enums';
+import { APIErrors } from 'shared/exceptions/api.exceptions';
 
 export class CreateAthleteDto {
-  name: string;
-  surname: string;
-  birth: number;
-  gender: Gender;
-  country: string;
-  continent: string;
-  ageCategory: AgeCategory;
-  profilePictureUrl: string;
+  public name: string;
+  public surname: string;
+  public birth: number;
+  public gender: Gender;
+  public country: string;
+  public continent: string;
+  public ageCategory: AgeCategory;
+  public profilePictureUrl: string;
 }
 
 export const createAthleteDtoSchema = Joi.object().keys({
   name: Joi.string()
     .required()
-    .error(new JoiValidationError('Unknown name')),
+    .error(new APIErrors.JoiValidationError('Unknown name')),
   surname: Joi.string()
     .required()
-    .error(new JoiValidationError('Unknown surname')),
+    .error(new APIErrors.JoiValidationError('Unknown surname')),
   gender: Joi.number()
     .required()
-    .valid(wrappedGender.getValues())
-    .error(new JoiValidationError('Invalid gender')),
+    .valid(ValidGenders)
+    .error(new APIErrors.JoiValidationError('Invalid gender')),
   birth: Joi.date()
     .timestamp('unix')
-    .error(new JoiValidationError('Invalid birth')),
+    .error(new APIErrors.JoiValidationError('Invalid birth')),
   country: Joi.string()
     .required()
-    .error(new JoiValidationError('Unknown country')),
+    .error(new APIErrors.JoiValidationError('Unknown country')),
   continent: Joi.string()
     .required()
-    .error(new JoiValidationError('Unknown continent')),
+    .error(new APIErrors.JoiValidationError('Unknown continent')),
   ageCategory: Joi.number()
-    .valid(wrappedAgeCategory.getValues())
-    .error(new JoiValidationError('Invalid ageCategory')),
+    .valid(ValidAgeCategories)
+    .error(new APIErrors.JoiValidationError('Invalid ageCategory')),
   profilePictureUrl: Joi.string()
     .required()
-    .error(new JoiValidationError('Unknown profilePictureUrl')),
+    .error(new APIErrors.JoiValidationError('Unknown profilePictureUrl')),
 });

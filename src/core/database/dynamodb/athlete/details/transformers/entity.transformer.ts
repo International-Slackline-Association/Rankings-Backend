@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { DDBAthleteDetailItem } from '../athlete.details.interface';
 import { AthleteDetail } from 'core/athlete/entity/athlete-detail';
-import { normalizeStringForSearching } from 'shared/utils';
+import * as moment from 'moment';
+import { Utils } from 'shared/utils';
+import { DDBAthleteDetailItem } from '../athlete.details.interface';
 
 @Injectable()
 export class EntityTransformer {
@@ -14,17 +15,17 @@ export class EntityTransformer {
       birthEpoch: athlete.birth,
       continent: athlete.continent,
       country: athlete.country,
-      createdAt: athlete.createdAt,
+      createdAt: athlete.createdAt || moment().unix(),
       gender: athlete.gender,
       name: athlete.name,
-      normalizedName: normalizeStringForSearching(athlete.name),
+      normalizedName: Utils.normalizeStringForSearching(athlete.name),
       profilePictureUrl: athlete.profilePictureUrl,
       surname: athlete.surname,
     };
   }
 
   public fromDBItem(athlete: DDBAthleteDetailItem): AthleteDetail {
-    if (!athlete) return null;
+    if (!athlete) { return null; }
     return {
       ageCategory: athlete.ageCategory,
       id: athlete.athleteId,

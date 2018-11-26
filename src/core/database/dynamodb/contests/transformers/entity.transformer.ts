@@ -1,7 +1,6 @@
-import { Injectable } from '@nestjs/common';
-import * as moment from 'moment';
-import { unixToDate } from 'shared/utils';
 import { ContestDiscipline } from 'core/contest/entity/contest-discipline';
+import * as moment from 'moment';
+import { Utils } from 'shared/utils';
 import { DDBDisciplineContestItem } from '../discipline.contest.interface';
 
 export class EntityTransformer {
@@ -19,13 +18,13 @@ export class EntityTransformer {
       name: contest.name,
       prize: contest.prize,
       prizeUnit: contest.prizeUnit,
-      year: unixToDate(contest.date).year(),
+      year: Utils.unixToDate(contest.date).year(),
       profilePictureUrl: contest.profilePictureUrl,
     };
   }
 
   public fromDBItem(contest: DDBDisciplineContestItem): ContestDiscipline {
-    if (!contest) return null;
+    if (!contest) { return null; }
     return {
       id: contest.contestId,
       city: contest.city,

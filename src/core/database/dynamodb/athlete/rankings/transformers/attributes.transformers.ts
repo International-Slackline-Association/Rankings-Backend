@@ -1,10 +1,7 @@
+import { AgeCategory, Discipline, Gender } from 'shared/enums';
 import { DDBOverloadedTableTransformer } from '../../../dynamodb.table.transformers';
-import {
-  AllAttrs,
-  DDBAthleteRankingsItem,
-} from '../athlete.rankings.interface';
 import { buildCompositeKey, destructCompositeKey } from '../../../utils/utils';
-import { Discipline, Gender, AgeCategory } from 'shared/enums';
+import { AllAttrs, DDBAthleteRankingsItem } from '../athlete.rankings.interface';
 
 /**
  * Transformers define how the application level DTO objects transforms to DynamoDB attributes in a table

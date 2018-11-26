@@ -1,17 +1,11 @@
-import {
-  Catch,
-  ExceptionFilter,
-  ArgumentsHost,
-  HttpStatus,
-  HttpException,
-} from '@nestjs/common';
-import { APIError, APIErrorAlias } from 'shared/exceptions/api.error';
+import { ArgumentsHost, Catch, ExceptionFilter, HttpException, HttpStatus } from '@nestjs/common';
 import env_variables from 'shared/env_variables';
+import { APIError, APIErrorAlias } from 'shared/exceptions/api.error';
 import { logger } from 'shared/logger';
 
 @Catch()
 export class AllExceptionsFilter implements ExceptionFilter {
-  catch(exception: any, host: ArgumentsHost) {
+  public catch(exception: any, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse();
 

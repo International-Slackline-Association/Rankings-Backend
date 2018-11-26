@@ -1,25 +1,24 @@
-import { ContestCategory, Discipline, PrizeUnit } from 'shared/enums';
 import * as Joi from 'joi';
-import { JoiValidationError } from 'shared/exceptions/api.exceptions';
-import { $enum } from 'ts-enum-util';
+import { CompetitionDisciplines, Discipline } from 'shared/enums';
+import { APIErrors } from 'shared/exceptions/api.exceptions';
 
-const wrappedDiscipline = $enum(Discipline);
+export interface DisciplineResultGroup {
+  discipline: Discipline;
+  places: {
+    athleteId: string;
+    place: number;
+  }[];
+}
 
 export class SubmitContestResultDto {
-  contestId: string;
-  scores: {
-    discipline: Discipline;
-    places: {
-      athleteId: string;
-      place: number;
-    }[];
-  }[];
+  public contestId: string;
+  public scores: DisciplineResultGroup[];
 }
 
 export const submitContestResultDtoSchema = Joi.object().keys({
   contestId: Joi.string()
     .required()
-    .error(new JoiValidationError('Unknown contestId')),
+    .error(new APIErrors.JoiValidationError('Unknown contestId')),
   scores: Joi.array()
     .required()
     .items(
@@ -27,8 +26,8 @@ export const submitContestResultDtoSchema = Joi.object().keys({
         .keys({
           discipline: Joi.number()
             .required()
-            .valid(wrappedDiscipline.getValues())
-            .error(new JoiValidationError('Invalid discipline')),
+            .valid(CompetitionDisciplines)
+            .error(new APIErrors.JoiValidationError('Invalid discipline')),
           places: Joi.array()
             .required()
             .items(
@@ -36,10 +35,10 @@ export const submitContestResultDtoSchema = Joi.object().keys({
                 .keys({
                   athleteId: Joi.string()
                     .required()
-                    .error(new JoiValidationError('Unknown athleteId')),
+                    .error(new APIErrors.JoiValidationError('Unknown athleteId')),
                   place: Joi.number()
                     .required()
-                    .error(new JoiValidationError('Unknown place')),
+                    .error(new APIErrors.JoiValidationError('Unknown place')),
                 })
                 .required(),
             ),

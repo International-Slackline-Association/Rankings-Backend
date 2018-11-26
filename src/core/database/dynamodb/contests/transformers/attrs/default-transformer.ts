@@ -1,10 +1,7 @@
-import { DDBOverloadedTableTransformer } from '../../../dynamodb.table.transformers';
-import {
-  AllAttrs,
-  DDBDisciplineContestItem,
-} from '../../discipline.contest.interface';
-import { buildCompositeKey, destructCompositeKey } from '../../../utils/utils';
 import { Discipline } from 'shared/enums';
+import { DDBOverloadedTableTransformer } from '../../../dynamodb.table.transformers';
+import { buildCompositeKey, destructCompositeKey } from '../../../utils/utils';
+import { AllAttrs, DDBDisciplineContestItem } from '../../discipline.contest.interface';
 
 /**
  * Transformers define how the application level DTO objects transforms to DynamoDB attributes in a table

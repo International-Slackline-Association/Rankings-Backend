@@ -1,28 +1,58 @@
 import { Injectable } from '@nestjs/common';
-import { DDBRepository, LocalSecondaryIndexName } from '../../dynamodb.repo';
+import { AttributeValue, StreamRecord } from 'aws-lambda';
+import { DocumentClient } from 'aws-sdk/clients/dynamodb';
 import { IDynamoDBService } from 'core/aws/aws.services.interface';
-import { logThrowDynamoDBError } from '../../utils/utils';
-import { AllAttrs, DDBAthleteContestItem } from './athlete.contests.interface';
-import { LastEvaluatedKey } from '../../interfaces/table.interface';
 import { Discipline } from 'shared/enums';
+import { DDBRepository, LocalSecondaryIndexName } from '../../dynamodb.repo';
+import { LastEvaluatedKey } from '../../interfaces/table.interface';
+import { logThrowDynamoDBError } from '../../utils/utils';
+import { AllAttrs, DDBAthleteContestItem, KeyAttrs } from './athlete.contests.interface';
 import { AttrsTransformer } from './transformers/attributes.transformer';
+import { EntityTransformer } from './transformers/entity.transformer';
+
+import dynamoDataTypes = require('dynamodb-data-types');
+const dynamoDbAttrValues = dynamoDataTypes.AttributeValue;
 
 @Injectable()
 export class DDBAthleteContestsRepository extends DDBRepository {
   protected _tableName = 'ISA-Rankings';
-  private readonly transformer = new AttrsTransformer();
+  public readonly transformer = new AttrsTransformer();
+  public readonly entityTransformer = new EntityTransformer();
 
   constructor(dynamodbService: IDynamoDBService) {
     super(dynamodbService);
   }
 
+  public transformFromDynamoDBType(image: StreamRecord['NewImage']) {
+    const attributes = dynamoDbAttrValues.unwrap(image) as AllAttrs;
+    const item = this.transformer.transformAttrsToItem(attributes);
+    return this.entityTransformer.fromDBItem(item);
+  }
+
+  public transformToDynamoDBType(item: DDBAthleteContestItem): {[P in keyof KeyAttrs]: AttributeValue} {
+    const attr = this.transformer.transformItemToAttrs(item);
+    return dynamoDbAttrValues.wrap(attr);
+  }
+
   public async put(contest: DDBAthleteContestItem) {
-    const params = {
-      TableName: this._tableName,
-      Item: this.transformer.transformItemToAttrs(contest),
+    const params: DocumentClient.BatchWriteItemInput = {
+      RequestItems: {
+        [this._tableName]: [
+          {
+            PutRequest: {
+              Item: this.transformer.transformItemToAttrs(contest),
+            },
+          },
+          {
+            PutRequest: {
+              Item: this.transformer.byDate.transformItemToAttrs(contest),
+            },
+          },
+        ],
+      },
     };
     return this.client
-      .put(params)
+      .batchWrite(params)
       .promise()
       .then(data => data)
       .catch(logThrowDynamoDBError('DDBAthleteContestsRepository Put', params));

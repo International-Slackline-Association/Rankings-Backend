@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
-import { SubmitAthleteController } from './submit-athlete.controller';
 import { DatabaseModule } from 'core/database/database.module';
+import { SubmitAthleteController } from './submit-athlete.controller';
 import { SubmitAthleteService } from './submit-athlete.service';
 
 @Module({

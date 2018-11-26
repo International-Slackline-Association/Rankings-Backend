@@ -1,3 +1,5 @@
+import { $enum } from 'ts-enum-util';
+
 export enum Discipline {
   Overall = 0,
   Trickline = 1,
@@ -14,21 +16,41 @@ export enum Discipline {
   Rigging = 12,
 }
 
+export const CategoricalDisciplines = [
+  Discipline.Overall,
+  Discipline.Trickline,
+  Discipline.Speedline,
+];
+
+export const CompetitionDisciplines = $enum(Discipline)
+  .getValues()
+  .filter(d => CategoricalDisciplines.indexOf(d) <= -1);
+
 export enum Gender {
   All = 0,
   Men = 1,
   Women = 2,
 }
 
+export const ValidGenders = [Gender.Men, Gender.Women];
+
 export enum AgeCategory {
   All = 0,
   Youth = 1,
 }
+export const ValidAgeCategories = [AgeCategory.Youth];
 
+// export type ContestCategoryLiteral =
+//   | 'WorldGames'
+//   | 'WorldCup'
+//   | 'Masters'
+//   | 'NationalChampionship'
+//   | 'Open'
+//   | 'Challenge';
 export enum ContestCategory {
   WorldGames = 0,
   WorldCup = 1,
-  Master = 2,
+  Masters = 2,
   NationalChampionship = 3,
   Open = 4,
   Challenge = 5,

@@ -1,8 +1,8 @@
 import { Test } from '@nestjs/testing';
 import { DynamoDBServices } from 'core/aws/aws.services';
-import { DatabaseService } from './database.service';
 import { DatabaseModule } from './database.module';
-import { logger } from 'shared/logger';
+import { DatabaseService } from './database.service';
+
 import latinize = require('latinize');
 
 describe('Database Service', () => {
@@ -10,7 +10,7 @@ describe('Database Service', () => {
 
   beforeAll(async () => {
     const module = await Test.createTestingModule(
-      DatabaseModule.forTest(new DynamoDBServices()),
+      DatabaseModule.forTest(new DynamoDBServices(), undefined),
     ).compile();
     databaseService = module.get(DatabaseService);
   });

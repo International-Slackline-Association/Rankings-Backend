@@ -1,9 +1,10 @@
-import { HttpStatus, HttpException } from '@nestjs/common';
+import { HttpException, HttpStatus } from '@nestjs/common';
 import env_variables from 'shared/env_variables';
 
 export enum APIErrorAlias {
   Unknown = 'Unknown',
   ValidationError = 'ValidationError',
+  NotFound = 'NotFound',
 }
 
 export interface IAPIError {

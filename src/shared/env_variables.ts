@@ -25,6 +25,18 @@ class EnvironmentVariables {
   get adminRoleSecret(): string {
     return process.env.ADMIN_ROLE_SECRET;
   }
+
+  get redis_host(): string {
+    return process.env.REDISHOST;
+  }
+
+  get redis_port(): string {
+    return process.env.REDISPORT;
+  }
+
+  get redis_password(): string {
+    return process.env.REDISPASSWORD;
+  }
 }
 
 export default new EnvironmentVariables();

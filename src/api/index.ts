@@ -1,13 +1,13 @@
+import { NestFactory } from '@nestjs/core';
+import { APIGatewayEvent, Context } from 'aws-lambda';
 import * as dotenv from 'dotenv-override';
+import { AllExceptionsFilter } from 'shared/filters/exception.filter';
+import { waitForLogger } from 'shared/logger';
+import { AppModule } from './api.module';
 // Because: https://github.com/motdotla/node-lambda/pull/369
 dotenv.config({ override: true });
 
 import serverlessHttp = require('serverless-http');
-import { NestFactory } from '@nestjs/core';
-import { AppModule } from './api.module';
-import { APIGatewayEvent, Callback, Context, Handler } from 'aws-lambda';
-import { waitForLogger } from 'shared/logger';
-import { AllExceptionsFilter } from 'shared/filters/exception.filter';
 
 // tslint:disable-next-line:no-var-requires
 const express = require('express')();

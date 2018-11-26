@@ -1,9 +1,9 @@
 import { Test } from '@nestjs/testing';
 import { DynamoDBServices } from 'core/aws/aws.services';
+import { AgeCategory, Gender } from 'shared/enums';
+import { DDBAthleteDetailItem } from './athlete.details.interface';
 import { DDBAthleteDetailsRepoModule } from './athlete.details.module';
 import { DDBAthleteDetailsRepository } from './athlete.details.repo';
-import { DDBAthleteDetailItem } from './athlete.details.interface';
-import { Gender, AgeCategory } from 'shared/enums';
 
 describe('AthleteDetails', () => {
   let repo: DDBAthleteDetailsRepository;

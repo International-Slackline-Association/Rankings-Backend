@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { DDBRepository } from '../../dynamodb.repo';
-import { AttrsTransformer } from './transformers/attributes.transformer';
-import { DDBAthleteDetailItem, AllAttrs } from './athlete.details.interface';
 import { DocumentClient } from 'aws-sdk/clients/dynamodb';
 import { IDynamoDBService } from 'core/aws/aws.services.interface';
+import { DDBRepository } from '../../dynamodb.repo';
 import { logDynamoDBError, logThrowDynamoDBError } from '../../utils/utils';
+import { AllAttrs, DDBAthleteDetailItem } from './athlete.details.interface';
+import { AttrsTransformer } from './transformers/attributes.transformer';
 import { EntityTransformer } from './transformers/entity.transformer';
 
 @Injectable()

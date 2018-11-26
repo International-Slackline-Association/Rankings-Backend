@@ -1,14 +1,14 @@
-import { Gender, AgeCategory } from 'shared/enums';
+import { AgeCategory, Gender } from 'shared/enums';
 
 export class AthleteDetail {
-  id: string;
-  name: string;
-  surname: string;
-  birth: number;
-  gender: Gender;
-  country: string;
-  continent: string;
-  ageCategory: AgeCategory;
-  profilePictureUrl: string;
-  createdAt?: number;
+  public id: string;
+  public name: string;
+  public surname: string;
+  public birth: number;
+  public gender: Gender;
+  public country: string;
+  public continent: string;
+  public ageCategory: AgeCategory;
+  public profilePictureUrl: string;
+  public createdAt?: number;
 }

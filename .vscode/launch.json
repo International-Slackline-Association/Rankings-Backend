@@ -24,6 +24,34 @@
             "windows": {
               "program": "${workspaceRoot}\\node_modules\\serverless\\bin\\serverless",
             }
-        }
+        },
+        {
+          "type": "node",
+          "request": "launch",
+          "name": "Debug Jest",
+          "cwd": "${workspaceFolder}",
+          "args": [
+            "--inspect-brk",
+            "${workspaceRoot}/node_modules/.bin/jest",
+            "--runInBand",
+          ],
+          "console": "integratedTerminal",
+          "internalConsoleOptions": "neverOpen"
+        },
+
+        {
+          "type": "node",
+          "request": "launch",
+          "name": "Debug DynamoDB Streams",
+          "cwd": "${workspaceFolder}",
+          "args": [
+            "--inspect-brk",
+            "${workspaceRoot}/node_modules/.bin/jest",
+            "--runInBand",
+            "dynamodb-streams"
+          ],
+          "console": "integratedTerminal",
+          "internalConsoleOptions": "neverOpen"
+        },
     ]
 }

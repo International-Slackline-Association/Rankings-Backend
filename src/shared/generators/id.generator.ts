@@ -1,4 +1,4 @@
-import { normalizeStringForSearching } from 'shared/utils';
+import { Utils } from 'shared/utils';
 
 export class IdGenerator {
   /** contestName + year is a unique human readable entity */
@@ -12,6 +12,12 @@ export class IdGenerator {
     return id;
   }
 
+  public static stripYearFromContestId(contestId: string): number {
+    // example swiss-open_2018, slackline_2019,
+    const year = contestId.split('_')[1];
+    return parseInt(year, 10);
+  }
+
   /** name-surname + suffix (if collision happens) is a unique human readable entity */
   public static generateAthleteId(
     name: string,
@@ -19,8 +25,8 @@ export class IdGenerator {
     suffix?: string,
   ): string {
     // example name_surname, name_surname_1
-    name = normalizeStringForSearching(name);
-    surname = normalizeStringForSearching(surname);
+    name = Utils.normalizeStringForSearching(name);
+    surname = Utils.normalizeStringForSearching(surname);
     return suffix ? `${name}-${surname}-${suffix}` : `${name}-${surname}`;
   }
 }

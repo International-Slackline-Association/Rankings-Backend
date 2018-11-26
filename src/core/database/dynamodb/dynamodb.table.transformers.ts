@@ -1,5 +1,3 @@
-import { DDBRepository } from './dynamodb.repo';
-import { IAWSServices } from 'core/aws/aws.services.interface';
 import { DocumentClient } from 'aws-sdk/clients/dynamodb';
 
 export type AttrsTransformer<T> = {

@@ -1,9 +1,8 @@
-import { Module, DynamicModule } from '@nestjs/common';
-import { DDBAthleteDetailsRepository } from './athlete.details.repo';
+import { DynamicModule, Module } from '@nestjs/common';
+import { ModuleMetadata } from '@nestjs/common/interfaces';
 import { IDynamoDBService } from 'core/aws/aws.services.interface';
 import { repositoryFactory } from '../../utils/utils';
-import { ModuleMetadata } from '@nestjs/common/interfaces';
-import { EntityTransformer } from './transformers/entity.transformer';
+import { DDBAthleteDetailsRepository } from './athlete.details.repo';
 
 @Module({
   imports: [],
@@ -11,7 +10,7 @@ import { EntityTransformer } from './transformers/entity.transformer';
   exports: [],
 })
 export class DDBAthleteDetailsRepoModule {
-  static withConfig(dynamodbService: IDynamoDBService): DynamicModule {
+  public static withConfig(dynamodbService: IDynamoDBService): DynamicModule {
     const repo = repositoryFactory(
       DDBAthleteDetailsRepository,
       dynamodbService,
@@ -22,7 +21,7 @@ export class DDBAthleteDetailsRepoModule {
       exports: [repo],
     };
   }
-  static forTest(dynamodbService: IDynamoDBService): ModuleMetadata {
+  public static forTest(dynamodbService: IDynamoDBService): ModuleMetadata {
     const repo = repositoryFactory(
       DDBAthleteDetailsRepository,
       dynamodbService,

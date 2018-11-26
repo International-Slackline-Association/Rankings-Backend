@@ -1,11 +1,12 @@
 import { Module } from '@nestjs/common';
+import { DatabaseModule } from 'api/database.module';
+import { ContestPointsCalculatorService } from 'core/contest/points-calculator.service';
 import { SubmitContestResultController } from './submit-contest-result.controller';
 import { SubmitContestResultService } from './submit-contest-result.service';
-import { DatabaseModule } from 'api/database.module';
 
 @Module({
   imports: [DatabaseModule],
   controllers: [SubmitContestResultController],
-  providers: [SubmitContestResultService],
+  providers: [SubmitContestResultService, ContestPointsCalculatorService],
 })
-export class SubmitContestModule {}
+export class SubmitContestResultsModule {}

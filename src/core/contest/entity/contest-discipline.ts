@@ -1,15 +1,15 @@
-import { Discipline, ContestCategory, PrizeUnit } from 'shared/enums';
+import { ContestCategory, Discipline, PrizeUnit } from 'shared/enums';
 
 export class ContestDiscipline {
-  id: string;
-  name: string;
-  date: number;
-  city: string;
-  country: string;
-  discipline: Discipline;
-  category: ContestCategory;
-  prize: number;
-  prizeUnit: PrizeUnit;
-  profilePictureUrl: string;
-  createdAt?: number;
+  public id: string;
+  public name: string;
+  public date: number;
+  public city: string;
+  public country: string;
+  public discipline: Discipline;
+  public category: ContestCategory;
+  public prize: number;
+  public prizeUnit: PrizeUnit;
+  public profilePictureUrl: string;
+  public createdAt?: number;
 }

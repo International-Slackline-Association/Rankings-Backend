@@ -1,11 +1,13 @@
-import { Module, DynamicModule } from '@nestjs/common';
-import { DatabaseService } from './database.service';
+import { DynamicModule, Module } from '@nestjs/common';
+import { ModuleMetadata } from '@nestjs/common/interfaces';
 import { IDynamoDBService } from 'core/aws/aws.services.interface';
-import { DDBAthleteDetailsRepoModule } from './dynamodb/athlete/details/athlete.details.module';
+import { ClientOpts } from 'redis';
+import { DatabaseService } from './database.service';
 import { DDBAthleteContestsRepoModule } from './dynamodb/athlete/contests/athlete.contests.module';
+import { DDBAthleteDetailsRepoModule } from './dynamodb/athlete/details/athlete.details.module';
 import { DDBAthleteRankingsRepoModule } from './dynamodb/athlete/rankings/athlete.rankings.module';
 import { DDBDisciplineContestRepoModule } from './dynamodb/contests/discipline.contest.module';
-import { ModuleMetadata } from '@nestjs/common/interfaces';
+import { RedisRepositoryModule } from './redis/redis.module';
 
 @Module({
   imports: [],
@@ -13,7 +15,10 @@ import { ModuleMetadata } from '@nestjs/common/interfaces';
   exports: [DatabaseService],
 })
 export class DatabaseModule {
-  static withConfig(dynamodbService: IDynamoDBService): DynamicModule {
+  public static withConfig(
+    dynamodbService: IDynamoDBService,
+    redisOpts: ClientOpts,
+  ): DynamicModule {
     return {
       module: DatabaseModule,
       imports: [
@@ -21,16 +26,21 @@ export class DatabaseModule {
         DDBAthleteContestsRepoModule.withConfig(dynamodbService),
         DDBAthleteRankingsRepoModule.withConfig(dynamodbService),
         DDBDisciplineContestRepoModule.withConfig(dynamodbService),
+        RedisRepositoryModule.withConfig(redisOpts),
       ],
     };
   }
-  static forTest(dynamodbService: IDynamoDBService): ModuleMetadata {
+  public static forTest(
+    dynamodbService: IDynamoDBService,
+    redisOpts: ClientOpts,
+  ): ModuleMetadata {
     return {
       imports: [
         DDBAthleteDetailsRepoModule.withConfig(dynamodbService),
         DDBAthleteContestsRepoModule.withConfig(dynamodbService),
         DDBAthleteRankingsRepoModule.withConfig(dynamodbService),
         DDBDisciplineContestRepoModule.withConfig(dynamodbService),
+        RedisRepositoryModule.withConfig(redisOpts),
       ],
       providers: [DatabaseService],
       exports: [],

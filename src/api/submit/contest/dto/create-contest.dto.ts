@@ -1,18 +1,17 @@
-import { ContestCategory, Discipline, PrizeUnit } from 'shared/enums';
 import * as Joi from 'joi';
-import { JoiValidationError } from 'shared/exceptions/api.exceptions';
+import { CompetitionDisciplines, ContestCategory, Discipline, PrizeUnit } from 'shared/enums';
+import { APIErrors } from 'shared/exceptions/api.exceptions';
 import { $enum } from 'ts-enum-util';
 
-const wrappedContestCategory = $enum(ContestCategory);
-const wrappedDiscipline = $enum(Discipline);
-const wrappedPrizeUnit = $enum(PrizeUnit);
+const contestCategories = $enum(ContestCategory).getValues();
+const prizeUnits = $enum(PrizeUnit).getValues();
 
 export class CreateContestDto {
-  name: string;
-  date: number;
-  city: string;
-  country: string;
-  disciplines: {
+  public name: string;
+  public date: number;
+  public city: string;
+  public country: string;
+  public disciplines: {
     discipline: Discipline;
     category: ContestCategory;
     prize: {
@@ -20,22 +19,22 @@ export class CreateContestDto {
       unit: PrizeUnit;
     };
   }[];
-  profilePictureUrl: string;
+  public profilePictureUrl: string;
 }
 
 export const createContestDtoSchema = Joi.object().keys({
   name: Joi.string()
     .required()
-    .error(new JoiValidationError('Unknown name')),
+    .error(new APIErrors.JoiValidationError('Unknown name')),
   date: Joi.date()
     .timestamp('unix')
-    .error(new JoiValidationError('Invalid date')),
+    .error(new APIErrors.JoiValidationError('Invalid date')),
   city: Joi.string()
     .required()
-    .error(new JoiValidationError('Unknown city')),
+    .error(new APIErrors.JoiValidationError('Unknown city')),
   country: Joi.string()
     .required()
-    .error(new JoiValidationError('Unknown country')),
+    .error(new APIErrors.JoiValidationError('Unknown country')),
   disciplines: Joi.array()
     .required()
     .items(
@@ -43,25 +42,25 @@ export const createContestDtoSchema = Joi.object().keys({
         .keys({
           discipline: Joi.number()
             .required()
-            .valid(wrappedDiscipline.getValues())
-            .error(new JoiValidationError('Invalid discipline')),
+            .valid(CompetitionDisciplines)
+            .error(new APIErrors.JoiValidationError('Invalid discipline')),
           category: Joi.number()
             .required()
-            .valid(wrappedContestCategory.getValues())
-            .error(new JoiValidationError('Invalid category')),
+            .valid(contestCategories)
+            .error(new APIErrors.JoiValidationError('Invalid category')),
           prize: Joi.object().keys({
             value: Joi.number()
               .required()
-              .error(new JoiValidationError('Unknown prize value')),
+              .error(new APIErrors.JoiValidationError('Unknown prize value')),
             unit: Joi.string()
               .required()
-              .valid(wrappedPrizeUnit.getValues())
-              .error(new JoiValidationError('Invalid prize unit')),
+              .valid(prizeUnits)
+              .error(new APIErrors.JoiValidationError('Invalid prize unit')),
           }),
         })
         .required(),
     ),
   profilePictureUrl: Joi.string()
     .required()
-    .error(new JoiValidationError('Unknown profilePictureUrl')),
+    .error(new APIErrors.JoiValidationError('Unknown profilePictureUrl')),
 });

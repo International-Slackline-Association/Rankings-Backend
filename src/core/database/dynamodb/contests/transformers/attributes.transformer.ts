@@ -1,5 +1,5 @@
-import { DefaultAttrsTransformer } from './attrs/default-transformer';
 import { ByDateAttrsTransformer } from './attrs/byDate-transformer';
+import { DefaultAttrsTransformer } from './attrs/default-transformer';
 
 export class AttrsTransformer extends DefaultAttrsTransformer {
   public readonly byDate: ByDateAttrsTransformer;

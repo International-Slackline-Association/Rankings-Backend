@@ -1,14 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import {
-  buildCompositeKey,
-  destructCompositeKey,
-} from '../../../../utils/utils';
-import { Discipline } from 'shared/enums';
 import { DDBOverloadedTableTransformer } from 'core/database/dynamodb/dynamodb.table.transformers';
-import {
-  AllAttrs,
-  DDBAthleteContestItem,
-} from '../../athlete.contests.interface';
+import { Discipline } from 'shared/enums';
+import { buildCompositeKey, destructCompositeKey } from '../../../../utils/utils';
+import { AllAttrs, DDBAthleteContestItem, KeyAttrs } from '../../athlete.contests.interface';
 
 /**
  * Transformers define how the application level DTO objects transforms to DynamoDB attributes in a table
@@ -21,10 +15,11 @@ export class DefaultAttrsTransformer extends DDBOverloadedTableTransformer<
   constructor() {
     super();
   }
-  public prefixes = {
+  public prefixes: KeyAttrs = {
     PK: 'Athlete',
     SK_GSI: 'Contest',
     LSI: 'Contest',
+    GSI_SK: ''
   };
 
   public attrsToItemTransformer = {

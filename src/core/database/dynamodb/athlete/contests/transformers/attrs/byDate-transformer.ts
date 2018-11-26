@@ -1,15 +1,8 @@
-import {
-  buildCompositeKey,
-  destructCompositeKey,
-} from '../../../../utils/utils';
-import { Discipline } from 'shared/enums';
-import { DefaultAttrsTransformer } from './default-transformer';
-
 import { DDBOverloadedTableTransformer } from 'core/database/dynamodb/dynamodb.table.transformers';
-import {
-  AllAttrs,
-  DDBAthleteContestItem,
-} from '../../athlete.contests.interface';
+import { Discipline } from 'shared/enums';
+import { buildCompositeKey, destructCompositeKey } from '../../../../utils/utils';
+import { AllAttrs, DDBAthleteContestItem } from '../../athlete.contests.interface';
+import { DefaultAttrsTransformer } from './default-transformer';
 
 /**
  * Transformers define how the application level DTO objects transforms to DynamoDB attributes in a table

@@ -1,5 +1,5 @@
-import { DocumentClient } from 'aws-sdk/clients/dynamodb';
 import { DynamoDB } from 'aws-sdk';
+import { DocumentClient } from 'aws-sdk/clients/dynamodb';
 import { IDynamoDBService } from 'core/aws/aws.services.interface';
 
 export const LocalSecondaryIndexName = 'PK-LSI-index';

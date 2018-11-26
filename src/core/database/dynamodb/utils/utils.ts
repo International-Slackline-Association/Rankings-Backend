@@ -1,6 +1,7 @@
+import { AWSError } from 'aws-sdk';
 import { IDynamoDBService } from 'core/aws/aws.services.interface';
 import { logger } from 'shared/logger';
-import { AWSError } from 'aws-sdk';
+import { Utils } from 'shared/utils';
 
 /**
  * Create dynamodb repository with transformers via dynamodb configuration
@@ -41,14 +42,7 @@ export function logThrowDynamoDBError(errorDesc: string, params: any) {
 }
 
 export function buildCompositeKey(base: string, ...params: string[]) {
-  let str = base;
-  for (const param of params) {
-    if (param) {
-      str = str + ':' + param;
-    } else {
-      break;
-    }
-  }
+  const str = Utils.concatParams(base, ...params);
   return str + (str === base ? ':' : '');
 }
 

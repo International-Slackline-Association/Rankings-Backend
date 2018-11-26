@@ -1,7 +1,7 @@
-import { Module, DynamicModule } from '@nestjs/common';
+import { DynamicModule, Module } from '@nestjs/common';
+import { ModuleMetadata } from '@nestjs/common/interfaces';
 import { IDynamoDBService } from 'core/aws/aws.services.interface';
 import { repositoryFactory } from '../utils/utils';
-import { ModuleMetadata } from '@nestjs/common/interfaces';
 import { DDBDisciplineContestRepository } from './discipline.contest.repo';
 
 @Module({
@@ -10,7 +10,7 @@ import { DDBDisciplineContestRepository } from './discipline.contest.repo';
   exports: [],
 })
 export class DDBDisciplineContestRepoModule {
-  static withConfig(dynamodbService: IDynamoDBService): DynamicModule {
+  public static withConfig(dynamodbService: IDynamoDBService): DynamicModule {
     const repo = repositoryFactory(
       DDBDisciplineContestRepository,
       dynamodbService,
@@ -21,7 +21,7 @@ export class DDBDisciplineContestRepoModule {
       exports: [repo],
     };
   }
-  static forTest(dynamodbService: IDynamoDBService): ModuleMetadata {
+  public static forTest(dynamodbService: IDynamoDBService): ModuleMetadata {
     const repo = repositoryFactory(
       DDBDisciplineContestRepository,
       dynamodbService,

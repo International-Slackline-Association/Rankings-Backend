@@ -1,7 +1,7 @@
-import { Module, DynamicModule } from '@nestjs/common';
+import { DynamicModule, Module } from '@nestjs/common';
+import { ModuleMetadata } from '@nestjs/common/interfaces';
 import { IDynamoDBService } from 'core/aws/aws.services.interface';
 import { repositoryFactory } from '../../utils/utils';
-import { ModuleMetadata } from '@nestjs/common/interfaces';
 import { DDBAthleteRankingsRepository } from './athlete.rankings.repo';
 
 @Module({
@@ -10,7 +10,7 @@ import { DDBAthleteRankingsRepository } from './athlete.rankings.repo';
   exports: [],
 })
 export class DDBAthleteRankingsRepoModule {
-  static withConfig(dynamodbService: IDynamoDBService): DynamicModule {
+  public static withConfig(dynamodbService: IDynamoDBService): DynamicModule {
     const repo = repositoryFactory(
       DDBAthleteRankingsRepository,
       dynamodbService,
@@ -21,7 +21,7 @@ export class DDBAthleteRankingsRepoModule {
       exports: [repo],
     };
   }
-  static forTest(dynamodbService: IDynamoDBService): ModuleMetadata {
+  public static forTest(dynamodbService: IDynamoDBService): ModuleMetadata {
     const repo = repositoryFactory(
       DDBAthleteRankingsRepository,
       dynamodbService,

@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { DDBRepository, LocalSecondaryIndexName } from '../../dynamodb.repo';
 import { IDynamoDBService } from 'core/aws/aws.services.interface';
+import { DDBRepository } from '../../dynamodb.repo';
 import { logThrowDynamoDBError } from '../../utils/utils';
-import { AttrsTransformer } from './transformers/attributes.transformers';
 import { DDBAthleteRankingsItem } from './athlete.rankings.interface';
+import { AttrsTransformer } from './transformers/attributes.transformers';
 
 @Injectable()
 export class DDBAthleteRankingsRepository extends DDBRepository {

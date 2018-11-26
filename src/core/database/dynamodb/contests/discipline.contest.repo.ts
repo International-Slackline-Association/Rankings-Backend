@@ -1,16 +1,14 @@
 import { Injectable } from '@nestjs/common';
-import { DDBRepository, LocalSecondaryIndexName } from '../dynamodb.repo';
 import { DocumentClient } from 'aws-sdk/clients/dynamodb';
 import { IDynamoDBService } from 'core/aws/aws.services.interface';
-import { logDynamoDBError, logThrowDynamoDBError } from '../utils/utils';
-import {
-  AllAttrs,
-  DDBDisciplineContestItem,
-} from './discipline.contest.interface';
-import { LastEvaluatedKey } from '../interfaces/table.interface';
 import { Discipline } from 'shared/enums';
-import { EntityTransformer } from './transformers/entity.transformer';
+import { IdGenerator } from 'shared/generators/id.generator';
+import { DDBRepository, LocalSecondaryIndexName } from '../dynamodb.repo';
+import { LastEvaluatedKey } from '../interfaces/table.interface';
+import { logDynamoDBError, logThrowDynamoDBError } from '../utils/utils';
+import { AllAttrs, DDBDisciplineContestItem } from './discipline.contest.interface';
 import { AttrsTransformer } from './transformers/attributes.transformer';
+import { EntityTransformer } from './transformers/entity.transformer';
 
 @Injectable()
 export class DDBDisciplineContestRepository extends DDBRepository {
@@ -22,7 +20,8 @@ export class DDBDisciplineContestRepository extends DDBRepository {
     super(dynamodbService);
   }
 
-  public async get(contestId: string, discipline: Discipline, year: number) {
+  public async get(contestId: string, discipline: Discipline) {
+    const year = IdGenerator.stripYearFromContestId(contestId);
     const params: DocumentClient.GetItemInput = {
       TableName: this._tableName,
       Key: this.transformer.primaryKey(year, discipline, contestId),
