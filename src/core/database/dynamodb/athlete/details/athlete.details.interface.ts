@@ -1,7 +1,7 @@
+import { AgeCategory, Gender } from 'shared/enums';
 import { DDBTableKeyAttrs } from '../../interfaces/table.interface';
-import { Gender, AgeCategory } from 'shared/enums';
 
-type KeyAttrs = DDBTableKeyAttrs;
+export type KeyAttrs = DDBTableKeyAttrs;
 
 interface Attrs {
   readonly name: string;
@@ -10,7 +10,6 @@ interface Attrs {
   readonly gender: Gender;
   readonly country: string;
   readonly continent: string;
-  readonly ageCategory: AgeCategory;
   readonly profilePictureUrl: string;
   readonly createdAt: number;
 }

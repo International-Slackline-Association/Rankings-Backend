@@ -1,5 +1,5 @@
+import { AgeCategory, Discipline, Gender } from 'shared/enums';
 import { DDBTableKeyAttrs } from '../../interfaces/table.interface';
-import { Discipline, AgeCategory, Gender } from 'shared/enums';
 
 type KeyAttrs = DDBTableKeyAttrs;
 
@@ -8,7 +8,8 @@ interface Attrs {
   readonly surname: string;
   readonly country: string;
   readonly continent: string;
-  readonly createdAt: number;
+  readonly normalizedName: string;
+  readonly lastUpdatedAt?: number;
 }
 
 interface NonKeyAttrs extends Attrs {}
@@ -21,4 +22,12 @@ export interface DDBAthleteRankingsItem extends Attrs {
   readonly gender: Gender;
   readonly year: number;
   readonly points: number;
+}
+
+export interface DDBAthleteRankingsItemPrimaryKey {
+  readonly athleteId: string;
+  readonly discipline: Discipline;
+  readonly ageCategory: AgeCategory;
+  readonly gender: Gender;
+  readonly year: number;
 }

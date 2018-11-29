@@ -1,6 +1,7 @@
 import * as moment from 'moment';
 
 import latinize = require('latinize');
+import { logger } from './logger';
 
 // tslint:disable-next-line:no-namespace
 export namespace Utils {
@@ -25,7 +26,10 @@ export namespace Utils {
   }
 
   export function omitReject<T>(promise: Promise<T>) {
-    return promise.then<T>(d => d).catch<null>(_ => null);
+    return promise.then<T>(d => d).catch<null>(err => {
+      logger.debug('OmitReject Error', err.message);
+      return null;
+    });
   }
 
   export function csvToObject<T = any>(csvString: string) {
@@ -52,7 +56,9 @@ export namespace Utils {
       }
 
       const curKey = attr.split(nestedDelimeter)[0];
-      if (!parentObj[curKey]) { parentObj[curKey] = {}; }
+      if (!parentObj[curKey]) {
+        parentObj[curKey] = {};
+      }
       parentObj[curKey] = constructObj(
         attr
           .split(nestedDelimeter)

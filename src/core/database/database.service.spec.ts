@@ -17,6 +17,7 @@ describe('Database Service', () => {
 
   describe('get contest info', () => {
     it('should get item', async () => {
+
       // const s = 'æåÇaan İşç';
       // const latin = latinize(s);
       // console.log(latin);

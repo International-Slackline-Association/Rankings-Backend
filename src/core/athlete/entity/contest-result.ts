@@ -1,7 +1,7 @@
 import { Discipline } from 'shared/enums';
 
 export class AthleteContestResult {
-  public id: string;
+  public athleteId: string;
   public contestId: string;
   public contestDate: number;
   public contestDiscipline: Discipline;

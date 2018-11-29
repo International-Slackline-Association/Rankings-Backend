@@ -1,14 +1,19 @@
-import { Callback, Context, DynamoDBRecord, DynamoDBStreamEvent, StreamRecord } from 'aws-lambda';
-import { DynamoDBServices } from 'core/aws/aws.services';
-import { DDBAthleteContestsRepository } from 'core/database/dynamodb/athlete/contests/athlete.contests.repo';
-import { handler } from 'dynamodb-streams';
+import {
+  Callback,
+  Context,
+  DynamoDBRecord,
+  DynamoDBStreamEvent,
+  DynamoDBStreamHandler,
+  StreamRecord,
+} from 'aws-lambda';
 
-interface LambdaTrigger<TEvent, TResult> {
+export interface LambdaTriggerEvent<TEvent, TResult> {
   event: TEvent;
   context: Context;
   callback: Callback<TResult>;
 }
-function context(options, cb): Context {
+
+function createLambdaContext(options, cb): Context {
   return {
     succeed: result => {
       if (result === undefined) {
@@ -55,12 +60,9 @@ function context(options, cb): Context {
   };
 }
 
-const callback: Callback<void> = (err, result) => {};
+const defaultCallback: Callback<void> = (err, result) => {};
 
-function createDynamoDBEvent(
-  eventName: DynamoDBRecord['eventName'],
-  record: StreamRecord,
-) {
+export function createDynamoDBEvent(eventName: DynamoDBRecord['eventName'], record: StreamRecord) {
   const dynamoEvent: DynamoDBStreamEvent = {
     Records: [
       {
@@ -76,42 +78,15 @@ function createDynamoDBEvent(
   };
   return dynamoEvent;
 }
-describe('DynamoDB Streams', () => {
-  let athleteContestRepo: DDBAthleteContestsRepository;
 
-  beforeAll(async () => {
-    athleteContestRepo = new DDBAthleteContestsRepository(
-      new DynamoDBServices(),
-    );
-  });
-
-  describe('trigger handler', () => {
-    it('should pretend new athlete contest result has inserted', async () => {
-      const newImage = athleteContestRepo.transformToDynamoDBType({
-        athleteId: 'a',
-        contestId: '1',
-        createdAt: 123,
-        date: 123,
-        discipline: 0,
-        place: 1,
-        points: 1,
-        year: 123,
-      });
-      const dynamobRecord: StreamRecord = {
-        Keys: {
-          PK: newImage.PK,
-          SK_GSI: newImage.SK_GSI,
-          LSI: newImage.LSI,
-          GSI_SK: newImage.GSI_SK,
-        },
-        NewImage: newImage,
-        StreamViewType: 'NEW_AND_OLD_IMAGES',
-        SequenceNumber: '111',
-        SizeBytes: 26,
-      };
-      const event = createDynamoDBEvent('INSERT', dynamobRecord);
-
-      await handler(event, context({}, null), callback);
-    });
-  });
-});
+export async function triggerLambdaHandlerWithEvent(
+  handler: DynamoDBStreamHandler,
+  event: DynamoDBStreamEvent,
+  context?,
+  callback = defaultCallback,
+) {
+  if (!context) {
+    context = createLambdaContext({}, null);
+  }
+  return handler(event, context, callback);
+}

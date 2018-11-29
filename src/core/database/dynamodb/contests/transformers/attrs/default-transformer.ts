@@ -1,3 +1,4 @@
+import { isNil } from 'lodash';
 import { Discipline } from 'shared/enums';
 import { DDBOverloadedTableTransformer } from '../../../dynamodb.table.transformers';
 import { buildCompositeKey, destructCompositeKey } from '../../../utils/utils';
@@ -34,14 +35,14 @@ export class DefaultAttrsTransformer extends DDBOverloadedTableTransformer<
       buildCompositeKey(
         this.prefixes.SK_GSI,
         year && year.toString(),
-        discipline !== undefined && discipline.toString(),
+        !isNil(discipline) && discipline.toString(),
         contestId,
       ),
     LSI: (year: number, discipline: Discipline, date: number) =>
       buildCompositeKey(
         this.prefixes.LSI,
         year && year.toString(),
-        discipline !== undefined && discipline.toString(),
+        !isNil(discipline) && discipline.toString(),
         date && date.toString(),
       ),
     GSI_SK: () => undefined,

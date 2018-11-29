@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { DDBOverloadedTableTransformer } from 'core/database/dynamodb/dynamodb.table.transformers';
+import { isNil } from 'lodash';
 import { Discipline } from 'shared/enums';
 import { buildCompositeKey, destructCompositeKey } from '../../../../utils/utils';
 import { AllAttrs, DDBAthleteContestItem, KeyAttrs } from '../../athlete.contests.interface';
@@ -38,15 +39,15 @@ export class DefaultAttrsTransformer extends DDBOverloadedTableTransformer<
       buildCompositeKey(
         this.prefixes.SK_GSI,
         year && year.toString(),
-        discipline !== undefined && discipline.toString(),
+        !isNil(discipline) && discipline.toString(),
         contestId,
       ),
     LSI: (year: number, discipline: Discipline, date: number) =>
       buildCompositeKey(
         this.prefixes.LSI,
         year && year.toString(),
-        discipline !== undefined && discipline.toString(),
-        date && date.toString(),
+        !isNil(discipline) && discipline.toString(),
+        !isNil(date) && date.toString(),
       ),
     GSI_SK: (points: number) => points.toString(),
   };

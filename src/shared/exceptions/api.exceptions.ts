@@ -1,6 +1,6 @@
 import { HttpStatus } from '@nestjs/common';
-import { DisciplineUtility } from 'shared/disciplineUtility';
 import { Discipline } from 'shared/enums';
+import { DisciplineUtility } from 'shared/enums-utility';
 import { APIError, APIErrorAlias } from './api.error';
 
 // tslint:disable-next-line:no-namespace

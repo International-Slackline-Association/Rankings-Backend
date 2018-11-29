@@ -1,3 +1,4 @@
+import { isNil } from 'lodash';
 import { AgeCategory, Discipline, Gender } from 'shared/enums';
 import { DDBOverloadedTableTransformer } from '../../../dynamodb.table.transformers';
 import { buildCompositeKey, destructCompositeKey } from '../../../utils/utils';
@@ -41,9 +42,9 @@ export class AttrsTransformer extends DDBOverloadedTableTransformer<
       buildCompositeKey(
         this.prefixes.SK_GSI,
         year && year.toString(),
-        discipline !== undefined && discipline.toString(),
-        gender !== undefined && gender.toString(),
-        ageCategory !== undefined && ageCategory.toString(),
+        !isNil(discipline) && discipline.toString(),
+        !isNil(gender) && gender.toString(),
+        !isNil(ageCategory) && ageCategory.toString(),
       ),
     LSI: () => undefined,
     GSI_SK: (points: number) => points.toString(),

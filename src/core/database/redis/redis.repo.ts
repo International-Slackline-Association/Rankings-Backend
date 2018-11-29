@@ -3,6 +3,7 @@ import { IHandyRedis } from 'handy-redis';
 import { Discipline } from 'shared/enums';
 import { Utils } from 'shared/utils';
 import { DDBAthleteDetailItem } from '../dynamodb/athlete/details/athlete.details.interface';
+import { DDBAthleteRankingsItemPrimaryKey } from '../dynamodb/athlete/rankings/athlete.rankings.interface';
 import { DDBDisciplineContestItem } from '../dynamodb/contests/discipline.contest.interface';
 import { RedisConfig } from './redis.config';
 
@@ -37,6 +38,12 @@ export class RedisRepository {
     return Utils.omitReject(set);
   }
 
+  public async clearAthleteDetail(athleteId: string) {
+    const key = this.redisKeyOfAthleteDetails(athleteId);
+    const del = this.redis.del(key);
+    return Utils.omitReject(del);
+  }
+
   public async getContestDiscipline(contestId: string, discipline: Discipline) {
     const key = this.redisKeyOfContestDiscipline(contestId, discipline);
     const get = this.redis.get(key).then(d => JSON.parse(d) as DDBDisciplineContestItem);
@@ -50,6 +57,22 @@ export class RedisRepository {
     const key = this.redisKeyOfContestDiscipline(item.contestId, item.discipline);
     const set = this.redis.set(key, JSON.stringify(item));
     return Utils.omitReject(set);
+  }
+
+  public async updatePointsOfAthleteInRankingCategory(pk: DDBAthleteRankingsItemPrimaryKey, points: number) {
+    const key = this.redisKeyOfRankingCategory(pk);
+    const zadd = this.redis.zadd(key, [points, pk.athleteId]);
+    return Utils.omitReject(zadd);
+  }
+
+  protected redisKeyOfRankingCategory(pk: DDBAthleteRankingsItemPrimaryKey): string {
+    return this.concatWithKeynamePrefix(
+      'PointPlaces',
+      pk.year.toString(),
+      pk.discipline.toString(),
+      pk.gender.toString(),
+      pk.ageCategory.toString(),
+    );
   }
 
   protected redisKeyOfAthleteDetails(athleteId: string): string {

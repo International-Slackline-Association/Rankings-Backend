@@ -16,6 +16,8 @@ export class AttrsTransformer extends DDBOverloadedTableTransformer<
   public prefixes = {
     PK: 'Athlete',
     SK_GSI: 'AthleteDetails',
+    LSI: '',
+    GSI_SK: ''
   };
 
   protected attrsToItemTransformer = {

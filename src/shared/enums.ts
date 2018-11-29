@@ -38,15 +38,9 @@ export enum AgeCategory {
   All = 0,
   Youth = 1,
 }
+
 export const ValidAgeCategories = [AgeCategory.Youth];
 
-// export type ContestCategoryLiteral =
-//   | 'WorldGames'
-//   | 'WorldCup'
-//   | 'Masters'
-//   | 'NationalChampionship'
-//   | 'Open'
-//   | 'Challenge';
 export enum ContestCategory {
   WorldGames = 0,
   WorldCup = 1,

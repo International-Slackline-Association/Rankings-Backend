@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
-import { ContestStreamsModule } from './contest/contest-streams.module';
+import { AthleteRecordsModule } from './athlete/athlete-records.module';
 import { DynamoDBStreamsService } from './dynamodb-streams.service';
 
 @Module({
-  imports: [ContestStreamsModule],
+  imports: [AthleteRecordsModule],
   providers: [DynamoDBStreamsService],
 })
 export class DynamoDBStreamsModule {}

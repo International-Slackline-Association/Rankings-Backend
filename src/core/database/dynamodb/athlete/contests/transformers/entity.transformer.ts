@@ -9,7 +9,7 @@ export class EntityTransformer {
   public toDBItem(contestResult: AthleteContestResult): DDBAthleteContestItem {
     return {
       contestId: contestResult.contestId,
-      athleteId: contestResult.id,
+      athleteId: contestResult.athleteId,
       date: contestResult.contestDate,
       discipline: contestResult.contestDiscipline,
       points: contestResult.points,
@@ -28,7 +28,7 @@ export class EntityTransformer {
       contestDiscipline: dbItem.discipline,
       contestId: dbItem.contestId,
       createdAt: dbItem.createdAt,
-      id: dbItem.athleteId,
+      athleteId: dbItem.athleteId,
       place: dbItem.place,
       points: dbItem.points,
     };

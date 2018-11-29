@@ -49,7 +49,7 @@ export class SubmitContestResultService {
       for (const result of disciplineGroup.results) {
         const athleteResult: AthleteContestResult = {
           contestId: contestId,
-          id: result.athleteId,
+          athleteId: result.athleteId,
           place: result.place,
           points: result.points,
           contestDate: contest.date,

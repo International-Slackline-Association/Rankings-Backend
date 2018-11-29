@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { DynamoDBRecord } from 'aws-lambda';
 import { logger } from 'shared/logger';
-import { AthleteContestResultService } from './contest/contest-result.service';
+import { AthleteContestRecordService } from './athlete/athlete-contest-record.service';
+import { AthleteDetailsRecordService } from './athlete/athlete-details-record.service';
 
 function reflect(promise: Promise<any>) {
   return promise.then(
@@ -16,7 +17,10 @@ function reflect(promise: Promise<any>) {
 
 @Injectable()
 export class DynamoDBStreamsService {
-  constructor(private readonly athleteContestResultService: AthleteContestResultService) {}
+  constructor(
+    private readonly athleteContestResultService: AthleteContestRecordService,
+    private readonly athleteDetailsService: AthleteDetailsRecordService,
+  ) {}
 
   public async processRecords(records: DynamoDBRecord[]) {
     const promises = [];
@@ -25,7 +29,7 @@ export class DynamoDBStreamsService {
         this.processRecord(record).catch(err => {
           logger.error('Processing Streams Error', {
             record: record,
-            err: err,
+            err: err.message,
           });
         }),
       );
@@ -36,6 +40,9 @@ export class DynamoDBStreamsService {
   private async processRecord(record: DynamoDBRecord) {
     if (this.athleteContestResultService.isRecordValidForThisService(record.dynamodb)) {
       await this.athleteContestResultService.processNewRecord(record);
+    }
+    if (this.athleteDetailsService.isRecordValidForThisService(record.dynamodb)) {
+      await this.athleteDetailsService.processNewRecord(record);
     }
   }
 }
