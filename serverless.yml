@@ -63,7 +63,7 @@ provider:
         - dynamodb:GetRecords
         - dynamodb:GetShardIterator
         - dynamodb:ListStreams
-      Resource: arn:aws:dynamodb:${self:provider.region}:*:table/ISA-Rankings_*
+      Resource: arn:aws:dynamodb:${self:provider.region}:*:table/ISA-Rankings*
     - Effect: Allow
       Action:
         - logs:PutLogEvents

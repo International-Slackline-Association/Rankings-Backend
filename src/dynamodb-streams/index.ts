@@ -8,18 +8,12 @@ import { DynamoDBStreamsService } from './dynamodb-streams.service';
 dotenv.config({ path: '../../.env', override: true });
 
 async function bootstrap(records: DynamoDBRecord[]) {
-  const app = await NestFactory.createApplicationContext(
-    DynamoDBStreamsModule,
-  );
+  const app = await NestFactory.createApplicationContext(DynamoDBStreamsModule, { logger: false });
   const service = app.get(DynamoDBStreamsService);
   await service.processRecords(records);
 }
 
-export const handler: DynamoDBStreamHandler = async (
-  event,
-  context,
-  callback,
-) => {
+export const handler: DynamoDBStreamHandler = async (event, context, callback) => {
   logger.debug('DynamoDB Event', { event });
   // Socket connections (redis) keeps waiting lamba functions. Dont want that
   context.callbackWaitsForEmptyEventLoop = false;

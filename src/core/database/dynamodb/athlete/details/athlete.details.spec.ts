@@ -10,7 +10,6 @@ describe('AthleteDetails', () => {
 
   const athlete: DDBAthleteDetailItem = {
     athleteId: '1',
-    ageCategory: AgeCategory.Youth,
     birthEpoch: 123,
     continent: 'Europe',
     country: 'Switzerland',
