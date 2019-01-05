@@ -97,7 +97,6 @@ export class AthleteContestRecordService {
       } else {
         const item: AthleteRanking = {
           ageCategory: combination.ageCategory,
-          continent: athlete.continent,
           country: athlete.country,
           discipline: combination.discipline,
           gender: combination.gender,

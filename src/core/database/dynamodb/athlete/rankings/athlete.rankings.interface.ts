@@ -7,7 +7,6 @@ interface Attrs {
   readonly name: string;
   readonly surname: string;
   readonly country: string;
-  readonly continent: string;
   readonly normalizedName: string;
   readonly lastUpdatedAt?: number;
 }

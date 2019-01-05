@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { AthleteDetail } from 'core/athlete/entity/athlete-detail';
 import * as moment from 'moment';
-import { AgeCategory } from 'shared/enums';
 import { Utils } from 'shared/utils';
 import { DDBAthleteDetailItem } from '../athlete.details.interface';
 
@@ -12,15 +11,17 @@ export class EntityTransformer {
   public toDBItem(athlete: AthleteDetail): DDBAthleteDetailItem {
     return {
       athleteId: athlete.id,
-      birthEpoch: athlete.birth,
-      continent: athlete.continent,
+      birthdate: athlete.birthdate.toISOString(),
       country: athlete.country,
       createdAt: athlete.createdAt || moment().unix(),
       gender: athlete.gender,
       name: athlete.name,
-      normalizedName: Utils.normalizeStringForSearching(athlete.name),
-      profilePictureUrl: athlete.profilePictureUrl,
+      normalizedName: Utils.normalizeString(athlete.name),
+      profileUrl: athlete.profileUrl || undefined,
       surname: athlete.surname,
+      city: athlete.city,
+      email: athlete.email,
+      infoUrl: athlete.infoUrl || undefined,
     };
   }
 
@@ -30,14 +31,16 @@ export class EntityTransformer {
     }
     return new AthleteDetail({
       id: athlete.athleteId,
-      birth: athlete.birthEpoch,
-      continent: athlete.continent,
+      birthdate: new Date(athlete.birthdate),
       country: athlete.country,
       createdAt: athlete.createdAt,
       gender: athlete.gender,
       name: athlete.name,
-      profilePictureUrl: athlete.profilePictureUrl,
+      profileUrl: athlete.profileUrl || '',
       surname: athlete.surname,
+      city: athlete.city,
+      email: athlete.email,
+      infoUrl: athlete.infoUrl || '',
     });
   }
 }

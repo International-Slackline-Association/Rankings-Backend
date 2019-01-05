@@ -10,15 +10,17 @@ describe('AthleteDetails', () => {
 
   const athlete: DDBAthleteDetailItem = {
     athleteId: '1',
-    birthEpoch: 123,
-    continent: 'Europe',
+    birthdate: '2017-10-25',
     country: 'Switzerland',
     createdAt: 1234,
     gender: Gender.Men,
     name: 'name1',
     normalizedName: 'name1',
     surname: 'surname2',
-    profilePictureUrl: '',
+    profileUrl: '',
+    city: 'city',
+    email: 'email',
+    infoUrl: 'infoUrl',
   };
   beforeAll(async () => {
     const module = await Test.createTestingModule(

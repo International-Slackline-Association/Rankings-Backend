@@ -7,15 +7,17 @@ export class AthleteDetail {
   public readonly id: string;
   public readonly name: string;
   public readonly surname: string;
-  public readonly birth: number;
+  public readonly profileUrl: string;
   public readonly gender: Gender;
   public readonly country: string;
-  public readonly continent: string;
-  public readonly profilePictureUrl: string;
+  public readonly birthdate: Date;
+  public readonly email: string;
+  public readonly city: string;
+  public readonly infoUrl: string;
   public readonly createdAt?: number;
 
   public get ageCategory(): AgeCategory {
-    const birthYear = Utils.unixToDate(this.birth).year();
+    const birthYear = Utils.dateToMoment(this.birthdate).year();
     const age =
       moment()
         .utc()
@@ -27,31 +29,37 @@ export class AthleteDetail {
     id,
     name,
     surname,
-    birth,
+    profileUrl,
     gender,
     country,
-    continent,
-    profilePictureUrl,
+    birthdate,
+    email,
+    city,
+    infoUrl,
     createdAt,
   }: {
     id: string;
     name: string;
     surname: string;
-    birth: number;
+    profileUrl: string;
     gender: Gender;
     country: string;
-    continent: string;
-    profilePictureUrl: string;
+    birthdate: Date;
+    email: string;
+    city: string;
+    infoUrl: string;
     createdAt?: number;
   }) {
     this.id = id;
     this.name = name;
     this.surname = surname;
-    this.birth = birth;
+    this.profileUrl = profileUrl;
     this.gender = gender;
     this.country = country;
-    this.continent = continent;
-    this.profilePictureUrl = profilePictureUrl;
+    this.birthdate = birthdate;
+    this.email = email;
+    this.city = city;
+    this.infoUrl = infoUrl;
     this.createdAt = createdAt;
   }
 }

@@ -11,12 +11,11 @@ export class EntityTransformer {
     return {
       ageCategory: athleteRanking.ageCategory,
       athleteId: athleteRanking.id,
-      continent: athleteRanking.continent,
       country: athleteRanking.country,
       lastUpdatedAt: athleteRanking.lastUpdatedAt || moment().unix(),
       gender: athleteRanking.gender,
       name: athleteRanking.name,
-      normalizedName: Utils.normalizeStringForSearching(athleteRanking.name),
+      normalizedName: Utils.normalizeString(athleteRanking.name),
       surname: athleteRanking.surname,
       discipline: athleteRanking.discipline,
       points: athleteRanking.points,
@@ -31,7 +30,6 @@ export class EntityTransformer {
     return {
       ageCategory: dbItem.ageCategory || AgeCategory.All,
       id: dbItem.athleteId,
-      continent: dbItem.continent,
       country: dbItem.country,
       lastUpdatedAt: dbItem.lastUpdatedAt,
       gender: dbItem.gender,

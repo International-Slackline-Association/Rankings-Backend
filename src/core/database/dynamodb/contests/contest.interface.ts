@@ -8,9 +8,9 @@ interface Attrs {
   readonly city: string;
   readonly country: string;
   readonly prize: number;
-  readonly prizeUnit: PrizeUnit;
   readonly category: ContestCategory;
-  readonly profilePictureUrl: string;
+  readonly profileUrl: string;
+  readonly infoUrl: string;
   readonly createdAt: number;
 }
 
@@ -18,9 +18,9 @@ interface NonKeyAttrs extends Attrs {}
 
 export type AllAttrs = KeyAttrs & NonKeyAttrs;
 
-export interface DDBDisciplineContestItem extends Attrs {
+export interface DDBContestItem extends Attrs {
   readonly contestId: string;
   readonly discipline: Discipline;
   readonly year: number;
-  readonly date: number;
+  readonly date: string;
 }

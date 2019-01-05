@@ -2,14 +2,14 @@ import { isNil } from 'lodash';
 import { Discipline } from 'shared/enums';
 import { DDBOverloadedTableTransformer } from '../../../dynamodb.table.transformers';
 import { buildCompositeKey, destructCompositeKey } from '../../../utils/utils';
-import { AllAttrs, DDBDisciplineContestItem } from '../../discipline.contest.interface';
+import { AllAttrs, DDBContestItem } from '../../contest.interface';
 
 /**
  * Transformers define how the application level DTO objects transforms to DynamoDB attributes in a table
  */
 export class DefaultAttrsTransformer extends DDBOverloadedTableTransformer<
   AllAttrs,
-  DDBDisciplineContestItem
+  DDBContestItem
 > {
   constructor() {
     super();
@@ -26,7 +26,7 @@ export class DefaultAttrsTransformer extends DDBOverloadedTableTransformer<
     year: (sk_gsi: string) => parseInt(destructCompositeKey(sk_gsi, 1), 10),
     discipline: (sk_gsi: string) =>
       parseInt(destructCompositeKey(sk_gsi, 2), 10),
-    date: (lsi: string) => parseInt(destructCompositeKey(lsi, 3), 10),
+    date: (lsi: string) => destructCompositeKey(lsi, 3),
   };
 
   public itemToAttrsTransformer = {
@@ -38,7 +38,7 @@ export class DefaultAttrsTransformer extends DDBOverloadedTableTransformer<
         !isNil(discipline) && discipline.toString(),
         contestId,
       ),
-    LSI: (year: number, discipline: Discipline, date: number) =>
+    LSI: (year: number, discipline: Discipline, date: string) =>
       buildCompositeKey(
         this.prefixes.LSI,
         year && year.toString(),
@@ -50,7 +50,7 @@ export class DefaultAttrsTransformer extends DDBOverloadedTableTransformer<
 
   public transformAttrsToItem(
     dynamodbItem: AllAttrs,
-  ): DDBDisciplineContestItem {
+  ): DDBContestItem {
     const { PK, SK_GSI, LSI, GSI_SK, ...rest } = dynamodbItem;
     return {
       contestId: this.attrsToItemTransformer.contestId(SK_GSI),
@@ -61,7 +61,7 @@ export class DefaultAttrsTransformer extends DDBOverloadedTableTransformer<
     };
   }
 
-  public transformItemToAttrs(item: DDBDisciplineContestItem): AllAttrs {
+  public transformItemToAttrs(item: DDBContestItem): AllAttrs {
     const { contestId, discipline, year, date, ...rest } = item;
     return {
       PK: this.itemToAttrsTransformer.PK(),

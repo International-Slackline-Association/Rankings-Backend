@@ -4,7 +4,7 @@ import { Discipline } from 'shared/enums';
 import { Utils } from 'shared/utils';
 import { DDBAthleteDetailItem } from '../dynamodb/athlete/details/athlete.details.interface';
 import { DDBAthleteRankingsItemPrimaryKey } from '../dynamodb/athlete/rankings/athlete.rankings.interface';
-import { DDBDisciplineContestItem } from '../dynamodb/contests/discipline.contest.interface';
+import { DDBContestItem } from '../dynamodb/contests/contest.interface';
 import { RedisConfig } from './redis.config';
 
 @Injectable()
@@ -46,11 +46,11 @@ export class RedisRepository {
 
   public async getContestDiscipline(contestId: string, discipline: Discipline) {
     const key = this.redisKeyOfContestDiscipline(contestId, discipline);
-    const get = this.redis.get(key).then(d => JSON.parse(d) as DDBDisciplineContestItem);
+    const get = this.redis.get(key).then(d => JSON.parse(d) as DDBContestItem);
     return Utils.omitReject(get);
   }
 
-  public async setContestDiscipline(item: DDBDisciplineContestItem) {
+  public async setContestDiscipline(item: DDBContestItem) {
     if (!item) {
       return;
     }

@@ -1,8 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { AthleteContestResult } from 'core/athlete/entity/contest-result';
-import { ContestDiscipline } from 'core/contest/entity/contest-discipline';
+import { Contest } from 'core/contest/entity/contest';
 // tslint:disable-next-line:max-line-length
-import { ContestPointsCalculatorService, DetailedDisciplineResultGroup, DisciplineResultsGroupCalculated } from 'core/contest/points-calculator.service';
+import {
+  ContestPointsCalculatorService,
+  DetailedDisciplineResultGroup,
+  DisciplineResultsGroupCalculated,
+} from 'core/contest/points-calculator.service';
 import { DatabaseService } from 'core/database/database.service';
 import { ContestCategory } from 'shared/enums';
 import { APIErrors } from 'shared/exceptions/api.exceptions';
@@ -25,7 +29,7 @@ export class SubmitContestResultService {
     const calculatedScores = submitContestResultdto.scores.map(scores => {
       return this.calculatePointsForDisciplineGroup(
         scores,
-        contestDisciplines.find(d => d.discipline === scores.discipline).category,
+        contestDisciplines.find(d => d.discipline === scores.discipline).contestCategory,
       );
     });
 
@@ -40,7 +44,7 @@ export class SubmitContestResultService {
 
   private async putResultsIntoDB(
     contestId: string,
-    contestDisciplines: ContestDiscipline[],
+    contestDisciplines: Contest[],
     calculatedScores: DisciplineResultsGroupCalculated[],
   ) {
     const dbFailedAthleteResults: AthleteContestResult[] = [];
@@ -52,7 +56,7 @@ export class SubmitContestResultService {
           athleteId: result.athleteId,
           place: result.place,
           points: result.points,
-          contestDate: contest.date,
+          contestDate: contest.date.getUTCDate(),
           contestDiscipline: disciplineGroup.discipline,
         };
         await this.db

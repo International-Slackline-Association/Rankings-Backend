@@ -25,8 +25,8 @@ export class IdGenerator {
     suffix?: string,
   ): string {
     // example name_surname, name_surname_1
-    name = Utils.normalizeStringForSearching(name);
-    surname = Utils.normalizeStringForSearching(surname);
+    name = Utils.normalizeString(name);
+    surname = Utils.normalizeString(surname);
     return suffix ? `${name}-${surname}-${suffix}` : `${name}-${surname}`;
   }
 }

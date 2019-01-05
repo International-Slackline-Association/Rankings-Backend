@@ -86,6 +86,17 @@ package:
     - .env
     
 functions:
+  AdminAPI:
+    handler: src/api/admin/index.handler
+    description: Rankings Admin WebAPI service
+    environment: ${file(./serverless/environment.yml)}
+    events:
+      - http: 
+          method: any
+          path: /admin/api/{proxy+}
+          cors: true
+          authorizer:
+            arn: ${self:custom.secrets.CognitoPoolAuthorizer}
   RankingsAPI:
     handler: src/api/index.handler
     description: Rankings WebAPI service

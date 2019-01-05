@@ -21,7 +21,11 @@ export namespace Utils {
     return moment.unix(unix);
   }
 
-  export function normalizeStringForSearching(str: string) {
+  export function dateToMoment(date: Date): moment.Moment {
+    return moment(date);
+  }
+
+  export function normalizeString(str: string) {
     return (latinize(str) as string).toLowerCase();
   }
 

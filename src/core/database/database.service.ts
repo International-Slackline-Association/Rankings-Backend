@@ -2,13 +2,13 @@ import { Injectable } from '@nestjs/common';
 import { AthleteDetail } from 'core/athlete/entity/athlete-detail';
 import { AthleteRanking } from 'core/athlete/entity/athlete-ranking';
 import { AthleteContestResult } from 'core/athlete/entity/contest-result';
-import { ContestDiscipline } from 'core/contest/entity/contest-discipline';
+import { Contest } from 'core/contest/entity/contest';
 import { Discipline } from 'shared/enums';
 import { DDBAthleteContestsRepository } from './dynamodb/athlete/contests/athlete.contests.repo';
 import { DDBAthleteDetailsRepository } from './dynamodb/athlete/details/athlete.details.repo';
 import { DDBAthleteRankingsItemPrimaryKey } from './dynamodb/athlete/rankings/athlete.rankings.interface';
 import { DDBAthleteRankingsRepository } from './dynamodb/athlete/rankings/athlete.rankings.repo';
-import { DDBDisciplineContestRepository } from './dynamodb/contests/discipline.contest.repo';
+import { DDBContestRepository } from './dynamodb/contests/contest.repo';
 import { RedisRepository } from './redis/redis.repo';
 
 @Injectable()
@@ -17,7 +17,7 @@ export class DatabaseService {
     private readonly athleteDetailsRepo: DDBAthleteDetailsRepository,
     private readonly athleteContestsRepo: DDBAthleteContestsRepository,
     private readonly athleteRankingsRepo: DDBAthleteRankingsRepository,
-    private readonly disciplineContestRepo: DDBDisciplineContestRepository,
+    private readonly contestRepo: DDBContestRepository,
     private readonly redisRepo: RedisRepository,
   ) {}
 
@@ -49,6 +49,10 @@ export class DatabaseService {
   public async putAthlete(athlete: AthleteDetail) {
     const dbItem = this.athleteDetailsRepo.entityTransformer.toDBItem(athlete);
     return this.athleteDetailsRepo.put(dbItem);
+  }
+
+  public async updateAthleteUrl(athleteId: string, url: string) {
+    return this.athleteDetailsRepo.updateUrl(athleteId, url);
   }
 
   public async putContestResult(contestResult: AthleteContestResult) {
@@ -86,15 +90,19 @@ export class DatabaseService {
     // Read-through cache
     let dbItem = await this.redisRepo.getContestDiscipline(contestId, discipline);
     if (!dbItem) {
-      dbItem = await this.disciplineContestRepo.get(contestId, discipline);
+      dbItem = await this.contestRepo.get(contestId, discipline);
       await this.redisRepo.setContestDiscipline(dbItem);
     }
-    return this.disciplineContestRepo.entityTransformer.fromDBItem(dbItem);
+    return this.contestRepo.entityTransformer.fromDBItem(dbItem);
   }
 
-  public async putContestDiscipline(contestDiscipline: ContestDiscipline) {
-    const dbItem = this.disciplineContestRepo.entityTransformer.toDBItem(contestDiscipline);
-    await this.disciplineContestRepo.put(dbItem);
+  public async putContest(contest: Contest) {
+    const dbItem = this.contestRepo.entityTransformer.toDBItem(contest);
+    await this.contestRepo.put(dbItem);
   }
+  public async updateContestUrl(contestId: string, discipline: Discipline, url: string) {
+    return this.contestRepo.updateUrl(contestId, discipline, url);
+  }
+
   //#endregion
 }

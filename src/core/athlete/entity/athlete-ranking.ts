@@ -6,7 +6,6 @@ export class AthleteRanking {
   public readonly surname: string;
   public readonly gender: Gender;
   public readonly country: string;
-  public readonly continent: string;
   public readonly ageCategory: AgeCategory;
   public readonly lastUpdatedAt?: number;
   public readonly points: number;

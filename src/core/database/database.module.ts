@@ -6,7 +6,7 @@ import { DatabaseService } from './database.service';
 import { DDBAthleteContestsRepoModule } from './dynamodb/athlete/contests/athlete.contests.module';
 import { DDBAthleteDetailsRepoModule } from './dynamodb/athlete/details/athlete.details.module';
 import { DDBAthleteRankingsRepoModule } from './dynamodb/athlete/rankings/athlete.rankings.module';
-import { DDBDisciplineContestRepoModule } from './dynamodb/contests/discipline.contest.module';
+import { DDBContestRepoModule } from './dynamodb/contests/contest.module';
 import { RedisRepositoryModule } from './redis/redis.module';
 
 @Module({
@@ -25,7 +25,7 @@ export class DatabaseModule {
         DDBAthleteDetailsRepoModule.withConfig(dynamodbService),
         DDBAthleteContestsRepoModule.withConfig(dynamodbService),
         DDBAthleteRankingsRepoModule.withConfig(dynamodbService),
-        DDBDisciplineContestRepoModule.withConfig(dynamodbService),
+        DDBContestRepoModule.withConfig(dynamodbService),
         RedisRepositoryModule.withConfig(redisOpts),
       ],
     };
@@ -39,7 +39,7 @@ export class DatabaseModule {
         DDBAthleteDetailsRepoModule.withConfig(dynamodbService),
         DDBAthleteContestsRepoModule.withConfig(dynamodbService),
         DDBAthleteRankingsRepoModule.withConfig(dynamodbService),
-        DDBDisciplineContestRepoModule.withConfig(dynamodbService),
+        DDBContestRepoModule.withConfig(dynamodbService),
         RedisRepositoryModule.withConfig(redisOpts),
       ],
       providers: [DatabaseService],

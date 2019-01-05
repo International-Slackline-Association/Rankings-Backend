@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { DisciplineResultGroup } from 'api/submit/results/dto/submit-contest-result.dto';
+import { DisciplineResultGroup } from 'api/admin/submit/results/dto/submit-contest-result.dto';
 import { Constants } from 'shared/constants';
 import { ContestCategory, Discipline } from 'shared/enums';
 

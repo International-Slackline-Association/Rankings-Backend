@@ -16,9 +16,7 @@ export class DDBAthleteDetailsRepository extends DDBRepository {
   public readonly transformer = new AttrsTransformer();
   public readonly entityTransformer = new EntityTransformer();
 
-  constructor(
-    dynamodbService: IDynamoDBService,
-  ) {
+  constructor(dynamodbService: IDynamoDBService) {
     super(dynamodbService);
   }
 
@@ -28,7 +26,7 @@ export class DDBAthleteDetailsRepository extends DDBRepository {
     return this.entityTransformer.fromDBItem(item);
   }
 
-  public transformToDynamoDBType(item: DDBAthleteDetailItem): {[P in keyof KeyAttrs]: AttributeValue} {
+  public transformToDynamoDBType(item: DDBAthleteDetailItem): { [P in keyof KeyAttrs]: AttributeValue } {
     const attr = this.transformer.transformItemToAttrs(item);
     return dynamoDbAttrValues.wrap(attr);
   }
@@ -92,9 +90,7 @@ export class DDBAthleteDetailsRepository extends DDBRepository {
           return this.transformer.transformAttrsToItem(item);
         });
       })
-      .catch(
-        logThrowDynamoDBError('DDBAthleteDetailsRepository batchGet', params),
-      );
+      .catch(logThrowDynamoDBError('DDBAthleteDetailsRepository batchGet', params));
   }
   public async put(athlete: DDBAthleteDetailItem) {
     const params = {
@@ -106,5 +102,29 @@ export class DDBAthleteDetailsRepository extends DDBRepository {
       .promise()
       .then(data => data)
       .catch(logThrowDynamoDBError('DDBAthleteDetailsRepository Put', params));
+  }
+
+  public async updateUrl(athleteId: string, url: string) {
+    const params: DocumentClient.UpdateItemInput = {
+      TableName: this._tableName,
+      Key: this.transformer.primaryKey(athleteId),
+      UpdateExpression: 'SET #profileUrl = :url',
+      ConditionExpression: 'attribute_exists(#pk)',
+      ExpressionAttributeNames: {
+        '#pk': this.transformer.attrName('PK'),
+        '#profileUrl': this.transformer.attrName('profileUrl'),
+      },
+      ExpressionAttributeValues: {
+        ':url': url
+      },
+      ReturnValues: 'UPDATED_NEW',
+    };
+    return this.client
+      .update(params)
+      .promise()
+      .then(data => {
+        return data.Attributes[this.transformer.attrName('profileUrl')] as string;
+      })
+      .catch(logThrowDynamoDBError('DDBAthleteDetailsRepository updateUrl', params));
   }
 }

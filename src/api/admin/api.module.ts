@@ -9,11 +9,7 @@ import { SubmitContestModule } from './submit/contest/submit-contest.module';
 import { SubmitContestResultsModule } from './submit/results/submit-contest-result.module';
 
 @Module({
-  imports: [
-    SubmitContestModule,
-    SubmitAthleteModule,
-    SubmitContestResultsModule,
-  ],
+  imports: [SubmitContestModule, SubmitAthleteModule, SubmitContestResultsModule],
   controllers: [NestJSTestController],
   providers: [],
   exports: [],
