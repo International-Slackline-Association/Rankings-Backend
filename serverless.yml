@@ -97,8 +97,8 @@ functions:
           cors: true
           authorizer:
             arn: ${self:custom.secrets.CognitoPoolAuthorizer}
-  RankingsAPI:
-    handler: src/api/index.handler
+  WebAppAPI:
+    handler: src/api/webapp/index.handler
     description: Rankings WebAPI service
     environment: ${file(./serverless/environment.yml)}
     events:

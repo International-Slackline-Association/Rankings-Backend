@@ -2,6 +2,7 @@ import { Body, Controller, Post, Put, UseGuards, UsePipes } from '@nestjs/common
 import { Roles } from 'shared/decorators/roles.decorator';
 import { AuthenticationRole, Discipline } from 'shared/enums';
 import { RolesGuard } from 'shared/guards/roles.guard';
+import { logger } from 'shared/logger';
 import { JoiValidationPipe } from 'shared/pipes/JoiValidation.pipe';
 import { SubmitContestDto, submitContestDtoSchema } from './dto/submit-contest.dto';
 import { SubmitContestResponse } from './dto/submit-contest.response';
@@ -17,6 +18,7 @@ export class SubmitContestController {
   // @UseGuards(RolesGuard)
   @UsePipes(new JoiValidationPipe(submitContestDtoSchema))
   public async submitContest(@Body() dto: SubmitContestDto) {
+    logger.debug('Submit Contest', dto);
     let rsp: { id: string; discipline: Discipline };
     if (dto.id) {
       rsp = await this.service.modifyContest(dto);

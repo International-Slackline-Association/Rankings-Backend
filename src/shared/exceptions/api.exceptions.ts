@@ -21,7 +21,7 @@ export namespace APIErrors {
     constructor(contestId: string, discipline: Discipline) {
       const x = DisciplineUtility.getName(discipline);
       super({
-        message: `Contest-Discipline: ${contestId}-${DisciplineUtility.getName(
+        message: `Contest: ${contestId}, Discipline: ${DisciplineUtility.getName(
           discipline,
         )} was not found in the database`,
         alias: APIErrorAlias.NotFound,

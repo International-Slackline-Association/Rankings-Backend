@@ -46,13 +46,18 @@ export class DatabaseService {
     return this.redisRepo.clearAthleteDetail(athleteId);
   }
 
+  public async queryAthletesByName(name: string, limit: number) {
+    const dbItems = await this.athleteDetailsRepo.queryAthletesByName(name, limit);
+    return dbItems.map(dbItem => this.athleteDetailsRepo.entityTransformer.fromDBItem(dbItem));
+  }
+
   public async putAthlete(athlete: AthleteDetail) {
     const dbItem = this.athleteDetailsRepo.entityTransformer.toDBItem(athlete);
     return this.athleteDetailsRepo.put(dbItem);
   }
 
-  public async updateAthleteUrl(athleteId: string, url: string) {
-    return this.athleteDetailsRepo.updateUrl(athleteId, url);
+  public async updateAthleteProfileUrl(athleteId: string, url: string) {
+    return this.athleteDetailsRepo.updateProfileUrl(athleteId, url);
   }
 
   public async putContestResult(contestResult: AthleteContestResult) {
@@ -86,22 +91,27 @@ export class DatabaseService {
   //#endregion
 
   //#region Contest
-  public async getContestDiscipline(contestId: string, discipline: Discipline) {
+  public async getContest(contestId: string, discipline: Discipline) {
     // Read-through cache
-    let dbItem = await this.redisRepo.getContestDiscipline(contestId, discipline);
+    let dbItem = await this.redisRepo.getContest(contestId, discipline);
     if (!dbItem) {
       dbItem = await this.contestRepo.get(contestId, discipline);
-      await this.redisRepo.setContestDiscipline(dbItem);
+      await this.redisRepo.setContest(dbItem);
     }
     return this.contestRepo.entityTransformer.fromDBItem(dbItem);
+  }
+
+  public async queryContestsByName(name: string, limit: number) {
+    const dbItems = await this.contestRepo.queryContestsByName(name, limit);
+    return dbItems.map(dbItem => this.contestRepo.entityTransformer.fromDBItem(dbItem));
   }
 
   public async putContest(contest: Contest) {
     const dbItem = this.contestRepo.entityTransformer.toDBItem(contest);
     await this.contestRepo.put(dbItem);
   }
-  public async updateContestUrl(contestId: string, discipline: Discipline, url: string) {
-    return this.contestRepo.updateUrl(contestId, discipline, url);
+  public async updateContestProfileUrl(contestId: string, discipline: Discipline, url: string) {
+    return this.contestRepo.updateProfileUrl(contestId, discipline, url);
   }
 
   //#endregion

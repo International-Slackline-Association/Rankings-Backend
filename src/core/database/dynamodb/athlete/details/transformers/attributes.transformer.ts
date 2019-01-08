@@ -20,11 +20,11 @@ export class AttrsTransformer extends DDBOverloadedTableTransformer<
     GSI_SK: ''
   };
 
-  protected attrsToItemTransformer = {
+  public attrsToItemTransformer = {
     athleteId: (pk: string) => destructCompositeKey(pk, 1),
   };
 
-  protected itemToAttrsTransformer = {
+  public itemToAttrsTransformer = {
     PK: (id: string) => buildCompositeKey(this.prefixes.PK, id),
     SK_GSI: () => this.prefixes.SK_GSI,
     LSI: () => undefined,

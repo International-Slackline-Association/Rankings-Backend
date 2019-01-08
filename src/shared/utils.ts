@@ -1,6 +1,8 @@
+import latinize = require('latinize');
+import { isNil } from 'lodash';
 import * as moment from 'moment';
 
-import latinize = require('latinize');
+import env_variables from './env_variables';
 import { logger } from './logger';
 
 // tslint:disable-next-line:no-namespace
@@ -26,7 +28,7 @@ export namespace Utils {
   }
 
   export function normalizeString(str: string) {
-    return (latinize(str) as string).toLowerCase();
+    return latinize(str).toLowerCase();
   }
 
   export function omitReject<T>(promise: Promise<T>) {
@@ -36,42 +38,10 @@ export namespace Utils {
     });
   }
 
-  export function csvToObject<T = any>(csvString: string) {
-    const nestedDelimeter = '__';
-    const csv = csvString.split('\n');
-
-    const attrs = csv.splice(0, 1)[0];
-
-    const result = csv.map(row => {
-      let obj = {};
-      const rowData = row.split(',');
-      attrs.split(',').forEach((attr, idx) => {
-        obj = constructObj(attr, obj, rowData[idx]);
-      });
-      return obj;
-    });
-
-    return result;
-
-    function constructObj(attr, parentObj, data) {
-      if (attr.split(nestedDelimeter).length === 1) {
-        parentObj[attr] = data;
-        return parentObj;
-      }
-
-      const curKey = attr.split(nestedDelimeter)[0];
-      if (!parentObj[curKey]) {
-        parentObj[curKey] = {};
-      }
-      parentObj[curKey] = constructObj(
-        attr
-          .split(nestedDelimeter)
-          .slice(1)
-          .join(nestedDelimeter),
-        parentObj[curKey],
-        data,
-      );
-      return parentObj;
+  export function isRequestAuthenticated(request: Express.Request) {
+    if (env_variables.isDev) {
+      return true;
     }
+    return !isNil(request.cognitoClaims);
   }
 }

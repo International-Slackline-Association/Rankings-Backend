@@ -45,8 +45,7 @@ export class AthleteContestRecordService {
 
   private async processNewContestResult(newItem: AthleteContestResult) {
     const pointsToAdd = newItem.points;
-    const year = Utils.unixToDate(newItem.contestDate).year();
-
+    const year = Utils.dateToMoment(newItem.contestDate).year();
     await this.updateRankingsForCombinations(newItem.athleteId, newItem.contestDiscipline, year, pointsToAdd);
   }
 
@@ -55,14 +54,14 @@ export class AthleteContestRecordService {
     if (pointsToAdd === 0) {
       return;
     }
-    const year = Utils.unixToDate(newItem.contestDate).year();
+    const year = Utils.dateToMoment(newItem.contestDate).year();
 
     await this.updateRankingsForCombinations(newItem.athleteId, newItem.contestDiscipline, year, pointsToAdd);
   }
 
   private async processRemovedContestResult(oldItem: AthleteContestResult) {
     const pointsToAdd = -oldItem.points;
-    const year = Utils.unixToDate(oldItem.contestDate).year();
+    const year = Utils.dateToMoment(oldItem.contestDate).year();
 
     await this.updateRankingsForCombinations(oldItem.athleteId, oldItem.contestDiscipline, year, pointsToAdd);
   }

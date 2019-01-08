@@ -29,7 +29,7 @@ export class DefaultAttrsTransformer extends DDBOverloadedTableTransformer<
     year: (sk_gsi: string) => parseInt(destructCompositeKey(sk_gsi, 1), 10),
     discipline: (sk_gsi: string) =>
       parseInt(destructCompositeKey(sk_gsi, 2), 10),
-    date: (lsi: string) => parseInt(destructCompositeKey(lsi, 3), 10),
+    date: (lsi: string) => destructCompositeKey(lsi, 3),
     points: (gsi_sk: string) => parseFloat(gsi_sk),
   };
 
@@ -42,12 +42,12 @@ export class DefaultAttrsTransformer extends DDBOverloadedTableTransformer<
         !isNil(discipline) && discipline.toString(),
         contestId,
       ),
-    LSI: (year: number, discipline: Discipline, date: number) =>
+    LSI: (year: number, discipline: Discipline, date: string) =>
       buildCompositeKey(
         this.prefixes.LSI,
         year && year.toString(),
         !isNil(discipline) && discipline.toString(),
-        !isNil(date) && date.toString(),
+        !isNil(date) && date,
       ),
     GSI_SK: (points: number) => points.toString(),
   };

@@ -19,10 +19,6 @@ export class RedisRepository {
 
   constructor(public readonly redisConfig: RedisConfig) {}
 
-  public async test() {
-    return this.redis.get('test');
-  }
-
   public async getAthleteDetail(athleteId: string) {
     const key = this.redisKeyOfAthleteDetails(athleteId);
     const get = this.redis.get(key).then(d => JSON.parse(d) as DDBAthleteDetailItem);
@@ -44,17 +40,17 @@ export class RedisRepository {
     return Utils.omitReject(del);
   }
 
-  public async getContestDiscipline(contestId: string, discipline: Discipline) {
-    const key = this.redisKeyOfContestDiscipline(contestId, discipline);
+  public async getContest(contestId: string, discipline: Discipline) {
+    const key = this.redisKeyOfContest(contestId, discipline);
     const get = this.redis.get(key).then(d => JSON.parse(d) as DDBContestItem);
     return Utils.omitReject(get);
   }
 
-  public async setContestDiscipline(item: DDBContestItem) {
+  public async setContest(item: DDBContestItem) {
     if (!item) {
       return;
     }
-    const key = this.redisKeyOfContestDiscipline(item.contestId, item.discipline);
+    const key = this.redisKeyOfContest(item.contestId, item.discipline);
     const set = this.redis.set(key, JSON.stringify(item));
     return Utils.omitReject(set);
   }
@@ -67,7 +63,7 @@ export class RedisRepository {
 
   protected redisKeyOfRankingCategory(pk: DDBAthleteRankingsItemPrimaryKey): string {
     return this.concatWithKeynamePrefix(
-      'PointPlaces',
+      'Rankings',
       pk.year.toString(),
       pk.discipline.toString(),
       pk.gender.toString(),
@@ -79,8 +75,8 @@ export class RedisRepository {
     return this.concatWithKeynamePrefix('AthleteDetails', athleteId);
   }
 
-  protected redisKeyOfContestDiscipline(contesId: string, discipline: Discipline): string {
-    return this.concatWithKeynamePrefix('ContestDiscipline', contesId, discipline.toString());
+  protected redisKeyOfContest(contesId: string, discipline: Discipline): string {
+    return this.concatWithKeynamePrefix('Contest', contesId, discipline.toString());
   }
 
   protected concatWithKeynamePrefix(keySpace: string, ...params: string[]): string {

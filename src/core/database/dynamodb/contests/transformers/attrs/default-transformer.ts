@@ -31,14 +31,14 @@ export class DefaultAttrsTransformer extends DDBOverloadedTableTransformer<
 
   public itemToAttrsTransformer = {
     PK: () => this.prefixes.PK,
-    SK_GSI: (year: number, discipline: Discipline, contestId: string) =>
+    SK_GSI: (year?: number, discipline?: Discipline, contestId?: string) =>
       buildCompositeKey(
         this.prefixes.SK_GSI,
         year && year.toString(),
         !isNil(discipline) && discipline.toString(),
         contestId,
       ),
-    LSI: (year: number, discipline: Discipline, date: string) =>
+    LSI: (year?: number, discipline?: Discipline, date?: string) =>
       buildCompositeKey(
         this.prefixes.LSI,
         year && year.toString(),

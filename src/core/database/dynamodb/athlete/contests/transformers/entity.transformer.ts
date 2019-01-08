@@ -10,7 +10,7 @@ export class EntityTransformer {
     return {
       contestId: contestResult.contestId,
       athleteId: contestResult.athleteId,
-      date: contestResult.contestDate,
+      date: contestResult.contestDate.toISOString().split('T')[0],
       discipline: contestResult.contestDiscipline,
       points: contestResult.points,
       place: contestResult.place,
@@ -19,12 +19,12 @@ export class EntityTransformer {
     };
   }
 
-  public fromDBItem(
-    dbItem: DDBAthleteContestItem,
-  ): AthleteContestResult {
-    if (!dbItem) { return null; }
+  public fromDBItem(dbItem: DDBAthleteContestItem): AthleteContestResult {
+    if (!dbItem) {
+      return null;
+    }
     return {
-      contestDate: dbItem.date,
+      contestDate: new Date(dbItem.date),
       contestDiscipline: dbItem.discipline,
       contestId: dbItem.contestId,
       createdAt: dbItem.createdAt,

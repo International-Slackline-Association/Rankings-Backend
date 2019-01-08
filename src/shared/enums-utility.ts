@@ -1,11 +1,11 @@
 import { $enum } from 'ts-enum-util';
-import { AgeCategory, Discipline, Gender } from './enums';
+import { AgeCategory, ContestCategory, Discipline, Gender } from './enums';
 
 const wrappedDiscipline = $enum(Discipline);
 
 // tslint:disable-next-line:no-namespace
 export namespace DisciplineUtility {
-  export function getName(discipline: Discipline) {
+  export function getEnumName(discipline: Discipline) {
     return wrappedDiscipline.getKeyOrDefault(discipline, discipline.toString());
   }
 
@@ -14,10 +14,9 @@ export namespace DisciplineUtility {
       case Discipline.Overall:
         return [];
       // 2nd degree disciplines
-      case Discipline.Trickline_Arial:
+      case Discipline.Trickline_Aerial:
       case Discipline.Trickline_JibAndStatic:
-      case Discipline.Trickline_TransferSingle:
-      case Discipline.Trickline_TransferTandem:
+      case Discipline.Trickline_Transfer:
         return [Discipline.Trickline, Discipline.Overall];
       case Discipline.Speedline_Sprint:
       case Discipline.Speedline__HighLongWaterline:
@@ -26,7 +25,7 @@ export namespace DisciplineUtility {
       // 1st degree disciplines
       case Discipline.Trickline:
         return [Discipline.Overall];
-      case Discipline.HighLongWaterline_Contact:
+      case Discipline.Contact_HighLongWaterline:
         return [Discipline.Overall];
       case Discipline.Speedline:
         return [Discipline.Overall];
@@ -38,6 +37,61 @@ export namespace DisciplineUtility {
         return [Discipline.Overall];
       default:
         return [Discipline.Overall];
+    }
+  }
+
+  export function getName(discipline: Discipline) {
+    switch (discipline) {
+      case Discipline.Overall:
+        return 'Overall';
+      case Discipline.Trickline_Aerial:
+        return 'Trickline - Aerial';
+      case Discipline.Trickline_JibAndStatic:
+        return 'Trickline - Jib-Static';
+      case Discipline.Trickline_Transfer:
+        return 'Trickline - Transfer';
+      case Discipline.Speedline_Sprint:
+        return 'Speedline - Sprint';
+      case Discipline.Speedline__HighLongWaterline:
+        return 'Speedline - High-/Long-/Waterline';
+
+      // 1st degree disciplines
+      case Discipline.Trickline:
+        return 'Trickline';
+      case Discipline.Contact_HighLongWaterline:
+        return 'Contact - High-/Long-/Waterline';
+      case Discipline.Speedline:
+        return 'Speedline';
+      case Discipline.Endurance:
+        return 'Endurance';
+      case Discipline.Blind:
+        return 'Blind';
+      case Discipline.Rigging:
+        return 'Rigging';
+      default:
+        throw new Error(`Discipline name not found: ${discipline}`);
+    }
+  }
+}
+
+// tslint:disable-next-line:no-namespace
+export namespace ContestCategoryUtility {
+  export function getName(category: ContestCategory) {
+    switch (category) {
+      case ContestCategory.WorldGames:
+        return 'World Games';
+      case ContestCategory.WorldCup:
+        return 'World Cup';
+      case ContestCategory.Masters:
+        return 'Masters';
+      case ContestCategory.NationalChampionship:
+        return 'National Championship';
+      case ContestCategory.Open:
+        return 'Open';
+      case ContestCategory.Challenge:
+        return 'Challenge';
+      default:
+        throw new Error(`Contest Category name not found: ${category}`);
     }
   }
 }

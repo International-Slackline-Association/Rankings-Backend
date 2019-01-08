@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { AttributeValue, StreamRecord } from 'aws-lambda';
 import { DocumentClient } from 'aws-sdk/clients/dynamodb';
 import { IDynamoDBService } from 'core/aws/aws.services.interface';
-import { DDBRepository } from '../../dynamodb.repo';
+import { DDBRepository, GlobalSecondaryIndexName } from '../../dynamodb.repo';
 import { logDynamoDBError, logThrowDynamoDBError } from '../../utils/utils';
 import { AllAttrs, DDBAthleteDetailItem, KeyAttrs } from './athlete.details.interface';
 import { AttrsTransformer } from './transformers/attributes.transformer';
@@ -10,6 +10,7 @@ import { EntityTransformer } from './transformers/entity.transformer';
 
 import dynamoDataTypes = require('dynamodb-data-types');
 const dynamoDbAttrValues = dynamoDataTypes.AttributeValue;
+
 @Injectable()
 export class DDBAthleteDetailsRepository extends DDBRepository {
   protected readonly _tableName = 'ISA-Rankings';
@@ -104,7 +105,7 @@ export class DDBAthleteDetailsRepository extends DDBRepository {
       .catch(logThrowDynamoDBError('DDBAthleteDetailsRepository Put', params));
   }
 
-  public async updateUrl(athleteId: string, url: string) {
+  public async updateProfileUrl(athleteId: string, url: string) {
     const params: DocumentClient.UpdateItemInput = {
       TableName: this._tableName,
       Key: this.transformer.primaryKey(athleteId),
@@ -115,7 +116,7 @@ export class DDBAthleteDetailsRepository extends DDBRepository {
         '#profileUrl': this.transformer.attrName('profileUrl'),
       },
       ExpressionAttributeValues: {
-        ':url': url
+        ':url': url,
       },
       ReturnValues: 'UPDATED_NEW',
     };
@@ -126,5 +127,32 @@ export class DDBAthleteDetailsRepository extends DDBRepository {
         return data.Attributes[this.transformer.attrName('profileUrl')] as string;
       })
       .catch(logThrowDynamoDBError('DDBAthleteDetailsRepository updateUrl', params));
+  }
+
+  public async queryAthletesByName(name: string, limit: number) {
+    const params: AWS.DynamoDB.DocumentClient.QueryInput = {
+      TableName: this._tableName,
+      IndexName: GlobalSecondaryIndexName,
+      Limit: limit,
+      KeyConditionExpression: '#sk_gsi = :sk_gsi and begins_with(#gsi_sk, :value) ',
+      ExpressionAttributeNames: {
+        '#sk_gsi': this.transformer.attrName('SK_GSI'),
+        '#gsi_sk': this.transformer.attrName('GSI_SK'),
+      },
+      ExpressionAttributeValues: {
+        ':sk_gsi': this.transformer.itemToAttrsTransformer.SK_GSI(),
+        ':value': this.transformer.itemToAttrsTransformer.GSI_SK(name),
+      },
+    };
+    return this.client
+      .query(params)
+      .promise()
+      .then(data => {
+        const items = data.Items.map((item: AllAttrs) => {
+          return this.transformer.transformAttrsToItem(item);
+        });
+        return items;
+      })
+      .catch(logThrowDynamoDBError('DDBAthleteDetailsRepository queryAthleteByName', params));
   }
 }

@@ -11,7 +11,7 @@ export class EntityTransformer {
   public toDBItem(athlete: AthleteDetail): DDBAthleteDetailItem {
     return {
       athleteId: athlete.id,
-      birthdate: athlete.birthdate.toISOString(),
+      birthdate: athlete.birthdate.toISOString().split('T')[0],
       country: athlete.country,
       createdAt: athlete.createdAt || moment().unix(),
       gender: athlete.gender,

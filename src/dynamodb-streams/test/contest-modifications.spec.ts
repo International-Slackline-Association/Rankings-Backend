@@ -17,7 +17,7 @@ describe('DynamoDB Streams', () => {
         athleteId: 'can-sahin',
         contestId: 'test_2018',
         createdAt: 123,
-        date: 123,
+        date: '2015-10-25',
         discipline: 2,
         place: 1,
         points: 4,

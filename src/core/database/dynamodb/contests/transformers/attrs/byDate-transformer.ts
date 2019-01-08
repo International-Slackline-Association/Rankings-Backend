@@ -28,14 +28,14 @@ export class ByDateAttrsTransformer extends DDBOverloadedTableTransformer<AllAtt
 
   public itemToAttrsTransformer = {
     PK: this.base.itemToAttrsTransformer.PK,
-    SK_GSI: (year: number, discipline: Discipline, contestId: string) =>
+    SK_GSI: (year?: number, discipline?: Discipline, contestId?: string) =>
       buildCompositeKey(
         this.prefixes.SK_GSI,
         year && year.toString(),
         !isNil(discipline) && discipline.toString(),
         contestId,
       ),
-    LSI: (year: number, date: string) =>
+    LSI: (year?: number, date?: string) =>
       buildCompositeKey(this.prefixes.LSI, year && year.toString(), date && date.toString()),
     GSI_SK: () => undefined,
   };

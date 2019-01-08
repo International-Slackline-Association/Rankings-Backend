@@ -1,11 +1,10 @@
 import { NestFactory } from '@nestjs/core';
 import { APIGatewayEvent, Callback, Context, Handler } from 'aws-lambda';
 import * as dotenv from 'dotenv-override';
-import * as fs from 'fs';
-import { join } from 'path';
+
 import { AllExceptionsFilter } from 'shared/filters/exception.filter';
 import { waitForLogger } from 'shared/logger';
-import { AppModule } from './admin/api.module';
+import { AppModule } from './api.module';
 
 // Because: https://github.com/motdotla/node-lambda/pull/369
 dotenv.config({ override: true });

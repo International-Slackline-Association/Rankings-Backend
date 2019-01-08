@@ -65,7 +65,7 @@ export class DDBAthleteContestsRepository extends DDBRepository {
     limit: number,
     after?: {
       contestId: string;
-      date: number;
+      date: string;
     },
   ) {
     let startKey: LastEvaluatedKey;

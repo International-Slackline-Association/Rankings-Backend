@@ -2,47 +2,37 @@ import * as Joi from 'joi';
 import { CompetitionDisciplines, Discipline } from 'shared/enums';
 import { APIErrors } from 'shared/exceptions/api.exceptions';
 
-export interface DisciplineResultGroup {
-  discipline: Discipline;
-  places: {
-    athleteId: string;
-    place: number;
-  }[];
+export interface ContestResult {
+  readonly contestId: string;
+  readonly discipline: number;
+  readonly places: { athleteId: string }[];
 }
 
-export class SubmitContestResultDto {
-  public contestId: string;
-  public scores: DisciplineResultGroup[];
+export class SubmitContestResultDto implements ContestResult {
+  public readonly places: { athleteId: string }[];
+  public readonly contestId: string;
+  public readonly discipline: Discipline;
 }
 
 export const submitContestResultDtoSchema = Joi.object().keys({
   contestId: Joi.string()
     .required()
     .error(new APIErrors.JoiValidationError('Unknown contestId')),
-  scores: Joi.array()
+  discipline: Joi.number()
+    .required()
+    .valid(CompetitionDisciplines)
+    .error(new APIErrors.JoiValidationError('Invalid discipline')),
+  places: Joi.array()
+    .min(2)
     .required()
     .items(
       Joi.object()
         .keys({
-          discipline: Joi.number()
+          athleteId: Joi.string()
             .required()
-            .valid(CompetitionDisciplines)
-            .error(new APIErrors.JoiValidationError('Invalid discipline')),
-          places: Joi.array()
-            .required()
-            .items(
-              Joi.object()
-                .keys({
-                  athleteId: Joi.string()
-                    .required()
-                    .error(new APIErrors.JoiValidationError('Unknown athleteId')),
-                  place: Joi.number()
-                    .required()
-                    .error(new APIErrors.JoiValidationError('Unknown place')),
-                })
-                .required(),
-            ),
+            .error(new APIErrors.JoiValidationError('Unknown athleteId')),
         })
         .required(),
-    ),
+    )
+    .error(new APIErrors.JoiValidationError('Results must be greater than 1')),
 });

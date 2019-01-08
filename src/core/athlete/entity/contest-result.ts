@@ -3,7 +3,7 @@ import { Discipline } from 'shared/enums';
 export class AthleteContestResult {
   public athleteId: string;
   public contestId: string;
-  public contestDate: number;
+  public contestDate: Date;
   public contestDiscipline: Discipline;
   public points: number;
   public place: number;

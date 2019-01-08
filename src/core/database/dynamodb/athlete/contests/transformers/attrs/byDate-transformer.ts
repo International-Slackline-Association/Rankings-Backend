@@ -27,7 +27,7 @@ export class ByDateAttrsTransformer extends DDBOverloadedTableTransformer<
     contestId: this.base.attrsToItemTransformer.contestId,
     year: this.base.attrsToItemTransformer.year,
     discipline: this.base.attrsToItemTransformer.discipline,
-    date: (lsi: string) => parseInt(destructCompositeKey(lsi, 2), 10),
+    date: (lsi: string) => destructCompositeKey(lsi, 2),
     points: this.base.attrsToItemTransformer.points,
   };
 
@@ -40,11 +40,11 @@ export class ByDateAttrsTransformer extends DDBOverloadedTableTransformer<
         !isNil(discipline) && discipline.toString(),
         contestId,
       ),
-    LSI: (year: number, date: number) =>
+    LSI: (year: number, date: string) =>
       buildCompositeKey(
         this.prefixes.LSI,
         year && year.toString(),
-        date && date.toString(),
+        date,
       ),
     GSI_SK: this.base.itemToAttrsTransformer.GSI_SK,
   };

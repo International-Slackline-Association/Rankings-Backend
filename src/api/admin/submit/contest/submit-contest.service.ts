@@ -32,6 +32,6 @@ export class SubmitContestService {
   }
 
   public async updateContestProfileUrl(contestId: string, discipline: Discipline, url: string) {
-    return this.db.updateContestUrl(contestId, discipline, url);
+    return this.db.updateContestProfileUrl(contestId, discipline, url);
   }
 }

@@ -2,6 +2,7 @@ import { Body, Controller, Post, Put, UsePipes } from '@nestjs/common';
 import { Roles } from 'shared/decorators/roles.decorator';
 import { AuthenticationRole } from 'shared/enums';
 import { RolesGuard } from 'shared/guards/roles.guard';
+import { logger } from 'shared/logger';
 import { JoiValidationPipe } from 'shared/pipes/JoiValidation.pipe';
 import { SubmitAthleteDto, submitAthleteDtoSchema } from './dto/submit-athlete.dto';
 import { SubmitAthleteResponse } from './dto/submit-athlete.response';
@@ -16,12 +17,13 @@ export class SubmitAthleteController {
   // @Roles(AuthenticationRole.admin)
   // @UseGuards(RolesGuard) // Lambda Authorizer is applied
   @UsePipes(new JoiValidationPipe(submitAthleteDtoSchema))
-  public async submitAthlete(@Body() submitAthleteDto: SubmitAthleteDto) {
+  public async submitAthlete(@Body() dto: SubmitAthleteDto) {
+    logger.debug('Submit Athlete', dto);
     let id: string;
-    if (submitAthleteDto.id) {
-      id = await this.service.modifyAthlete(submitAthleteDto);
+    if (dto.id) {
+      id = await this.service.modifyAthlete(dto);
     } else {
-      id = await this.service.createAthlete(submitAthleteDto);
+      id = await this.service.createAthlete(dto);
     }
     const response = new SubmitAthleteResponse(id);
     return response;

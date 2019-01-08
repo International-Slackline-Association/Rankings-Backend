@@ -65,7 +65,7 @@ export class DDBContestRepository extends DDBRepository {
       .catch(logThrowDynamoDBError('DDBContestRepository Put', params));
   }
 
-  public async updateUrl(contestId: string, discipline: Discipline, url: string) {
+  public async updateProfileUrl(contestId: string, discipline: Discipline, url: string) {
     const year = IdGenerator.stripYearFromContestId(contestId);
     const params: DocumentClient.UpdateItemInput = {
       TableName: this._tableName,
@@ -88,6 +88,37 @@ export class DDBContestRepository extends DDBRepository {
         return data.Attributes[this.transformer.attrName('profileUrl')] as string;
       })
       .catch(logThrowDynamoDBError('DDBContestRepository updateUrl', params));
+  }
+
+  public async queryContestsByName(name: string, limit: number) {
+    const params: AWS.DynamoDB.DocumentClient.QueryInput = {
+      TableName: this._tableName,
+      IndexName: LocalSecondaryIndexName,
+      ScanIndexForward: false,
+      Limit: limit,
+      KeyConditionExpression: '#pk = :pk and begins_with(#lsi, :lsi_value) ',
+      FilterExpression: 'contains(#normalizedName, :queryString) ',
+      ExpressionAttributeNames: {
+        '#pk': this.transformer.attrName('PK'),
+        '#lsi': this.transformer.attrName('LSI'),
+        '#normalizedName': this.transformer.attrName('normalizedName'),
+      },
+      ExpressionAttributeValues: {
+        ':pk': this.transformer.byDate.itemToAttrsTransformer.PK(),
+        ':lsi_value': this.transformer.byDate.itemToAttrsTransformer.LSI(undefined, undefined),
+        ':queryString': name,
+      },
+    };
+    return this.client
+      .query(params)
+      .promise()
+      .then(data => {
+        const items = data.Items.map((item: AllAttrs) => {
+          return this.transformer.transformAttrsToItem(item);
+        });
+        return items;
+      })
+      .catch(logThrowDynamoDBError('DDBContestRepository queryContestsByName', params));
   }
 
   public async queryContestsByDate(

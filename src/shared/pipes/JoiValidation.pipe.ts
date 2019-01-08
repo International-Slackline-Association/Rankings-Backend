@@ -5,8 +5,8 @@ import * as Joi from 'joi';
 export class JoiValidationPipe implements PipeTransform {
   constructor(private readonly schema) {}
 
-  public transform(value: any, metadata: ArgumentMetadata) {
-    const { error } = Joi.validate(value, this.schema, { convert: true });
+  public transform(v: any, metadata: ArgumentMetadata) {
+    const { error , value } = Joi.validate(v, this.schema, { convert: true });
     if (error) {
       throw error;
     }

@@ -28,7 +28,7 @@ export class SubmitAthleteService {
   }
 
   public async updateAthleteProfileUrl(athleteId: string, url: string) {
-    return this.db.updateAthleteUrl(athleteId, url);
+    return this.db.updateAthleteProfileUrl(athleteId, url);
   }
 
   private async generateValidAthleteId(name: string, surname: string) {

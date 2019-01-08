@@ -13,13 +13,14 @@ export class EntityTransformer {
       city: contest.city,
       country: contest.country,
       createdAt: contest.createdAt || moment().unix(),
-      date: contest.date.toISOString(),
+      date: contest.date.toISOString().split('T')[0],
       discipline: contest.discipline,
       name: contest.name,
+      normalizedName: Utils.normalizeString(contest.name),
       prize: contest.prize,
       year: Utils.dateToMoment(contest.date).year(),
-      profileUrl: contest.profileUrl || '',
-      infoUrl: contest.infoUrl || '',
+      profileUrl: contest.profileUrl || undefined,
+      infoUrl: contest.infoUrl || undefined,
     };
   }
 
@@ -38,7 +39,7 @@ export class EntityTransformer {
       name: contest.name,
       prize: contest.prize,
       profileUrl: contest.profileUrl || '',
-      infoUrl: contest.infoUrl,
+      infoUrl: contest.infoUrl || '',
     });
   }
 }

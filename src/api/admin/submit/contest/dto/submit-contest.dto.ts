@@ -1,9 +1,6 @@
 import * as Joi from 'joi';
-import { CompetitionDisciplines, ContestCategory, Discipline, PrizeUnit } from 'shared/enums';
+import { CompetitionDisciplines, ContestCategories } from 'shared/enums';
 import { APIErrors } from 'shared/exceptions/api.exceptions';
-import { $enum } from 'ts-enum-util';
-
-const contestCategories = $enum(ContestCategory).getValues();
 
 export class SubmitContestDto {
   public readonly id: string;
@@ -33,6 +30,7 @@ export const submitContestDtoSchema = Joi.object().keys({
     .required()
     .error(new APIErrors.JoiValidationError('Unknown city')),
   country: Joi.string()
+    .lowercase()
     .required()
     .error(new APIErrors.JoiValidationError('Unknown country')),
   discipline: Joi.number()
@@ -41,7 +39,7 @@ export const submitContestDtoSchema = Joi.object().keys({
     .error(new APIErrors.JoiValidationError('Invalid discipline')),
   contestCategory: Joi.number()
     .required()
-    .valid(contestCategories)
+    .valid(ContestCategories)
     .error(new APIErrors.JoiValidationError('Invalid category')),
   prize: Joi.number()
     .required()

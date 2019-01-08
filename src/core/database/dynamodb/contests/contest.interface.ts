@@ -5,6 +5,7 @@ type KeyAttrs = DDBTableKeyAttrs;
 
 interface Attrs {
   readonly name: string;
+  readonly normalizedName: string;
   readonly city: string;
   readonly country: string;
   readonly prize: number;

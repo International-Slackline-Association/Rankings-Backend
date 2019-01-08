@@ -1,16 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { AthleteContestResult } from 'core/athlete/entity/contest-result';
 import { Contest } from 'core/contest/entity/contest';
-// tslint:disable-next-line:max-line-length
 import {
+  AthletePointsDictionary,
   ContestPointsCalculatorService,
-  DetailedDisciplineResultGroup,
-  DisciplineResultsGroupCalculated,
+  DetailedContestResult,
 } from 'core/contest/points-calculator.service';
 import { DatabaseService } from 'core/database/database.service';
 import { ContestCategory } from 'shared/enums';
 import { APIErrors } from 'shared/exceptions/api.exceptions';
-import { DisciplineResultGroup, SubmitContestResultDto } from './dto/submit-contest-result.dto';
+import { SubmitContestResultDto } from './dto/submit-contest-result.dto';
 
 @Injectable()
 export class SubmitContestResultService {
@@ -19,21 +18,13 @@ export class SubmitContestResultService {
     private readonly pointsCalculator: ContestPointsCalculatorService,
   ) {}
 
-  public async submitContestResult(submitContestResultdto: SubmitContestResultDto) {
-    const contestId = submitContestResultdto.contestId;
+  public async submitContestResult(dto: SubmitContestResultDto) {
+    const contest = await this.findContest(dto);
 
-    const contestDisciplines = await this.findContestDisciplines(submitContestResultdto);
+    const athletes = await this.findAthletes(dto);
 
-    const athletes = await this.findAthletes(submitContestResultdto);
-
-    const calculatedScores = submitContestResultdto.scores.map(scores => {
-      return this.calculatePointsForDisciplineGroup(
-        scores,
-        contestDisciplines.find(d => d.discipline === scores.discipline).contestCategory,
-      );
-    });
-
-    const failures = await this.putResultsIntoDB(contestId, contestDisciplines, calculatedScores);
+    const athletePointsDict = this.calculatePoints(dto, contest.contestCategory);
+    const failures = await this.putResultsIntoDB(contest, dto, athletePointsDict);
     if (failures.length > 0) {
       throw new APIErrors.OperationFailedError(
         'Some athlete results failed when writing to database',
@@ -43,69 +34,54 @@ export class SubmitContestResultService {
   }
 
   private async putResultsIntoDB(
-    contestId: string,
-    contestDisciplines: Contest[],
-    calculatedScores: DisciplineResultsGroupCalculated[],
+    contest: Contest,
+    contestResults: SubmitContestResultDto,
+    athletePointsDict: AthletePointsDictionary,
   ) {
     const dbFailedAthleteResults: AthleteContestResult[] = [];
-    for (const disciplineGroup of calculatedScores) {
-      const contest = contestDisciplines.find(d => d.discipline === disciplineGroup.discipline);
-      for (const result of disciplineGroup.results) {
-        const athleteResult: AthleteContestResult = {
-          contestId: contestId,
-          athleteId: result.athleteId,
-          place: result.place,
-          points: result.points,
-          contestDate: contest.date.getUTCDate(),
-          contestDiscipline: disciplineGroup.discipline,
-        };
-        await this.db
-          .putContestResult(athleteResult)
-          .then(data => data)
-          .catch(err => {
-            dbFailedAthleteResults.push(athleteResult);
-          });
-      }
+    for (const athlete of contestResults.places) {
+      const { points, place } = athletePointsDict[athlete.athleteId];
+      const athleteResult: AthleteContestResult = {
+        contestId: contest.id,
+        athleteId: athlete.athleteId,
+        place: place,
+        points: points,
+        contestDate: contest.date,
+        contestDiscipline: contest.discipline,
+      };
+      await this.db
+        .putContestResult(athleteResult)
+        .then(data => data)
+        .catch(err => {
+          dbFailedAthleteResults.push(athleteResult);
+        });
     }
     return dbFailedAthleteResults;
   }
 
-  private calculatePointsForDisciplineGroup(disciplineGroup: DisciplineResultGroup, category: ContestCategory) {
-    const resultGroup: DetailedDisciplineResultGroup = {
-      discipline: disciplineGroup.discipline,
+  private calculatePoints(contestScores: SubmitContestResultDto, category: ContestCategory) {
+    const contestResults: DetailedContestResult = {
+      contestId: contestScores.contestId,
+      discipline: contestScores.discipline,
+      places: contestScores.places,
       category: category,
-      places: disciplineGroup.places,
     };
-    const calculatedResultGroup = this.pointsCalculator.calculatePointsAndPlace(resultGroup);
-    return calculatedResultGroup;
+    const athletePointsDict = this.pointsCalculator.calculatePoints(contestResults);
+    return athletePointsDict;
   }
 
-  private async findContestDisciplines(submitContestResultdto: SubmitContestResultDto) {
-    const contestId = submitContestResultdto.contestId;
-    const contestDisciplinesGroup = submitContestResultdto.scores.map(disciplineGroup => {
-      return {
-        contestId: contestId,
-        discipline: disciplineGroup.discipline,
-      };
+  private async findContest(dto: SubmitContestResultDto) {
+    const contest = await this.db.getContest(dto.contestId, dto.discipline);
+    if (!contest) {
+      throw new APIErrors.ContestNotFoundError(dto.contestId, dto.discipline);
+    }
+    return contest;
+  }
+
+  private async findAthletes(dto: SubmitContestResultDto) {
+    const athleteIds = dto.places.map(athlete => {
+      return athlete.athleteId;
     });
-    const contestDisciplines = await Promise.all(
-      contestDisciplinesGroup.map(async cd => {
-        const contestDiscipline = await this.db.getContestDiscipline(cd.contestId, cd.discipline);
-        if (!contestDiscipline) {
-          throw new APIErrors.ContestNotFoundError(cd.contestId, cd.discipline);
-        }
-        return contestDiscipline;
-      }),
-    );
-    return contestDisciplines;
-  }
-
-  private async findAthletes(submitContestResultdto: SubmitContestResultDto) {
-    const athleteIds = submitContestResultdto.scores
-      .map(disciplineGroup => {
-        return disciplineGroup.places.map(p => p.athleteId);
-      })
-      .reduce((a, b) => a.concat(b), []);
     const notFoundAthletes: string[] = [];
     const athletes = await Promise.all(
       athleteIds.map(async id => {

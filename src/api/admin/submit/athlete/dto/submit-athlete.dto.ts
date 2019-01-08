@@ -33,6 +33,7 @@ export const submitAthleteDtoSchema = Joi.object().keys({
     .uri()
     .error(new APIErrors.JoiValidationError('Unknown profileUrl')),
   country: Joi.string()
+    .lowercase()
     .required()
     .error(new APIErrors.JoiValidationError('Unknown country')),
   gender: Joi.number()
