@@ -13,7 +13,7 @@ export class EntityTransformer {
       city: contest.city,
       country: contest.country,
       createdAt: contest.createdAt || moment().unix(),
-      date: contest.date.toISOString().split('T')[0],
+      date: contest.date.toISODate(),
       discipline: contest.discipline,
       name: contest.name,
       normalizedName: Utils.normalizeString(contest.name),

@@ -10,7 +10,7 @@ export class EntityTransformer {
     return {
       contestId: contestResult.contestId,
       athleteId: contestResult.athleteId,
-      date: contestResult.contestDate.toISOString().split('T')[0],
+      date: contestResult.contestDate.toISODate(),
       discipline: contestResult.contestDiscipline,
       points: contestResult.points,
       place: contestResult.place,

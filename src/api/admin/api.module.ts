@@ -3,13 +3,16 @@ import { MethodOverrideMiddleware } from '@nest-middlewares/method-override';
 import { MorganMiddleware } from '@nest-middlewares/morgan';
 import { MiddlewareConsumer, Module } from '@nestjs/common';
 import env_variables from 'shared/env_variables';
+import { AthleteModule } from './athlete/athlete.module';
 import { ContestModule } from './contest/contest.module';
 import { SubmitAthleteModule } from './submit/athlete/submit-athlete.module';
 import { SubmitContestModule } from './submit/contest/submit-contest.module';
 import { SubmitContestResultsModule } from './submit/results/submit-contest-result.module';
 
+import 'shared';
+
 @Module({
-  imports: [SubmitContestModule, SubmitAthleteModule, SubmitContestResultsModule, ContestModule],
+  imports: [SubmitContestModule, SubmitAthleteModule, SubmitContestResultsModule, ContestModule, AthleteModule],
   providers: [],
   exports: [],
 })

@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { ContestResult } from 'api/admin/submit/results/dto/submit-contest-result.dto';
+import { groupBy } from 'lodash';
 import { Constants } from 'shared/constants';
 import { ContestCategory } from 'shared/enums';
 
@@ -11,27 +12,32 @@ export interface AthletePointsDictionary {
   [key: string]: { points: number; place: number };
 }
 
+interface IAthletePoint {
+  athlete: { athleteId: string; place: number };
+  points: number;
+}
+
 @Injectable()
 export class ContestPointsCalculatorService {
   constructor() {}
 
   public calculatePoints(results: DetailedContestResult): AthletePointsDictionary {
-    const calculatedAthletePoints = results.places.map((athlete, index) => {
-      const place = index + 1;
-      const points = this.calculatePoint(
-        Constants.ContestCategoryTopPoints(results.category),
-        place,
-        results.places.length,
-      );
+    const numOfParticipants = results.places.length;
+    const pointOfFirstPlace = Constants.ContestCategoryTopPoints(results.category);
+    let calculatedAthletePoints = results.places.map<IAthletePoint>((athlete, index) => {
+      const defaultPlace = index + 1;
+      const points = this.calculatePoint(pointOfFirstPlace, defaultPlace, numOfParticipants);
       return {
-        athleteId: athlete.athleteId,
+        athlete: athlete,
         points: points,
-        place: place,
       };
     });
+
+    calculatedAthletePoints = this.calculatePointsForTie(calculatedAthletePoints);
+
     const athletePoints: AthletePointsDictionary = {};
     calculatedAthletePoints.forEach(p => {
-      athletePoints[p.athleteId] = { points: p.points, place: p.place };
+      athletePoints[p.athlete.athleteId] = { points: p.points, place: p.athlete.place };
     });
     return athletePoints;
   }
@@ -44,5 +50,23 @@ export class ContestPointsCalculatorService {
 
     const point = A * Math.log(place) + B;
     return Math.round(point);
+  }
+
+  private calculatePointsForTie(calculatedAthletePoints: IAthletePoint[]) {
+    const pointsGroup = groupBy(calculatedAthletePoints, a => a.athlete.place);
+    const modifiedAthletePointArray: IAthletePoint[] = [];
+
+    for (const place in pointsGroup) {
+      if (pointsGroup.hasOwnProperty(place)) {
+        const athletePointArray = pointsGroup[place];
+        if (athletePointArray.length > 1) {
+          const average = athletePointArray.map(a => a.points).reduce((a, b) => a + b, 0) / athletePointArray.length;
+          athletePointArray.forEach(a => modifiedAthletePointArray.push({ ...a, points: Math.round(average) }));
+        } else {
+          modifiedAthletePointArray.push(...athletePointArray);
+        }
+      }
+    }
+    return modifiedAthletePointArray;
   }
 }

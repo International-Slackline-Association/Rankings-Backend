@@ -1,12 +1,18 @@
 import { Injectable } from '@nestjs/common';
+import { Contest } from 'core/contest/entity/contest';
 import { DatabaseService } from 'core/database/database.service';
-import { CompetitionDisciplines, ContestCategories } from 'shared/enums';
+import { CompetitionDisciplines, ContestCategories, Discipline } from 'shared/enums';
 import { ContestCategoryUtility, DisciplineUtility } from 'shared/enums-utility';
 import { INamedDiscipline } from 'shared/types/shared';
 
 @Injectable()
 export class ContestService {
   constructor(private readonly db: DatabaseService) {}
+
+  public async getContest(id: string, discipline: Discipline): Promise<Contest> {
+    const contest = await this.db.getContest(id, discipline);
+    return contest;
+  }
 
   public getDisciplines() {
     const disciplines = CompetitionDisciplines;
