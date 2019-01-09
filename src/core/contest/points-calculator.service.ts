@@ -23,10 +23,10 @@ export class ContestPointsCalculatorService {
 
   public calculatePoints(results: DetailedContestResult): AthletePointsDictionary {
     const numOfParticipants = results.places.length;
-    const pointOfFirstPlace = Constants.ContestCategoryTopPoints(results.category);
-    let calculatedAthletePoints = results.places.map<IAthletePoint>((athlete, index) => {
+    const sortedPlaces = results.places.sort((a, b) => a.place - b.place);
+    let calculatedAthletePoints = sortedPlaces.map<IAthletePoint>((athlete, index) => {
       const defaultPlace = index + 1;
-      const points = this.calculatePoint(pointOfFirstPlace, defaultPlace, numOfParticipants);
+      const points = this.calculatePoint(results.category, defaultPlace, numOfParticipants);
       return {
         athlete: athlete,
         points: points,
@@ -42,10 +42,16 @@ export class ContestPointsCalculatorService {
     return athletePoints;
   }
 
-  private calculatePoint(pointOfFirstPlace: number, place: number, numberOfParticipants: number) {
+  private calculatePoint(contestCategory: ContestCategory, place: number, numberOfParticipants: number) {
     // For details check ISA's score calculation algoritm
-    const numberOfParticipantsLimit = Constants.ScoringRange;
-    const A = (1 - pointOfFirstPlace) / Math.log(Math.min(numberOfParticipants, numberOfParticipantsLimit));
+
+    const minParticipantThreshold = Constants.ContestCategoryMinParticipantsLimit(contestCategory);
+    if (numberOfParticipants < minParticipantThreshold) {
+      return 0;
+    }
+    const pointOfFirstPlace = Constants.ContestCategoryTopPoints(contestCategory);
+    const maxRange = Constants.ContestScoringRange;
+    const A = (1 - pointOfFirstPlace) / Math.log(Math.min(numberOfParticipants, maxRange));
     const B = pointOfFirstPlace;
 
     const point = A * Math.log(place) + B;
