@@ -1,6 +1,7 @@
 import * as Joi from 'joi';
 
-import { Gender, ValidGenders } from 'shared/enums';
+import { Gender } from 'shared/enums';
+import { GenderUtility } from 'shared/enums/enums-utility';
 import { APIErrors } from 'shared/exceptions/api.exceptions';
 
 export class SubmitAthleteDto {
@@ -38,7 +39,7 @@ export const submitAthleteDtoSchema = Joi.object().keys({
     .error(new APIErrors.JoiValidationError('Unknown country')),
   gender: Joi.number()
     .required()
-    .valid(ValidGenders)
+    .valid(GenderUtility.ValidGenders)
     .error(new APIErrors.JoiValidationError('Invalid gender')),
   birthdate: Joi.string()
     .isoDate()

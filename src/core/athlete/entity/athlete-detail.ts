@@ -1,6 +1,6 @@
 import * as moment from 'moment';
 import { AgeCategory, Gender } from 'shared/enums';
-import { EnumsUtility } from 'shared/enums-utility';
+import { AgeCategoryUtility } from 'shared/enums/enums-utility';
 import { Utils } from 'shared/utils';
 
 export class AthleteDetail {
@@ -22,7 +22,7 @@ export class AthleteDetail {
       moment()
         .utc()
         .year() - birthYear;
-    return EnumsUtility.getAgeCategoryOfAge(age);
+    return AgeCategoryUtility.getAgeCategoryOfAge(age);
   }
 
   constructor({

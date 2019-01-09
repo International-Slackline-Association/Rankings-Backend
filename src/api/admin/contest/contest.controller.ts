@@ -1,6 +1,6 @@
 import { Controller, Get, Param, ParseIntPipe, Req } from '@nestjs/common';
 import { Discipline } from 'shared/enums';
-import { ContestCategoryUtility, DisciplineUtility } from 'shared/enums-utility';
+import { ContestCategoryUtility, DisciplineUtility } from 'shared/enums/enums-utility';
 import { ISelectOption } from 'shared/types/shared';
 import { ContestService } from './contest.service';
 import { CategoriesResponse } from './dto/categories.response';

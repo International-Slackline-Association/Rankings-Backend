@@ -2,6 +2,7 @@ import latinize = require('latinize');
 import { isNil } from 'lodash';
 import * as moment from 'moment';
 
+import { Constants } from './constants';
 import env_variables from './env_variables';
 import { logger } from './logger';
 
@@ -43,5 +44,16 @@ export namespace Utils {
       return true;
     }
     return !isNil(request.cognitoClaims);
+  }
+
+  export function yearList() {
+    const currentYear = moment()
+      .utc()
+      .year();
+    const years: number[] = [];
+    for (let year = Constants.BaseYear; year <= currentYear; year++) {
+      years.push(year);
+    }
+    return years.reverse();
   }
 }

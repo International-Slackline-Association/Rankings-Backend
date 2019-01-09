@@ -1,4 +1,4 @@
-import { ContestCategory, Discipline, PrizeUnit } from 'shared/enums';
+import { ContestCategory, Discipline } from 'shared/enums';
 
 export class Contest {
   public id: string;

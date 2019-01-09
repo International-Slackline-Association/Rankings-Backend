@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { DatabaseService } from 'core/database/database.service';
-import { DisciplineUtility } from 'shared/enums-utility';
+import { DisciplineUtility } from 'shared/enums/enums-utility';
 import { Utils } from 'shared/utils';
 import { ContestSuggestionsResponse } from './dto/contest-suggestions.response';
 

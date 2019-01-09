@@ -1,6 +1,5 @@
 import * as Joi from 'joi';
 
-import { Gender, ValidGenders } from 'shared/enums';
 import { APIErrors } from 'shared/exceptions/api.exceptions';
 
 export class SubmitAthletePictureDto {

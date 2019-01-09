@@ -61,6 +61,12 @@ export class RedisRepository {
     return Utils.omitReject(zadd);
   }
 
+  public async getRankOfAthleteInRankingCategory(pk: DDBAthleteRankingsItemPrimaryKey) {
+    const key = this.redisKeyOfRankingCategory(pk);
+    const zrevrank = this.redis.zrevrank(key, pk.athleteId);
+    return Utils.omitReject(zrevrank);
+  }
+
   protected redisKeyOfRankingCategory(pk: DDBAthleteRankingsItemPrimaryKey): string {
     return this.concatWithKeynamePrefix(
       'Rankings',

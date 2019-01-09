@@ -2,6 +2,8 @@ import { ContestCategory } from './enums';
 
 // tslint:disable-next-line:no-namespace
 export namespace Constants {
+  export const BaseYear = 2016;
+
   export const ContestScoringRange = 16;
 
   export function ContestCategoryTopPoints(category: ContestCategory): number {
@@ -18,6 +20,8 @@ export namespace Constants {
         return 125;
       case ContestCategory.Challenge:
         return 35;
+      default:
+        throw new Error('Contest Category Top Points not found: ' + category);
     }
   }
   export function ContestCategoryMinParticipantsLimit(category: ContestCategory): number {
@@ -34,6 +38,8 @@ export namespace Constants {
         return 4;
       case ContestCategory.Challenge:
         return 4;
+      default:
+        throw new Error('Contest Category Participant Limit not found: ' + category);
     }
   }
 }

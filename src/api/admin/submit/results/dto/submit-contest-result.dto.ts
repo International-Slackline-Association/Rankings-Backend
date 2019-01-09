@@ -1,5 +1,6 @@
 import * as Joi from 'joi';
-import { CompetitionDisciplines, Discipline } from 'shared/enums';
+import { Discipline } from 'shared/enums';
+import { DisciplineUtility } from 'shared/enums/enums-utility';
 import { APIErrors } from 'shared/exceptions/api.exceptions';
 
 export interface ContestResult {
@@ -20,7 +21,7 @@ export const submitContestResultDtoSchema = Joi.object().keys({
     .error(new APIErrors.JoiValidationError('Unknown contestId')),
   discipline: Joi.number()
     .required()
-    .valid(CompetitionDisciplines)
+    .valid(DisciplineUtility.CompetitionDisciplines)
     .error(new APIErrors.JoiValidationError('Invalid discipline')),
   places: Joi.array()
     .min(2)

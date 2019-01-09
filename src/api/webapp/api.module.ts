@@ -10,9 +10,10 @@ import { AthleteModule } from './athlete/athlete.module';
 import { ContestModule } from './contest/contest.module';
 import { CountryModule } from './country/country.module';
 import { NestJSTestController } from './nestjsTest.controller';
+import { RankingsModule } from './rankings/rankings.module';
 
 @Module({
-  imports: [CountryModule, AthleteModule, ContestModule],
+  imports: [CountryModule, AthleteModule, ContestModule, RankingsModule],
   controllers: [NestJSTestController],
   providers: [],
   exports: [],

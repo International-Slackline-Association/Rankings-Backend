@@ -13,14 +13,19 @@ export enum Discipline {
   Endurance = 9,
   Blind = 10,
   Rigging = 11,
+  Freestyle = 12,
+  Walking = 13,
 }
 
-export const CategoricalDisciplines = [Discipline.Overall, Discipline.Trickline, Discipline.Speedline];
+export enum DisciplineType {
+  Competition,
+  Category,
+  Container,
+}
 
-export const CompetitionDisciplines = $enum(Discipline)
-  .getValues()
-  .filter(d => CategoricalDisciplines.indexOf(d) <= -1)
-  .sort((a, b) => a - b); // ascending
+export enum Year {
+  All = 0,
+}
 
 export enum Gender {
   All = 0,
@@ -28,14 +33,10 @@ export enum Gender {
   Women = 2,
 }
 
-export const ValidGenders = [Gender.Men, Gender.Women];
-
 export enum AgeCategory {
   All = 0,
   Youth = 1,
 }
-
-export const ValidAgeCategories = [AgeCategory.Youth];
 
 export enum ContestCategory {
   WorldGames = 0,
@@ -44,15 +45,6 @@ export enum ContestCategory {
   NationalChampionship = 3,
   Open = 4,
   Challenge = 5,
-}
-
-export const ContestCategories = $enum(ContestCategory)
-  .getValues()
-  .sort((a, b) => a - b); // ascending
-
-export enum PrizeUnit {
-  Euro = '€',
-  USD = '$',
 }
 
 export enum AuthenticationRole {

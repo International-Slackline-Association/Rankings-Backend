@@ -1,4 +1,4 @@
-import { ContestCategory, Discipline, PrizeUnit } from 'shared/enums';
+import { ContestCategory, Discipline } from 'shared/enums';
 import { DDBTableKeyAttrs } from '../interfaces/table.interface';
 
 type KeyAttrs = DDBTableKeyAttrs;

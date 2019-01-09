@@ -7,10 +7,11 @@ import { DDBAthleteContestsRepository } from 'core/database/dynamodb/athlete/con
 import { isRecordOfTypeOfKeys } from 'dynamodb-streams/utils';
 import { isNil } from 'lodash';
 import { AgeCategory, Discipline, Gender } from 'shared/enums';
-import { DisciplineUtility, EnumsUtility } from 'shared/enums-utility';
+import { AgeCategoryUtility, DisciplineUtility, GenderUtility, YearUtility } from 'shared/enums/enums-utility';
 import { Utils } from 'shared/utils';
 
 interface RankingCombination {
+  year: number;
   discipline: Discipline;
   gender: Gender;
   ageCategory: AgeCategory;
@@ -77,6 +78,7 @@ export class AthleteContestRecordService {
       return;
     }
     const combinations = this.generateAllCombinationsWithParentCategories(
+      year,
       discipline,
       athlete.gender,
       athlete.ageCategory,
@@ -88,7 +90,7 @@ export class AthleteContestRecordService {
         athleteId: athlete.id,
         discipline: combination.discipline,
         gender: combination.gender,
-        year: year,
+        year: combination.year,
       };
       const athleteRanking = await this.db.getAthleteRanking(pk);
       if (athleteRanking) {
@@ -101,29 +103,34 @@ export class AthleteContestRecordService {
           gender: combination.gender,
           id: athlete.id,
           name: athlete.name,
+          birthdate: athlete.birthdate,
           points: pointsToAdd,
           surname: athlete.surname,
-          year: year,
+          year: combination.year,
         };
         await this.db.putAthleteRanking(item);
       }
     }
   }
   private generateAllCombinationsWithParentCategories(
+    year: number,
     discipline: Discipline,
     gender: Gender,
     ageCategory: AgeCategory,
   ) {
-    const allDisciplines = [discipline, ...DisciplineUtility.getParentDisciplines(discipline)];
-    const allGenders = [gender, ...EnumsUtility.getParentGenders(gender)];
-    const allAgeCategories = [ageCategory, ...EnumsUtility.getParentAgeCategory(ageCategory)];
+    const allYears = [year, ...YearUtility.getParents(year)];
+    const allDisciplines = [discipline, ...DisciplineUtility.getParents(discipline)];
+    const allGenders = [gender, ...GenderUtility.getParents(gender)];
+    const allAgeCategories = [ageCategory, ...AgeCategoryUtility.getParents(ageCategory)];
 
     const combinations: RankingCombination[] = [];
-    for (const d of allDisciplines) {
-      for (const g of allGenders) {
-        for (const a of allAgeCategories) {
-          if (!isNil(d) && !isNil(g) && !isNil(a)) {
-            combinations.push({ discipline: d, gender: g, ageCategory: a });
+    for (const y of allYears) {
+      for (const d of allDisciplines) {
+        for (const g of allGenders) {
+          for (const a of allAgeCategories) {
+            if (!isNil(y) && !isNil(d) && !isNil(g) && !isNil(a)) {
+              combinations.push({ year: y, discipline: d, gender: g, ageCategory: a });
+            }
           }
         }
       }

@@ -1,5 +1,5 @@
 import * as Joi from 'joi';
-import { CompetitionDisciplines, ContestCategories } from 'shared/enums';
+import { ContestCategoryUtility, DisciplineUtility } from 'shared/enums/enums-utility';
 import { APIErrors } from 'shared/exceptions/api.exceptions';
 
 export class SubmitContestDto {
@@ -35,11 +35,11 @@ export const submitContestDtoSchema = Joi.object().keys({
     .error(new APIErrors.JoiValidationError('Unknown country')),
   discipline: Joi.number()
     .required()
-    .valid(CompetitionDisciplines)
+    .valid(DisciplineUtility.CompetitionDisciplines)
     .error(new APIErrors.JoiValidationError('Invalid discipline')),
   contestCategory: Joi.number()
     .required()
-    .valid(ContestCategories)
+    .valid(ContestCategoryUtility.ContestCategories)
     .error(new APIErrors.JoiValidationError('Invalid category')),
   prize: Joi.number()
     .required()

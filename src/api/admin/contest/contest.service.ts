@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { Contest } from 'core/contest/entity/contest';
 import { DatabaseService } from 'core/database/database.service';
-import { CompetitionDisciplines, ContestCategories, Discipline } from 'shared/enums';
-import { ContestCategoryUtility, DisciplineUtility } from 'shared/enums-utility';
+import { Discipline } from 'shared/enums';
+import { ContestCategoryUtility, DisciplineUtility } from 'shared/enums/enums-utility';
 import { INamedDiscipline } from 'shared/types/shared';
 
 @Injectable()
@@ -15,7 +15,7 @@ export class ContestService {
   }
 
   public getDisciplines() {
-    const disciplines = CompetitionDisciplines;
+    const disciplines = DisciplineUtility.CompetitionDisciplines;
     const namedDisciplines = disciplines.map<INamedDiscipline>(d => {
       return {
         id: d,
@@ -26,7 +26,7 @@ export class ContestService {
   }
 
   public getCategories() {
-    const categories = ContestCategories;
+    const categories = ContestCategoryUtility.ContestCategories;
     const namedCategories = categories.map<INamedDiscipline>(d => {
       return {
         id: d,

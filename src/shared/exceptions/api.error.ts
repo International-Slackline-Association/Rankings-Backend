@@ -19,15 +19,12 @@ export class APIError extends HttpException implements IAPIError {
   public stack?: string;
   public data?: any;
 
-  constructor(params: {
-    message: string;
-    alias?: APIErrorAlias;
-    status?: number;
-    stack?: string;
-    data?: any;
-  }) {
+  constructor(params: { message: string; alias?: APIErrorAlias; status?: number; stack?: string; data?: any }) {
     if (env_variables.isProd) {
       delete params.stack;
+      if (params.alias === APIErrorAlias.Unknown) {
+        params.message = 'An Error Occured';
+      }
     }
     super(params, params.status || HttpStatus.INTERNAL_SERVER_ERROR);
 

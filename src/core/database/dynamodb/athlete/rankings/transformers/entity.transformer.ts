@@ -13,6 +13,7 @@ export class EntityTransformer {
       athleteId: athleteRanking.id,
       country: athleteRanking.country,
       lastUpdatedAt: athleteRanking.lastUpdatedAt || moment().unix(),
+      birthdate: athleteRanking.birthdate.toISODate(),
       gender: athleteRanking.gender,
       name: athleteRanking.name,
       normalizedName: Utils.normalizeString(athleteRanking.name),
@@ -38,6 +39,7 @@ export class EntityTransformer {
       discipline: dbItem.discipline,
       points: dbItem.points,
       year: dbItem.year,
+      birthdate: new Date(dbItem.birthdate),
     };
   }
 }
