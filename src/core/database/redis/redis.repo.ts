@@ -61,7 +61,7 @@ export class RedisRepository {
     return Utils.omitReject(zadd);
   }
 
-  public async getRankOfAthleteInRankingCategory(pk: DDBAthleteRankingsItemPrimaryKey) {
+  public async getPlaceOfAthleteInRankingCategory(pk: DDBAthleteRankingsItemPrimaryKey) {
     const key = this.redisKeyOfRankingCategory(pk);
     const zrevrank = this.redis.zrevrank(key, pk.athleteId);
     return Utils.omitReject(zrevrank);

@@ -20,6 +20,7 @@ export class EntityTransformer {
       prize: contest.prize,
       year: Utils.dateToMoment(contest.date).year(),
       profileUrl: contest.profileUrl || undefined,
+      thumbnailUrl: contest.thumbnailUrl || undefined,
       infoUrl: contest.infoUrl || undefined,
     };
   }
@@ -39,6 +40,7 @@ export class EntityTransformer {
       name: contest.name,
       prize: contest.prize,
       profileUrl: contest.profileUrl || '',
+      thumbnailUrl: contest.thumbnailUrl || '',
       infoUrl: contest.infoUrl || '',
     });
   }

@@ -1,3 +1,5 @@
+import * as moment from 'moment';
+
 import { Utils } from 'shared/utils';
 import { AgeCategory, Gender, Year } from '.';
 import { ContestCategoryUtility } from './contestCategory-utility';
@@ -7,9 +9,11 @@ export { DisciplineUtility, ContestCategoryUtility };
 
 // tslint:disable-next-line:no-namespace
 export namespace YearUtility {
-
   export const AllYears = [Year.All, ...Utils.yearList()];
   export const Years = Utils.yearList();
+  export const Current = moment()
+    .utc()
+    .year();
 
   export function getName(year: number) {
     switch (year) {

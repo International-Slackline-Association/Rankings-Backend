@@ -1,5 +1,8 @@
 import { Injectable } from '@nestjs/common';
+
+import { Contest } from 'core/contest/entity/contest';
 import { DatabaseService } from 'core/database/database.service';
+import { Discipline } from 'shared/enums';
 import { DisciplineUtility } from 'shared/enums/enums-utility';
 import { Utils } from 'shared/utils';
 import { ContestSuggestionsResponse } from './dto/contest-suggestions.response';
@@ -23,5 +26,10 @@ export class ContestService {
         };
       }),
     );
+  }
+
+  public async getContest(id: string, discipline: Discipline): Promise<Contest> {
+    const contest = await this.db.getContest(id, discipline);
+    return contest;
   }
 }

@@ -1,5 +1,8 @@
 import { Injectable } from '@nestjs/common';
+
+import { AthleteDetail } from 'core/athlete/entity/athlete-detail';
 import { DatabaseService } from 'core/database/database.service';
+import { AgeCategory, Discipline, Gender, Year } from 'shared/enums';
 import { Utils } from 'shared/utils';
 import { AthleteSuggestionsResponse } from './dto/athlete-suggestions.response';
 
@@ -23,5 +26,21 @@ export class AthleteService {
         };
       }),
     );
+  }
+
+  public async getAthlete(id: string): Promise<AthleteDetail> {
+    const athlete = await this.db.getAthleteDetails(id);
+    return athlete;
+  }
+  public async getOverallRank(id: string) {
+    const pk = {
+      ageCategory: AgeCategory.All,
+      athleteId: id,
+      discipline: Discipline.Overall,
+      gender: Gender.All,
+      year: Year.All,
+    };
+    const place = await this.db.getAthleteRankingPlace(pk);
+    return place;
   }
 }

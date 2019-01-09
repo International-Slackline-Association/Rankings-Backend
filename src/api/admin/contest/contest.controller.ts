@@ -18,7 +18,7 @@ export class ContestController {
     disciplineParam: Discipline,
   ): Promise<ContestResponse> {
     const contest = await this.contestService.getContest(id, disciplineParam);
-    const { createdAt, date, discipline, contestCategory, ...rest } = contest;
+    const { createdAt, date, discipline, contestCategory, thumbnailUrl, ...rest } = contest;
     const item: IContestResponseItem = {
       discipline: { id: discipline, name: DisciplineUtility.getName(discipline) },
       contestCategory: { id: contestCategory, name: ContestCategoryUtility.getName(contestCategory) },

@@ -8,6 +8,7 @@ export class AthleteDetail {
   public readonly name: string;
   public readonly surname: string;
   public readonly profileUrl: string;
+  public readonly thumbnailUrl: string;
   public readonly gender: Gender;
   public readonly country: string;
   public readonly birthdate: Date;
@@ -16,32 +17,25 @@ export class AthleteDetail {
   public readonly infoUrl: string;
   public readonly createdAt?: number;
 
-  public get ageCategory(): AgeCategory {
+  public get age(): number {
     const birthYear = Utils.dateToMoment(this.birthdate).year();
     const age =
       moment()
         .utc()
         .year() - birthYear;
-    return AgeCategoryUtility.getAgeCategoryOfAge(age);
+    return age;
   }
 
-  constructor({
-    id,
-    name,
-    surname,
-    profileUrl,
-    gender,
-    country,
-    birthdate,
-    email,
-    city,
-    infoUrl,
-    createdAt,
-  }: {
+  public get ageCategory(): AgeCategory {
+    return AgeCategoryUtility.getAgeCategoryOfAge(this.age);
+  }
+
+  constructor(init: {
     id: string;
     name: string;
     surname: string;
     profileUrl: string;
+    thumbnailUrl: string;
     gender: Gender;
     country: string;
     birthdate: Date;
@@ -50,16 +44,20 @@ export class AthleteDetail {
     infoUrl: string;
     createdAt?: number;
   }) {
-    this.id = id;
-    this.name = name;
-    this.surname = surname;
-    this.profileUrl = profileUrl;
-    this.gender = gender;
-    this.country = country;
-    this.birthdate = birthdate;
-    this.email = email;
-    this.city = city;
-    this.infoUrl = infoUrl;
-    this.createdAt = createdAt;
+    if (init) {
+      Object.assign(this, init);
+    }
+    // this.id = id;
+    // this.name = name;
+    // this.surname = surname;
+    // this.profileUrl = profileUrl;
+    // this.thumbnailUrl = this.thumbnailUrl;
+    // this.gender = gender;
+    // this.country = country;
+    // this.birthdate = birthdate;
+    // this.email = email;
+    // this.city = city;
+    // this.infoUrl = infoUrl;
+    // this.createdAt = createdAt;
   }
 }

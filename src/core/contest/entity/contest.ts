@@ -1,17 +1,18 @@
 import { ContestCategory, Discipline } from 'shared/enums';
 
 export class Contest {
-  public id: string;
-  public name: string;
-  public date: Date;
-  public city: string;
-  public country: string;
-  public discipline: Discipline;
-  public contestCategory: ContestCategory;
-  public prize: number;
-  public profileUrl: string;
+  public readonly id: string;
+  public readonly name: string;
+  public readonly date: Date;
+  public readonly city: string;
+  public readonly country: string;
+  public readonly discipline: Discipline;
+  public readonly contestCategory: ContestCategory;
+  public readonly prize: number;
+  public readonly profileUrl: string;
+  public readonly thumbnailUrl: string;
   public readonly infoUrl: string;
-  public createdAt?: number;
+  public readonly createdAt?: number;
 
   constructor(init: {
     id: string;
@@ -23,6 +24,7 @@ export class Contest {
     contestCategory: ContestCategory;
     prize: number;
     profileUrl: string;
+    thumbnailUrl: string;
     infoUrl: string;
     createdAt?: number;
   }) {

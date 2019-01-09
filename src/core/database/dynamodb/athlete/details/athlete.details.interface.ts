@@ -10,6 +10,7 @@ interface Attrs {
   readonly gender: Gender;
   readonly country: string;
   readonly profileUrl: string;
+  readonly thumbnailUrl: string;
   readonly createdAt: number;
   readonly email: string;
   readonly city: string;

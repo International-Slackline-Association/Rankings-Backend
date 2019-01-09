@@ -70,6 +70,11 @@ export class DatabaseService {
     return this.athleteRankingsRepo.entityTransformer.fromDBItem(dbItem);
   }
 
+  public async getAthleteRankingPlace(pk: DDBAthleteRankingsItemPrimaryKey) {
+    const place = await this.redisRepo.getPlaceOfAthleteInRankingCategory(pk);
+    return place;
+  }
+
   public async putAthleteRanking(item: AthleteRanking) {
     const pk: DDBAthleteRankingsItemPrimaryKey = {
       ageCategory: item.ageCategory,

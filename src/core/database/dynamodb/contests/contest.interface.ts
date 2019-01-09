@@ -11,6 +11,7 @@ interface Attrs {
   readonly prize: number;
   readonly category: ContestCategory;
   readonly profileUrl: string;
+  readonly thumbnailUrl: string;
   readonly infoUrl: string;
   readonly createdAt: number;
 }

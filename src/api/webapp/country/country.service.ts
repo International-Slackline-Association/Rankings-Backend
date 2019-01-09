@@ -22,4 +22,8 @@ export class CountryService {
     });
     return new CountrySuggestionsResponse(items);
   }
+
+  public getCountryName(code): string {
+    return countryList.getName(code);
+  }
 }

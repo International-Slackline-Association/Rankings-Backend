@@ -9,6 +9,7 @@ export class SubmitAthleteDto {
   public readonly name: string;
   public readonly surname: string;
   public readonly profileUrl: string;
+  public readonly thumbnailUrl: string;
   public readonly country: string;
   public readonly gender: Gender;
   public readonly birthdate: string;
@@ -33,6 +34,11 @@ export const submitAthleteDtoSchema = Joi.object().keys({
     .optional()
     .uri()
     .error(new APIErrors.JoiValidationError('Unknown profileUrl')),
+  thumbnailUrl: Joi.string()
+    .allow('')
+    .optional()
+    .uri()
+    .error(new APIErrors.JoiValidationError('Unknown thumbnailUrl')),
   country: Joi.string()
     .lowercase()
     .required()

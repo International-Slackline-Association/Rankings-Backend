@@ -12,6 +12,7 @@ export class SubmitContestDto {
   public readonly contestCategory: number;
   public readonly prize: number;
   public readonly profileUrl: string;
+  public readonly thumbnailUrl: string;
   public readonly infoUrl: string;
 }
 
@@ -49,6 +50,11 @@ export const submitContestDtoSchema = Joi.object().keys({
     .optional()
     .uri()
     .error(new APIErrors.JoiValidationError('Unknown profileUrl')),
+  thumbnailUrl: Joi.string()
+    .allow('')
+    .optional()
+    .uri()
+    .error(new APIErrors.JoiValidationError('Unknown thumbnailUrl')),
   infoUrl: Joi.string()
     .allow('')
     .optional()

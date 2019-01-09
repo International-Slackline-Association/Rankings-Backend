@@ -18,6 +18,7 @@ describe('AthleteDetails', () => {
     normalizedName: 'name1',
     surname: 'surname2',
     profileUrl: '',
+    thumbnailUrl: '',
     city: 'city',
     email: 'email',
     infoUrl: 'infoUrl',
