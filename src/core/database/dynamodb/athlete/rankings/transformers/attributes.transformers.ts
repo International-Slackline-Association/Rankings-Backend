@@ -1,16 +1,18 @@
 import { AgeCategory, Discipline, Gender } from 'shared/enums';
 import { Utils } from 'shared/utils';
 import { DDBOverloadedTableTransformer } from '../../../dynamodb.table.transformers';
-import { buildCompositeKey, destructCompositeKey } from '../../../utils/utils';
+import {
+  buildCompositeKey,
+  decodeStringToPoint,
+  destructCompositeKey,
+  encodePointToString,
+} from '../../../utils/utils';
 import { AllAttrs, DDBAthleteRankingsItem } from '../athlete.rankings.interface';
 
 /**
  * Transformers define how the application level DTO objects transforms to DynamoDB attributes in a table
  */
-export class AttrsTransformer extends DDBOverloadedTableTransformer<
-  AllAttrs,
-  DDBAthleteRankingsItem
-> {
+export class AttrsTransformer extends DDBOverloadedTableTransformer<AllAttrs, DDBAthleteRankingsItem> {
   constructor() {
     super();
   }
@@ -23,22 +25,15 @@ export class AttrsTransformer extends DDBOverloadedTableTransformer<
   public attrsToItemTransformer = {
     athleteId: (pk: string) => destructCompositeKey(pk, 1),
     year: (sk_gsi: string) => parseInt(destructCompositeKey(sk_gsi, 1), 10),
-    discipline: (sk_gsi: string) =>
-      parseInt(destructCompositeKey(sk_gsi, 2), 10),
+    discipline: (sk_gsi: string) => parseInt(destructCompositeKey(sk_gsi, 2), 10),
     gender: (sk_gsi: string) => parseInt(destructCompositeKey(sk_gsi, 3), 10),
-    ageCategory: (sk_gsi: string) =>
-      parseInt(destructCompositeKey(sk_gsi, 4), 10),
-    points: (gsi_sk: string) => parseFloat(gsi_sk),
+    ageCategory: (sk_gsi: string) => parseInt(destructCompositeKey(sk_gsi, 4), 10),
+    points: (gsi_sk: string) => decodeStringToPoint(gsi_sk),
   };
 
   public itemToAttrsTransformer = {
     PK: (id: string) => buildCompositeKey(this.prefixes.PK, id),
-    SK_GSI: (
-      year: number,
-      discipline: Discipline,
-      gender: Gender,
-      ageCategory: AgeCategory,
-    ) =>
+    SK_GSI: (year: number, discipline: Discipline, gender: Gender, ageCategory: AgeCategory) =>
       buildCompositeKey(
         this.prefixes.SK_GSI,
         !Utils.isNil(year) && year.toString(),
@@ -47,7 +42,7 @@ export class AttrsTransformer extends DDBOverloadedTableTransformer<
         !Utils.isNil(ageCategory) && ageCategory.toString(),
       ),
     LSI: () => undefined,
-    GSI_SK: (points: number) => points.toString(),
+    GSI_SK: (points: number) => encodePointToString(points),
   };
 
   public transformAttrsToItem(dynamodbItem: AllAttrs): DDBAthleteRankingsItem {
@@ -64,44 +59,20 @@ export class AttrsTransformer extends DDBOverloadedTableTransformer<
   }
 
   public transformItemToAttrs(item: DDBAthleteRankingsItem): AllAttrs {
-    const {
-      athleteId,
-      year,
-      points,
-      discipline,
-      gender,
-      ageCategory,
-      ...rest
-    } = item;
+    const { athleteId, year, points, discipline, gender, ageCategory, ...rest } = item;
     return {
       PK: this.itemToAttrsTransformer.PK(athleteId),
-      SK_GSI: this.itemToAttrsTransformer.SK_GSI(
-        year,
-        discipline,
-        gender,
-        ageCategory,
-      ),
+      SK_GSI: this.itemToAttrsTransformer.SK_GSI(year, discipline, gender, ageCategory),
       LSI: this.itemToAttrsTransformer.LSI(),
       GSI_SK: this.itemToAttrsTransformer.GSI_SK(points),
       ...rest,
     };
   }
 
-  public primaryKey(
-    athleteId: string,
-    year: number,
-    discipline: Discipline,
-    gender: Gender,
-    ageCategory: AgeCategory,
-  ) {
+  public primaryKey(athleteId: string, year: number, discipline: Discipline, gender: Gender, ageCategory: AgeCategory) {
     return {
       [this.attrName('PK')]: this.itemToAttrsTransformer.PK(athleteId),
-      [this.attrName('SK_GSI')]: this.itemToAttrsTransformer.SK_GSI(
-        year,
-        discipline,
-        gender,
-        ageCategory,
-      ),
+      [this.attrName('SK_GSI')]: this.itemToAttrsTransformer.SK_GSI(year, discipline, gender, ageCategory),
     };
   }
 }

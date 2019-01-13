@@ -11,7 +11,6 @@ import { AttrsTransformer } from './transformers/attributes.transformer';
 import { EntityTransformer } from './transformers/entity.transformer';
 
 import dynamoDataTypes = require('dynamodb-data-types');
-import { IdGenerator } from 'shared/generators/id.generator';
 const dynamoDbAttrValues = dynamoDataTypes.AttributeValue;
 
 @Injectable()
@@ -99,7 +98,6 @@ export class DDBAthleteContestsRepository extends DDBRepository {
     after?: { athleteId: string; points: number },
   ) {
     const exclusiveStartKey = this.createGSIExclusiveStartKey(contestId, discipline, after);
-
     const params: AWS.DynamoDB.DocumentClient.QueryInput = {
       TableName: this._tableName,
       IndexName: GlobalSecondaryIndexName,

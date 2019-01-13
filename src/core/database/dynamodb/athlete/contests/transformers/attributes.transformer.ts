@@ -2,7 +2,12 @@ import { Injectable } from '@nestjs/common';
 import { DDBOverloadedTableTransformer } from 'core/database/dynamodb/dynamodb.table.transformers';
 import { Discipline } from 'shared/enums';
 import { Utils } from 'shared/utils';
-import { buildCompositeKey, destructCompositeKey } from '../../../utils/utils';
+import {
+  buildCompositeKey,
+  decodeStringToPoint,
+  destructCompositeKey,
+  encodePointToString,
+} from '../../../utils/utils';
 import { AllAttrs, DDBAthleteContestItem, KeyAttrs } from '../athlete.contests.interface';
 
 /**
@@ -25,7 +30,7 @@ export class AttrsTransformer extends DDBOverloadedTableTransformer<AllAttrs, DD
     contestId: (sk_gsi: string) => destructCompositeKey(sk_gsi, 2),
     discipline: (sk_gsi: string) => parseInt(destructCompositeKey(sk_gsi, 1), 10),
     date: (lsi: string) => destructCompositeKey(lsi, 1),
-    points: (gsi_sk: string) => parseFloat(gsi_sk),
+    points: (gsi_sk: string) => decodeStringToPoint(gsi_sk),
   };
 
   public itemToAttrsTransformer = {
@@ -33,7 +38,7 @@ export class AttrsTransformer extends DDBOverloadedTableTransformer<AllAttrs, DD
     SK_GSI: (discipline: Discipline, contestId: string) =>
       buildCompositeKey(this.prefixes.SK_GSI, !Utils.isNil(discipline) && discipline.toString(), contestId),
     LSI: (date: string) => buildCompositeKey(this.prefixes.LSI, date),
-    GSI_SK: (points: number) => points.toString(),
+    GSI_SK: (points: number) => encodePointToString(points),
   };
 
   public transformAttrsToItem(dynamodbItem: AllAttrs): DDBAthleteContestItem {
@@ -50,6 +55,7 @@ export class AttrsTransformer extends DDBOverloadedTableTransformer<AllAttrs, DD
 
   public transformItemToAttrs(item: DDBAthleteContestItem): AllAttrs {
     const { athleteId, contestId, date, points, discipline, ...rest } = item;
+
     return {
       PK: this.itemToAttrsTransformer.PK(athleteId),
       SK_GSI: this.itemToAttrsTransformer.SK_GSI(discipline, contestId),

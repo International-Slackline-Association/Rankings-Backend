@@ -53,3 +53,15 @@ export function destructCompositeKey(key: string, index: number): string {
   const token = key.split(':')[index];
   return token;
 }
+
+/** Encode numbers in string preserving their lexicographical order */
+export function encodePointToString(point: number) {
+  const digitCount = Math.max(Math.floor(Math.log10(Math.abs(point))), 0) + 1;
+  // https://www.arangodb.com/2017/09/sorting-number-strings-numerically/
+  const prefix = String.fromCodePoint(digitCount + 33) + ' ';
+  return prefix + point.toString();
+}
+
+export function decodeStringToPoint(point: string) {
+  return parseInt(point.split(' ')[1], 10);
+}
