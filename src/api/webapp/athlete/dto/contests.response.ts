@@ -5,7 +5,7 @@ export interface IAthleteContestItem {
   readonly name: string;
   readonly rank: number;
   readonly contestCategory: INamedContestCategory;
-  readonly date: number;
+  readonly date: string;
   readonly discipline: INamedDiscipline;
   readonly smallProfileUrl: string;
 }

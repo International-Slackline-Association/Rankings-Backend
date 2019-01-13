@@ -5,35 +5,19 @@ import { DatabaseService } from 'core/database/database.service';
 import { Discipline } from 'shared/enums';
 import { DisciplineUtility } from 'shared/enums/enums-utility';
 import { Utils } from 'shared/utils';
-import { ContestSuggestionsResponse } from './dto/contest-suggestions.response';
 
 @Injectable()
 export class ContestService {
   constructor(private readonly db: DatabaseService) {}
 
-  public async getContestSuggestions(
-    query: string,
-    year?: number,
-    discipline?: Discipline,
-  ): Promise<ContestSuggestionsResponse> {
+  public async queryContestsByName(query: string, year?: number, discipline?: Discipline) {
     const lookup = Utils.normalizeString(query);
-    if (lookup.length < 3) {
-      return new ContestSuggestionsResponse([]);
-    }
     const filterDisciplines = Utils.isNil(discipline) ? [] : discipline === Discipline.Overall ? [] : [discipline];
     const contests = await this.db.queryContestsByDate(5, year, undefined, {
       disciplines: filterDisciplines,
       name: lookup,
     });
-    return new ContestSuggestionsResponse(
-      contests.items.map(contest => {
-        return {
-          id: contest.id,
-          name: contest.name,
-          discipline: { id: contest.discipline, name: DisciplineUtility.getName(contest.discipline) },
-        };
-      }),
-    );
+    return contests;
   }
 
   public async getContest(id: string, discipline: Discipline): Promise<Contest> {

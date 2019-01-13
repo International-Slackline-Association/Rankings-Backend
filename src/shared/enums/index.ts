@@ -1,4 +1,3 @@
-import { $enum } from 'ts-enum-util';
 
 export enum Discipline {
   Overall = 0,

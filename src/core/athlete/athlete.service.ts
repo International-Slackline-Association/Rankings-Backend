@@ -5,28 +5,15 @@ import { DatabaseService } from 'core/database/database.service';
 import { AgeCategory, Discipline, DisciplineType, Gender, Year } from 'shared/enums';
 import { DisciplineUtility } from 'shared/enums/enums-utility';
 import { Utils } from 'shared/utils';
-import { AthleteSuggestionsResponse } from './dto/athlete-suggestions.response';
 
 @Injectable()
 export class AthleteService {
   constructor(private readonly db: DatabaseService) {}
 
-  public async getAthleteSuggestions(query: string, includeEmail: boolean): Promise<AthleteSuggestionsResponse> {
+  public async queryAthletesByName(query: string, limit: number) {
     const lookup = Utils.normalizeString(query);
-    if (lookup.length < 3) {
-      return new AthleteSuggestionsResponse([]);
-    }
-    const athletes = await this.db.queryAthletesByName(lookup, 5);
-    return new AthleteSuggestionsResponse(
-      athletes.map(athlete => {
-        return {
-          id: athlete.id,
-          name: athlete.name,
-          surname: athlete.surname,
-          email: includeEmail ? athlete.email : undefined,
-        };
-      }),
-    );
+    const athletes = await this.db.queryAthletesByName(lookup, limit);
+    return athletes;
   }
 
   public async getAthlete(id: string): Promise<AthleteDetail> {

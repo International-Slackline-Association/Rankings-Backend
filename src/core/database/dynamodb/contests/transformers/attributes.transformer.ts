@@ -1,5 +1,5 @@
-import { isNil } from 'lodash';
 import { Discipline } from 'shared/enums';
+import { Utils } from 'shared/utils';
 import { DDBOverloadedTableTransformer } from '../../dynamodb.table.transformers';
 import { buildCompositeKey, destructCompositeKey } from '../../utils/utils';
 import { AllAttrs, DDBContestItem } from '../contest.interface';
@@ -29,7 +29,7 @@ export class AttrsTransformer extends DDBOverloadedTableTransformer<AllAttrs, DD
     SK_GSI: (discipline: Discipline, contestId: string) =>
       buildCompositeKey(
         this.prefixes.SK_GSI,
-        !isNil(discipline) && discipline.toString(),
+        !Utils.isNil(discipline) && discipline.toString(),
         contestId,
       ),
     LSI: (date: string) =>

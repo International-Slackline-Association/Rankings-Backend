@@ -4,6 +4,7 @@ export interface IContestSuggestionsResponseItem {
   id: string;
   name: string;
   discipline: INamedDiscipline;
+  year: number;
 }
 
 export class ContestSuggestionsResponse {

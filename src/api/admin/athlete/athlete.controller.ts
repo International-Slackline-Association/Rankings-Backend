@@ -1,5 +1,4 @@
 import { Controller, Get, Param, Req } from '@nestjs/common';
-import { Utils } from 'shared/utils';
 import { AthleteService } from './athlete.service';
 import { AthleteResponse } from './dto/athlete.response';
 

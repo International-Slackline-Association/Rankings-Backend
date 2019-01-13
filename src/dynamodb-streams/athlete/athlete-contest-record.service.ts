@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { DynamoDBRecord, StreamRecord } from 'aws-lambda';
+
 import { AthleteRanking } from 'core/athlete/entity/athlete-ranking';
 import { AthleteContestResult } from 'core/athlete/entity/contest-result';
 import { DatabaseService } from 'core/database/database.service';
 import { DDBAthleteContestsRepository } from 'core/database/dynamodb/athlete/contests/athlete.contests.repo';
 import { isRecordOfTypeOfKeys } from 'dynamodb-streams/utils';
-import { isNil } from 'lodash';
 import { AgeCategory, Discipline, Gender } from 'shared/enums';
 import { AgeCategoryUtility, DisciplineUtility, GenderUtility, YearUtility } from 'shared/enums/enums-utility';
 import { Utils } from 'shared/utils';
@@ -128,7 +128,7 @@ export class AthleteContestRecordService {
       for (const d of allDisciplines) {
         for (const g of allGenders) {
           for (const a of allAgeCategories) {
-            if (!isNil(y) && !isNil(d) && !isNil(g) && !isNil(a)) {
+            if (!Utils.isNil(y) && !Utils.isNil(d) && !Utils.isNil(g) && !Utils.isNil(a)) {
               combinations.push({ year: y, discipline: d, gender: g, ageCategory: a });
             }
           }

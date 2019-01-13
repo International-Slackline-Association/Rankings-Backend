@@ -47,17 +47,5 @@ export class AthleteDetail {
     if (init) {
       Object.assign(this, init);
     }
-    // this.id = id;
-    // this.name = name;
-    // this.surname = surname;
-    // this.profileUrl = profileUrl;
-    // this.thumbnailUrl = this.thumbnailUrl;
-    // this.gender = gender;
-    // this.country = country;
-    // this.birthdate = birthdate;
-    // this.email = email;
-    // this.city = city;
-    // this.infoUrl = infoUrl;
-    // this.createdAt = createdAt;
   }
 }

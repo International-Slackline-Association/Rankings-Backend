@@ -1,12 +1,12 @@
 import { Body, Controller, Get, Param, ParseIntPipe, Post, Req, UsePipes } from '@nestjs/common';
 
+import { AthleteService } from 'core/athlete/athlete.service';
 import { CategoriesService } from 'core/category/categories.service';
+import { ContestService } from 'core/contest/contest.service';
 import { Discipline } from 'shared/enums';
 import { ContestCategoryUtility, DisciplineUtility } from 'shared/enums/enums-utility';
 import { JoiValidationPipe } from 'shared/pipes/JoiValidation.pipe';
 import { Utils } from 'shared/utils';
-import { AthleteService } from '../athlete/athlete.service';
-import { ContestService } from './contest.service';
 import { CategoriesResponse } from './dto/categories.response';
 import { ContestSuggestionsDto, contestSuggestionsDtoSchema } from './dto/contest-suggestions.dto';
 import { ContestSuggestionsResponse } from './dto/contest-suggestions.response';
@@ -24,10 +24,22 @@ export class ContestController {
 
   @Post('suggestions')
   @UsePipes(new JoiValidationPipe(contestSuggestionsDtoSchema))
-  public async getContestSuggestions(
-    @Body() dto: ContestSuggestionsDto,
-  ): Promise<ContestSuggestionsResponse> {
-    return this.contestService.getContestSuggestions(dto.query, dto.year, dto.discipline);
+  public async getContestSuggestions(@Body() dto: ContestSuggestionsDto): Promise<ContestSuggestionsResponse> {
+    const lookup = Utils.normalizeString(dto.query);
+    if (lookup.length < 3) {
+      return new ContestSuggestionsResponse([]);
+    }
+    const contests = await this.contestService.queryContestsByName(dto.query, dto.year, dto.discipline);
+    return new ContestSuggestionsResponse(
+      contests.items.map(contest => {
+        return {
+          id: contest.id,
+          name: contest.name,
+          discipline: { id: contest.discipline, name: DisciplineUtility.getName(contest.discipline) },
+          year: contest.year,
+        };
+      }),
+    );
   }
 
   @Get('categories')

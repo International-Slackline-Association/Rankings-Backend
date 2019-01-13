@@ -1,4 +1,5 @@
 import { ContestCategory, Discipline } from 'shared/enums';
+import { Utils } from 'shared/utils';
 
 export class Contest {
   public readonly id: string;
@@ -14,6 +15,9 @@ export class Contest {
   public readonly infoUrl: string;
   public readonly createdAt?: number;
 
+  public get year(): number {
+    return Utils.dateToMoment(this.date).year();
+  }
   constructor(init: {
     id: string;
     name: string;

@@ -1,5 +1,6 @@
+import { uniqWith } from 'lodash';
+
 import { Discipline, DisciplineType } from '.';
-import { uniqWith, isEqual } from 'lodash';
 
 // tslint:disable-next-line:no-namespace
 export namespace DisciplineUtility {

@@ -43,7 +43,7 @@ export namespace Utils {
     if (env_variables.isDev) {
       return true;
     }
-    return !isNil(request.cognitoClaims);
+    return isNil(request.cognitoClaims);
   }
 
   export function yearList() {

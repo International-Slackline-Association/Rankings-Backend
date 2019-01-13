@@ -1,5 +1,5 @@
-import { isNil } from 'lodash';
 import { AgeCategory, Discipline, Gender } from 'shared/enums';
+import { Utils } from 'shared/utils';
 import { DDBOverloadedTableTransformer } from '../../../dynamodb.table.transformers';
 import { buildCompositeKey, destructCompositeKey } from '../../../utils/utils';
 import { AllAttrs, DDBAthleteRankingsItem } from '../athlete.rankings.interface';
@@ -41,10 +41,10 @@ export class AttrsTransformer extends DDBOverloadedTableTransformer<
     ) =>
       buildCompositeKey(
         this.prefixes.SK_GSI,
-        year && year.toString(),
-        !isNil(discipline) && discipline.toString(),
-        !isNil(gender) && gender.toString(),
-        !isNil(ageCategory) && ageCategory.toString(),
+        !Utils.isNil(year) && year.toString(),
+        !Utils.isNil(discipline) && discipline.toString(),
+        !Utils.isNil(gender) && gender.toString(),
+        !Utils.isNil(ageCategory) && ageCategory.toString(),
       ),
     LSI: () => undefined,
     GSI_SK: (points: number) => points.toString(),
