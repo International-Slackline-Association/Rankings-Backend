@@ -15,7 +15,6 @@ export interface DDBAthleteContestItem extends Attrs {
   readonly athleteId: string;
   readonly contestId: string;
   readonly discipline: Discipline;
-  readonly year: number;
   readonly date: string;
   readonly points: number;
 }

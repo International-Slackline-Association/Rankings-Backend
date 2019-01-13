@@ -1,4 +1,5 @@
 import { Discipline, DisciplineType } from '.';
+import { uniqWith, isEqual } from 'lodash';
 
 // tslint:disable-next-line:no-namespace
 export namespace DisciplineUtility {
@@ -52,18 +53,11 @@ export namespace DisciplineUtility {
     switch (discipline) {
       case Discipline.Overall:
         return null;
+
+      // container disciplines
       case Discipline.Freestyle:
       case Discipline.Walking:
         return Discipline.Overall;
-
-      // 2nd degree disciplines
-      case Discipline.Trickline_Aerial:
-      case Discipline.Trickline_JibAndStatic:
-      case Discipline.Trickline_Transfer:
-        return Discipline.Trickline;
-      case Discipline.Speedline_Sprint:
-      case Discipline.Speedline__HighLongWaterline:
-        return Discipline.Speedline;
 
       // 1st degree disciplines
       case Discipline.Trickline:
@@ -78,22 +72,72 @@ export namespace DisciplineUtility {
         return Discipline.Walking;
       case Discipline.Rigging:
         return Discipline.Overall;
+
+      // 2nd degree disciplines
+      case Discipline.Trickline_Aerial:
+      case Discipline.Trickline_JibAndStatic:
+      case Discipline.Trickline_Transfer:
+        return Discipline.Trickline;
+      case Discipline.Speedline_Sprint:
+      case Discipline.Speedline__HighLongWaterline:
+        return Discipline.Speedline;
+
       default:
-        throw new Error(`Parante discipline not found: ${discipline}`);
+        throw new Error(`Parant discipline not found: ${discipline}`);
     }
   }
 
   export function getParents(discipline: Discipline) {
     const parentDisciplines: Discipline[] = [];
-    let parentDiscipline = getParent(discipline);
-    while (parentDiscipline !== null) {
-      parentDisciplines.push(parentDiscipline);
-      parentDiscipline = getParent(parentDiscipline);
+    const parentDiscipline = getParent(discipline);
+    if (parentDiscipline !== null) {
+      parentDisciplines.push(parentDiscipline, ...getParents(parentDiscipline));
     }
     return parentDisciplines;
   }
 
-  export function getName(discipline: Discipline, withoutCategories: boolean = false) {
+  export function getChildren(discipline: Discipline): Discipline[] {
+    switch (discipline) {
+      case Discipline.Overall:
+        return [Discipline.Freestyle, Discipline.Walking];
+
+      case Discipline.Freestyle:
+        return [Discipline.Trickline, Discipline.Contact_HighLongWaterline];
+      case Discipline.Walking:
+        return [Discipline.Speedline, Discipline.Endurance, Discipline.Blind];
+
+      case Discipline.Trickline:
+        return [Discipline.Trickline_Aerial, Discipline.Trickline_JibAndStatic, Discipline.Trickline_Transfer];
+      case Discipline.Speedline:
+        return [Discipline.Speedline_Sprint, Discipline.Speedline__HighLongWaterline];
+
+      case Discipline.Contact_HighLongWaterline:
+      case Discipline.Endurance:
+      case Discipline.Blind:
+      case Discipline.Rigging:
+        return [];
+
+      case Discipline.Trickline_Aerial:
+      case Discipline.Trickline_JibAndStatic:
+      case Discipline.Trickline_Transfer:
+        return [];
+      case Discipline.Speedline_Sprint:
+      case Discipline.Speedline__HighLongWaterline:
+        return [];
+      default:
+        throw new Error(`Children discipline not found: ${discipline}`);
+    }
+  }
+
+  export function getAllChildren(discipline: Discipline) {
+    const childrenDisciplines = getChildren(discipline);
+    for (const child of childrenDisciplines) {
+      childrenDisciplines.push(...getAllChildren(child));
+    }
+    return uniqWith(childrenDisciplines);
+  }
+
+  export function getName(discipline: Discipline, withoutParent: boolean = false) {
     switch (discipline) {
       case Discipline.Overall:
         return 'Overall';
@@ -102,15 +146,15 @@ export namespace DisciplineUtility {
       case Discipline.Walking:
         return 'Walking';
       case Discipline.Trickline_Aerial:
-        return withoutCategories ? 'Aerial' : 'Trickline - Aerial';
+        return withoutParent ? 'Aerial' : 'Trickline - Aerial';
       case Discipline.Trickline_JibAndStatic:
-        return withoutCategories ? 'Jib-Static' : 'Trickline - Jib-Static';
+        return withoutParent ? 'Jib-Static' : 'Trickline - Jib-Static';
       case Discipline.Trickline_Transfer:
-        return withoutCategories ? 'Transfer' : 'Trickline - Transfer';
+        return withoutParent ? 'Transfer' : 'Trickline - Transfer';
       case Discipline.Speedline_Sprint:
-        return withoutCategories ? 'Sprint' : 'Speedline - Sprint';
+        return withoutParent ? 'Sprint' : 'Speedline - Sprint';
       case Discipline.Speedline__HighLongWaterline:
-        return withoutCategories ? 'High-/Long-/Waterline' : 'Speedline - High-/Long-/Waterline';
+        return withoutParent ? 'High-/Long-/Waterline' : 'Speedline - High-/Long-/Waterline';
 
       // 1st degree disciplines
       case Discipline.Trickline:

@@ -1,5 +1,5 @@
 import latinize = require('latinize');
-import { isNil } from 'lodash';
+import { isNil as _isNil } from 'lodash';
 import * as moment from 'moment';
 
 import { Constants } from './constants';
@@ -55,5 +55,9 @@ export namespace Utils {
       years.push(year);
     }
     return years.reverse();
+  }
+
+  export function isNil(value: any) {
+    return _isNil(value);
   }
 }

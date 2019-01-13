@@ -18,7 +18,6 @@ export class EntityTransformer {
       name: contest.name,
       normalizedName: Utils.normalizeString(contest.name),
       prize: contest.prize,
-      year: Utils.dateToMoment(contest.date).year(),
       profileUrl: contest.profileUrl || undefined,
       thumbnailUrl: contest.thumbnailUrl || undefined,
       infoUrl: contest.infoUrl || undefined,

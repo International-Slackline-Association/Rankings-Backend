@@ -4,7 +4,7 @@ import { IDynamoDBService } from 'core/aws/aws.services.interface';
 import { Discipline } from 'shared/enums';
 import { IdGenerator } from 'shared/generators/id.generator';
 import { DDBRepository, LocalSecondaryIndexName } from '../dynamodb.repo';
-import { LastEvaluatedKey } from '../interfaces/table.interface';
+import { LSILastEvaluatedKey } from '../interfaces/table.interface';
 import { logDynamoDBError, logThrowDynamoDBError } from '../utils/utils';
 import { AllAttrs, DDBContestItem } from './contest.interface';
 import { AttrsTransformer } from './transformers/attributes.transformer';
@@ -24,7 +24,7 @@ export class DDBContestRepository extends DDBRepository {
     const year = IdGenerator.stripYearFromContestId(contestId);
     const params: DocumentClient.GetItemInput = {
       TableName: this._tableName,
-      Key: this.transformer.primaryKey(year, discipline, contestId),
+      Key: this.transformer.primaryKey(discipline, contestId),
     };
     return this.client
       .get(params)
@@ -42,34 +42,21 @@ export class DDBContestRepository extends DDBRepository {
   }
 
   public async put(contest: DDBContestItem) {
-    const params: DocumentClient.BatchWriteItemInput = {
-      RequestItems: {
-        [this._tableName]: [
-          {
-            PutRequest: {
-              Item: this.transformer.transformItemToAttrs(contest),
-            },
-          },
-          {
-            PutRequest: {
-              Item: this.transformer.byDate.transformItemToAttrs(contest),
-            },
-          },
-        ],
-      },
+    const params: DocumentClient.PutItemInput = {
+      TableName: this._tableName,
+      Item: this.transformer.transformItemToAttrs(contest),
     };
     return this.client
-      .batchWrite(params)
+      .put(params)
       .promise()
       .then(data => data)
       .catch(logThrowDynamoDBError('DDBContestRepository Put', params));
   }
 
   public async updateProfileUrl(contestId: string, discipline: Discipline, url: string) {
-    const year = IdGenerator.stripYearFromContestId(contestId);
     const params: DocumentClient.UpdateItemInput = {
       TableName: this._tableName,
-      Key: this.transformer.primaryKey(year, discipline, contestId),
+      Key: this.transformer.primaryKey(discipline, contestId),
       UpdateExpression: 'SET #profileUrl = :url',
       ConditionExpression: 'attribute_exists(#pk)',
       ExpressionAttributeNames: {
@@ -90,68 +77,36 @@ export class DDBContestRepository extends DDBRepository {
       .catch(logThrowDynamoDBError('DDBContestRepository updateUrl', params));
   }
 
-  public async queryContestsByName(name: string, limit: number) {
-    const params: AWS.DynamoDB.DocumentClient.QueryInput = {
-      TableName: this._tableName,
-      IndexName: LocalSecondaryIndexName,
-      ScanIndexForward: false,
-      Limit: limit,
-      KeyConditionExpression: '#pk = :pk and begins_with(#lsi, :lsi_value) ',
-      FilterExpression: 'contains(#normalizedName, :queryString) ',
-      ExpressionAttributeNames: {
-        '#pk': this.transformer.attrName('PK'),
-        '#lsi': this.transformer.attrName('LSI'),
-        '#normalizedName': this.transformer.attrName('normalizedName'),
-      },
-      ExpressionAttributeValues: {
-        ':pk': this.transformer.byDate.itemToAttrsTransformer.PK(),
-        ':lsi_value': this.transformer.byDate.itemToAttrsTransformer.LSI(undefined, undefined),
-        ':queryString': name,
-      },
-    };
-    return this.client
-      .query(params)
-      .promise()
-      .then(data => {
-        const items = data.Items.map((item: AllAttrs) => {
-          return this.transformer.transformAttrsToItem(item);
-        });
-        return items;
-      })
-      .catch(logThrowDynamoDBError('DDBContestRepository queryContestsByName', params));
-  }
-
   public async queryContestsByDate(
-    year: number,
-    discipline: Discipline,
     limit: number,
+    year?: number,
     after?: {
       contestId: string;
+      discipline: Discipline;
       date: string;
     },
+    filter: { disciplines?: Discipline[]; name?: string } = { disciplines: [], name: undefined },
   ) {
-    let startKey: LastEvaluatedKey;
-    if (after && after.contestId && after.date) {
-      startKey = {
-        PK: this.transformer.itemToAttrsTransformer.PK(),
-        SK_GSI: this.transformer.itemToAttrsTransformer.SK_GSI(year, discipline, after.contestId),
-        LSI: this.transformer.itemToAttrsTransformer.LSI(year, discipline, after.date),
-      };
-    }
+    const exclusiveStartKey = this.createLSIExclusiveStartKey(after);
+    const { filterExpression, filterExpAttrNames, filterExpAttrValues } = this.createFilterExpression(filter);
+
     const params: AWS.DynamoDB.DocumentClient.QueryInput = {
       TableName: this._tableName,
       IndexName: LocalSecondaryIndexName,
       Limit: limit,
       ScanIndexForward: false,
-      ExclusiveStartKey: startKey,
+      ExclusiveStartKey: exclusiveStartKey,
       KeyConditionExpression: '#pk = :pk and begins_with(#lsi, :sortKeyPrefix) ',
+      FilterExpression: filterExpression,
       ExpressionAttributeNames: {
         '#pk': this.transformer.attrName('PK'),
         '#lsi': this.transformer.attrName('LSI'),
+        ...filterExpAttrNames,
       },
       ExpressionAttributeValues: {
         ':pk': this.transformer.itemToAttrsTransformer.PK(),
-        ':sortKeyPrefix': this.transformer.itemToAttrsTransformer.LSI(year, discipline, undefined),
+        ':sortKeyPrefix': this.transformer.itemToAttrsTransformer.LSI((year || '').toString()),
+        ...filterExpAttrValues,
       },
     };
     return this.client
@@ -161,8 +116,65 @@ export class DDBContestRepository extends DDBRepository {
         const items = data.Items.map((item: AllAttrs) => {
           return this.transformer.transformAttrsToItem(item);
         });
-        return items;
+        return { items: items, lastKey: this.extractLSILastEvaluatedKey(data.LastEvaluatedKey as LSILastEvaluatedKey) };
       })
       .catch(logThrowDynamoDBError('DDBContestRepository query', params));
+  }
+
+  private extractLSILastEvaluatedKey(lastEvaluatedKey: LSILastEvaluatedKey) {
+    let lastKey: any;
+    if (lastEvaluatedKey) {
+      lastKey = {
+        contestId: this.transformer.attrsToItemTransformer.contestId(lastEvaluatedKey.SK_GSI),
+        discipline: this.transformer.attrsToItemTransformer.discipline(lastEvaluatedKey.SK_GSI),
+        date: this.transformer.attrsToItemTransformer.date(lastEvaluatedKey.LSI),
+      };
+    }
+    return lastKey;
+  }
+
+  private createLSIExclusiveStartKey(after?: {
+    contestId: string;
+    discipline: Discipline;
+    date: string;
+  }): LSILastEvaluatedKey {
+    let startKey: LSILastEvaluatedKey;
+    if (after && after.contestId && after.date && after.discipline) {
+      startKey = {
+        PK: this.transformer.itemToAttrsTransformer.PK(),
+        SK_GSI: this.transformer.itemToAttrsTransformer.SK_GSI(after.discipline, after.contestId),
+        LSI: this.transformer.itemToAttrsTransformer.LSI(after.date),
+      };
+    }
+    return startKey;
+  }
+
+  private createFilterExpression(filter: { disciplines?: Discipline[]; name?: string }) {
+    let filterExpression = '';
+    const filterExpAttrNames = {};
+    const filterExpAttrValues = {};
+
+    if (!filter) {
+      return { filterExpression: undefined, filterExpAttrNames, filterExpAttrValues };
+    }
+    if (filter.disciplines) {
+      for (const discipline of filter.disciplines) {
+        filterExpression =
+          (filterExpression ? filterExpression + ' or ' : '') + `contains(#sk_gsi, :discipline_${discipline})`;
+        filterExpAttrNames['#sk_gsi'] = this.transformer.attrName('SK_GSI');
+        filterExpAttrValues[`:discipline_${discipline}`] = `:${discipline}:`;
+      }
+    }
+    if (filter.name) {
+      filterExpression =
+        (filterExpression ? filterExpression + ' and ' : '') + `contains(#normalizedName, :queryString)`;
+      filterExpAttrNames['#normalizedName'] = this.transformer.attrName('normalizedName');
+      filterExpAttrValues[':queryString'] = filter.name;
+    }
+    return {
+      filterExpression: filterExpression || undefined,
+      filterExpAttrNames,
+      filterExpAttrValues,
+    };
   }
 }

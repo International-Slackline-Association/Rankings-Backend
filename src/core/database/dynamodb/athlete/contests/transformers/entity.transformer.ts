@@ -14,7 +14,6 @@ export class EntityTransformer {
       discipline: contestResult.contestDiscipline,
       points: contestResult.points,
       place: contestResult.place,
-      year: IdGenerator.stripYearFromContestId(contestResult.contestId),
       createdAt: contestResult.createdAt || moment().unix(),
     };
   }

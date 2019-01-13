@@ -9,5 +9,6 @@ import { AthleteService } from './athlete.service';
   imports: [DatabaseModule, CountryModule],
   controllers: [AthleteController],
   providers: [AthleteService, CategoriesService],
+  exports: [AthleteService],
 })
 export class AthleteModule {}

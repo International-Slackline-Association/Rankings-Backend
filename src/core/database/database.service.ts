@@ -4,6 +4,7 @@ import { AthleteRanking } from 'core/athlete/entity/athlete-ranking';
 import { AthleteContestResult } from 'core/athlete/entity/contest-result';
 import { Contest } from 'core/contest/entity/contest';
 import { Discipline } from 'shared/enums';
+import { DisciplineUtility } from 'shared/enums/enums-utility';
 import { DDBAthleteContestsRepository } from './dynamodb/athlete/contests/athlete.contests.repo';
 import { DDBAthleteDetailsRepository } from './dynamodb/athlete/details/athlete.details.repo';
 import { DDBAthleteRankingsItemPrimaryKey } from './dynamodb/athlete/rankings/athlete.rankings.interface';
@@ -65,6 +66,57 @@ export class DatabaseService {
     await this.athleteContestsRepo.put(dbItem);
   }
 
+  public async getContestResults(
+    contestId: string,
+    discipline: Discipline,
+    limit: number,
+    after?: { athleteId: string; points: number },
+  ) {
+    const dbItems = await this.athleteContestsRepo.queryContestAthletes(contestId, discipline, limit, after);
+    const items = dbItems.items.map(dbItem => this.athleteContestsRepo.entityTransformer.fromDBItem(dbItem));
+    return { items, lastKey: dbItems.lastKey };
+  }
+
+  public async queryAthleteContestsByDate(
+    athleteId: string,
+    limit: number,
+    year?: number,
+    after?: {
+      contestId: string;
+      discipline: Discipline;
+      date: string;
+    },
+    filter: { disciplines?: Discipline[] } = { disciplines: [] },
+  ) {
+    let queryLimit: number = limit;
+    if (filter) {
+      if ((filter.disciplines || []).length > 0) {
+        queryLimit = Math.round(limit * (DisciplineUtility.CompetitionDisciplines.length / filter!.disciplines.length));
+      }
+    }
+    const queryResult = await this.athleteContestsRepo.queryAthleteContestsByDate(
+      athleteId,
+      queryLimit,
+      year,
+      after,
+      filter,
+    );
+    let items = queryResult.items.map(dbItem => this.athleteContestsRepo.entityTransformer.fromDBItem(dbItem));
+    let lastKey = queryResult.lastKey;
+    if (lastKey && items.length < limit) {
+      const moreQueryResults = await this.queryAthleteContestsByDate(
+        athleteId,
+        limit - items.length,
+        year,
+        queryResult.lastKey,
+        filter,
+      );
+      items = items.concat(moreQueryResults.items);
+      lastKey = queryResult.lastKey;
+    }
+    return { items: items.slice(0, limit), lastKey: lastKey };
+  }
+
   public async getAthleteRanking(pk: DDBAthleteRankingsItemPrimaryKey) {
     const dbItem = await this.athleteRankingsRepo.get(pk);
     return this.athleteRankingsRepo.entityTransformer.fromDBItem(dbItem);
@@ -106,9 +158,34 @@ export class DatabaseService {
     return this.contestRepo.entityTransformer.fromDBItem(dbItem);
   }
 
-  public async queryContestsByName(name: string, limit: number) {
-    const dbItems = await this.contestRepo.queryContestsByName(name, limit);
-    return dbItems.map(dbItem => this.contestRepo.entityTransformer.fromDBItem(dbItem));
+  public async queryContestsByDate(
+    limit: number,
+    year?: number,
+    after?: {
+      contestId: string;
+      discipline: Discipline;
+      date: string;
+    },
+    filter: { disciplines?: Discipline[]; name?: string } = { disciplines: [], name: undefined },
+  ) {
+    let queryLimit: number = limit;
+    if (filter) {
+      if ((filter.disciplines || []).length > 0) {
+        queryLimit = Math.round(limit * (DisciplineUtility.CompetitionDisciplines.length / filter!.disciplines.length));
+      }
+      if (filter.name) {
+        queryLimit = 30; // random paginator;
+      }
+    }
+    const queryResult = await this.contestRepo.queryContestsByDate(queryLimit, year, after, filter);
+    let items = queryResult.items.map(dbItem => this.contestRepo.entityTransformer.fromDBItem(dbItem));
+    let lastKey = queryResult.lastKey;
+    if (lastKey && items.length < limit) {
+      const moreQueryResults = await this.queryContestsByDate(limit - items.length, year, queryResult.lastKey, filter);
+      items = items.concat(moreQueryResults.items);
+      lastKey = queryResult.lastKey;
+    }
+    return { items: items.slice(0, limit), lastKey: lastKey };
   }
 
   public async putContest(contest: Contest) {

@@ -21,7 +21,6 @@ describe('DynamoDB Streams', () => {
         discipline: 2,
         place: 1,
         points: 4,
-        year: 123,
       });
       const dynamobRecord: StreamRecord = {
         Keys: {

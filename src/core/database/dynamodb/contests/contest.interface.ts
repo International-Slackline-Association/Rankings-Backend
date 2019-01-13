@@ -23,6 +23,5 @@ export type AllAttrs = KeyAttrs & NonKeyAttrs;
 export interface DDBContestItem extends Attrs {
   readonly contestId: string;
   readonly discipline: Discipline;
-  readonly year: number;
   readonly date: string;
 }

@@ -1,4 +1,5 @@
 import { ContestCategory } from './enums';
+import env_variables from './env_variables';
 
 // tslint:disable-next-line:no-namespace
 export namespace Constants {
@@ -25,6 +26,9 @@ export namespace Constants {
     }
   }
   export function ContestCategoryMinParticipantsLimit(category: ContestCategory): number {
+    if (env_variables.isDev) {
+      return 2;
+    }
     switch (category) {
       case ContestCategory.WorldGames:
         return 12;

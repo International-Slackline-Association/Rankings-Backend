@@ -11,14 +11,22 @@ import { ContestSuggestionsResponse } from './dto/contest-suggestions.response';
 export class ContestService {
   constructor(private readonly db: DatabaseService) {}
 
-  public async getContestSuggestions(query: string): Promise<ContestSuggestionsResponse> {
+  public async getContestSuggestions(
+    query: string,
+    year?: number,
+    discipline?: Discipline,
+  ): Promise<ContestSuggestionsResponse> {
     const lookup = Utils.normalizeString(query);
     if (lookup.length < 3) {
       return new ContestSuggestionsResponse([]);
     }
-    const contests = await this.db.queryContestsByName(lookup, 5);
+    const filterDisciplines = Utils.isNil(discipline) ? [] : discipline === Discipline.Overall ? [] : [discipline];
+    const contests = await this.db.queryContestsByDate(5, year, undefined, {
+      disciplines: filterDisciplines,
+      name: lookup,
+    });
     return new ContestSuggestionsResponse(
-      contests.map(contest => {
+      contests.items.map(contest => {
         return {
           id: contest.id,
           name: contest.name,
@@ -31,5 +39,15 @@ export class ContestService {
   public async getContest(id: string, discipline: Discipline): Promise<Contest> {
     const contest = await this.db.getContest(id, discipline);
     return contest;
+  }
+
+  public async getResults(
+    id: string,
+    discipline: Discipline,
+    limit: number,
+    after?: { athleteId: string; points: number },
+  ) {
+    const results = await this.db.getContestResults(id, discipline, limit, after);
+    return results;
   }
 }

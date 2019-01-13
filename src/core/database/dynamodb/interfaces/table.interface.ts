@@ -7,10 +7,16 @@ export interface DDBTableKeyAttrs {
   readonly GSI_SK: string;
 }
 
-export interface LastEvaluatedKey {
+export interface LSILastEvaluatedKey {
   readonly PK: string;
   readonly SK_GSI: string;
   readonly LSI: string;
+}
+
+export interface GSILastEvaluatedKey {
+  readonly PK: string;
+  readonly SK_GSI: string;
+  readonly GSI_SK: string;
 }
 
 export type NumberSet = DocumentClient.DynamoDbSet;
