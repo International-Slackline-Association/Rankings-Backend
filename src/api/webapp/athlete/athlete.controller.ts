@@ -85,15 +85,9 @@ export class AthleteController {
     return new AthleteContestsResponse(
       athletesWithContests.map<IAthleteContestItem>(obj => ({
         id: obj.contest.id,
-        contestCategory: {
-          id: obj.contest.contestCategory,
-          name: ContestCategoryUtility.getName(obj.contest.contestCategory),
-        },
+        contestCategory: ContestCategoryUtility.getNamedContestCategory(obj.contest.contestCategory),
         date: Utils.dateToMoment(obj.contest.date).format('DD/MM/YYYY'),
-        discipline: {
-          id: obj.contest.discipline,
-          name: DisciplineUtility.getName(obj.contest.discipline),
-        },
+        discipline: DisciplineUtility.getNamedDiscipline(obj.contest.discipline),
         name: obj.contest.name,
         rank: obj.item.place,
         smallProfileUrl: obj.contest.profileUrl,

@@ -8,11 +8,13 @@ import { ContestCategoryUtility, DisciplineUtility } from 'shared/enums/enums-ut
 import { JoiValidationPipe } from 'shared/pipes/JoiValidation.pipe';
 import { Utils } from 'shared/utils';
 import { CategoriesResponse } from './dto/categories.response';
-import { ContestSuggestionsDto, contestSuggestionsDtoSchema } from './dto/contest-suggestions.dto';
-import { ContestSuggestionsResponse } from './dto/contest-suggestions.response';
+import { ContestListDto, contestListDtoSchema } from './dto/contest-list.dto';
+import { ContestListResponse, IContestListItem } from './dto/contest-list.response';
 import { ContestResponse } from './dto/contest.response';
 import { ContestResultsDto, contestResultsDtoSchema } from './dto/results.dto';
 import { IContestResultItem, ResultsResponse } from './dto/results.response';
+import { ContestSuggestionsDto, contestSuggestionsDtoSchema } from './dto/suggestions.dto';
+import { ContestSuggestionsResponse } from './dto/suggestions.response';
 
 @Controller('contest')
 export class ContestController {
@@ -21,33 +23,6 @@ export class ContestController {
     private readonly categoriesService: CategoriesService,
     private readonly athleteService: AthleteService,
   ) {}
-
-  @Post('suggestions')
-  @UsePipes(new JoiValidationPipe(contestSuggestionsDtoSchema))
-  public async getContestSuggestions(@Body() dto: ContestSuggestionsDto): Promise<ContestSuggestionsResponse> {
-    const lookup = Utils.normalizeString(dto.query);
-    if (lookup.length < 3) {
-      return new ContestSuggestionsResponse([]);
-    }
-    const contests = await this.contestService.queryContestsByName(dto.query, dto.year, dto.discipline);
-    return new ContestSuggestionsResponse(
-      contests.items.map(contest => {
-        return {
-          id: contest.id,
-          name: contest.name,
-          discipline: { id: contest.discipline, name: DisciplineUtility.getName(contest.discipline) },
-          year: contest.year,
-        };
-      }),
-    );
-  }
-
-  @Get('categories')
-  public getCategories(): CategoriesResponse {
-    const categories = this.categoriesService.getCategories(false);
-    categories.discipline.options[0].label = 'All';
-    return new CategoriesResponse([categories.discipline, categories.year]);
-  }
 
   @Get(':id/:discipline')
   public async getContest(
@@ -63,8 +38,8 @@ export class ContestController {
     return new ContestResponse({
       id: contest.id,
       city: contest.city,
-      discipline: { id: contest.discipline, name: DisciplineUtility.getName(contest.discipline) },
-      contestCategory: { id: contest.contestCategory, name: ContestCategoryUtility.getName(contest.contestCategory) },
+      discipline: DisciplineUtility.getNamedDiscipline(contest.discipline),
+      contestCategory: ContestCategoryUtility.getNamedContestCategory(contest.contestCategory),
       country: contest.country,
       date: Utils.dateToMoment(contest.date).format('DD/MM/YYYY'),
       infoUrl: contest.infoUrl,
@@ -72,6 +47,66 @@ export class ContestController {
       prize: contest.prize.toString(),
       profileUrl: contest.profileUrl,
     });
+  }
+
+  @Post('list')
+  @UsePipes(new JoiValidationPipe(contestListDtoSchema))
+  public async getContestList(@Body() dto: ContestListDto): Promise<ContestListResponse> {
+    const discipline = dto.selectedCategories[0];
+    const year = dto.selectedCategories[1];
+
+    const contests = await this.contestService.queryContests(10, {
+      year: year,
+      contestId: dto.contestId,
+      after: dto.next,
+      discipline: discipline,
+    });
+    return new ContestListResponse(
+      contests.items.map<IContestListItem>(contest => {
+        return {
+          id: contest.id,
+          name: contest.name,
+          discipline: DisciplineUtility.getNamedDiscipline(contest.discipline),
+          year: contest.year,
+          prize: contest.prize.toString(),
+          contestCategory: ContestCategoryUtility.getNamedContestCategory(contest.contestCategory),
+          smallProfileUrl: contest.profileUrl,
+          date: Utils.dateToMoment(contest.date).format('DD/MM/YYYY'),
+        };
+      }),
+      contests.lastKey,
+    );
+  }
+
+  @Post('suggestions')
+  @UsePipes(new JoiValidationPipe(contestSuggestionsDtoSchema))
+  public async getContestSuggestions(@Body() dto: ContestSuggestionsDto): Promise<ContestSuggestionsResponse> {
+    const lookup = Utils.normalizeString(dto.query);
+    if (lookup.length < 3) {
+      return new ContestSuggestionsResponse([]);
+    }
+    const contests = await this.contestService.queryContests(5, {
+      year: dto.year,
+      discipline: dto.discipline,
+      name: dto.query,
+    });
+    return new ContestSuggestionsResponse(
+      contests.items.map(contest => {
+        return {
+          id: contest.id,
+          name: contest.name,
+          discipline: DisciplineUtility.getNamedDiscipline(contest.discipline),
+          year: contest.year,
+        };
+      }),
+    );
+  }
+
+  @Get('categories')
+  public getCategories(): CategoriesResponse {
+    const categories = this.categoriesService.getCategories(false);
+    categories.discipline.options[0].label = 'All';
+    return new CategoriesResponse([categories.discipline, categories.year]);
   }
 
   @Post('results/:id/:discipline')

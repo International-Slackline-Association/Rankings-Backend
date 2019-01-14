@@ -17,10 +17,7 @@ export class ContestService {
   public getDisciplines() {
     const disciplines = DisciplineUtility.CompetitionDisciplines;
     const namedDisciplines = disciplines.map<INamedDiscipline>(d => {
-      return {
-        id: d,
-        name: DisciplineUtility.getName(d),
-      };
+      return DisciplineUtility.getNamedDiscipline(d);
     });
     return namedDisciplines;
   }
@@ -28,10 +25,7 @@ export class ContestService {
   public getCategories() {
     const categories = ContestCategoryUtility.ContestCategories;
     const namedCategories = categories.map<INamedDiscipline>(d => {
-      return {
-        id: d,
-        name: ContestCategoryUtility.getName(d),
-      };
+      return ContestCategoryUtility.getNamedContestCategory(d);
     });
     return namedCategories;
   }

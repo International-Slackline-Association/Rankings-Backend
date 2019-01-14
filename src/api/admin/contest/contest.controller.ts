@@ -20,8 +20,8 @@ export class ContestController {
     const contest = await this.contestService.getContest(id, disciplineParam);
     const { createdAt, date, discipline, contestCategory, thumbnailUrl, ...rest } = contest;
     const item: IContestResponseItem = {
-      discipline: { id: discipline, name: DisciplineUtility.getName(discipline) },
-      contestCategory: { id: contestCategory, name: ContestCategoryUtility.getName(contestCategory) },
+      discipline: DisciplineUtility.getNamedDiscipline(discipline),
+      contestCategory: ContestCategoryUtility.getNamedContestCategory(contestCategory),
       date: date.toISODate(),
       ...rest,
     };

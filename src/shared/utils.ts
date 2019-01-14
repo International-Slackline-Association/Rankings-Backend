@@ -29,12 +29,15 @@ export namespace Utils {
   }
 
   export function normalizeString(str: string) {
+    if (!str) {
+      return str;
+    }
     return latinize(str).toLowerCase();
   }
 
   export function omitReject<T>(promise: Promise<T>) {
     return promise.then<T>(d => d).catch<null>(err => {
-      logger.debug('OmitReject Error', {err: JSON.stringify(err)});
+      logger.debug('OmitReject Error', { err: JSON.stringify(err) });
       return null;
     });
   }

@@ -1,5 +1,6 @@
 import { uniqWith } from 'lodash';
 
+import { INamedDiscipline } from 'shared/types/shared';
 import { Discipline, DisciplineType } from '.';
 
 // tslint:disable-next-line:no-namespace
@@ -173,5 +174,9 @@ export namespace DisciplineUtility {
       default:
         throw new Error(`Discipline name not found: ${discipline}`);
     }
+  }
+
+  export function getNamedDiscipline(discipline: Discipline): INamedDiscipline {
+    return { id: discipline, name: getName(discipline) };
   }
 }

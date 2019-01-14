@@ -85,7 +85,11 @@ export class DDBContestRepository extends DDBRepository {
       discipline: Discipline;
       date: string;
     },
-    filter: { disciplines?: Discipline[]; name?: string } = { disciplines: [], name: undefined },
+    filter: { disciplines?: Discipline[]; name?: string; id?: string } = {
+      disciplines: [],
+      name: undefined,
+      id: undefined,
+    },
   ) {
     const exclusiveStartKey = this.createLSIExclusiveStartKey(after);
     const { filterExpression, filterExpAttrNames, filterExpAttrValues } = this.createFilterExpression(filter);
@@ -149,7 +153,7 @@ export class DDBContestRepository extends DDBRepository {
     return startKey;
   }
 
-  private createFilterExpression(filter: { disciplines?: Discipline[]; name?: string }) {
+  private createFilterExpression(filter: { disciplines?: Discipline[]; name?: string; id?: string }) {
     let filterExpression = '';
     const filterExpAttrNames = {};
     const filterExpAttrValues = {};
@@ -170,6 +174,11 @@ export class DDBContestRepository extends DDBRepository {
         (filterExpression ? filterExpression + ' and ' : '') + `contains(#normalizedName, :queryString)`;
       filterExpAttrNames['#normalizedName'] = this.transformer.attrName('normalizedName');
       filterExpAttrValues[':queryString'] = filter.name;
+    }
+    if (filter.id) {
+      filterExpression = (filterExpression ? filterExpression + ' and ' : '') + `contains(#sk_gsi, :id)`;
+      filterExpAttrNames['#sk_gsi'] = this.transformer.attrName('SK_GSI');
+      filterExpAttrValues[':id'] = filter.id;
     }
     return {
       filterExpression: filterExpression || undefined,

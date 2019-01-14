@@ -23,3 +23,8 @@ export interface ICategoryItem {
   options: UISelectOption[];
   selectedValue: string;
 }
+
+// export interface ISelectedCategoryItem {
+//   index: number;
+//   value: string;
+// }

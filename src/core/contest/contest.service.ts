@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 
 import { Contest } from 'core/contest/entity/contest';
 import { DatabaseService } from 'core/database/database.service';
-import { Discipline } from 'shared/enums';
+import { Discipline, DisciplineType } from 'shared/enums';
 import { DisciplineUtility } from 'shared/enums/enums-utility';
 import { Utils } from 'shared/utils';
 
@@ -10,12 +10,34 @@ import { Utils } from 'shared/utils';
 export class ContestService {
   constructor(private readonly db: DatabaseService) {}
 
-  public async queryContestsByName(query: string, year?: number, discipline?: Discipline) {
-    const lookup = Utils.normalizeString(query);
-    const filterDisciplines = Utils.isNil(discipline) ? [] : discipline === Discipline.Overall ? [] : [discipline];
-    const contests = await this.db.queryContestsByDate(5, year, undefined, {
+  public async queryContests(
+    limit: number,
+    opts: {
+      year?: number;
+      discipline?: Discipline;
+      contestId?: string;
+      name?: string;
+      after?: {
+        contestId: string;
+        discipline: Discipline;
+        date: string;
+      };
+    } = {},
+  ) {
+    const discipline = opts.discipline;
+    let filterDisciplines: Discipline[] = [];
+    if (Utils.isNil(discipline) || discipline === Discipline.Overall) {
+      filterDisciplines = [];
+    } else {
+      filterDisciplines = [discipline, ...DisciplineUtility.getAllChildren(discipline)].filter(
+        d => DisciplineUtility.getType(d) === DisciplineType.Competition,
+      );
+    }
+
+    const contests = await this.db.queryContestsByDate(limit, opts.year, opts.after, {
       disciplines: filterDisciplines,
-      name: lookup,
+      name: Utils.normalizeString(opts.name),
+      id: opts.contestId,
     });
     return contests;
   }

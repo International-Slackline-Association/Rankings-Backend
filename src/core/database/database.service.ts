@@ -166,14 +166,18 @@ export class DatabaseService {
       discipline: Discipline;
       date: string;
     },
-    filter: { disciplines?: Discipline[]; name?: string } = { disciplines: [], name: undefined },
+    filter: { disciplines?: Discipline[]; name?: string; id?: string } = {
+      disciplines: [],
+      name: undefined,
+      id: undefined,
+    },
   ) {
     let queryLimit: number = limit;
     if (filter) {
       if ((filter.disciplines || []).length > 0) {
         queryLimit = Math.round(limit * (DisciplineUtility.CompetitionDisciplines.length / filter!.disciplines.length));
       }
-      if (filter.name) {
+      if (filter.name || filter.id) {
         queryLimit = 30; // random paginator;
       }
     }

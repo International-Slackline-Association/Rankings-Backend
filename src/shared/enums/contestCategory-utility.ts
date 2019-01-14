@@ -1,3 +1,4 @@
+import { INamedContestCategory } from 'shared/types/shared';
 import { ContestCategory } from '.';
 
 // tslint:disable-next-line:no-namespace
@@ -28,5 +29,9 @@ export namespace ContestCategoryUtility {
       default:
         throw new Error(`Contest Category name not found: ${category}`);
     }
+  }
+
+  export function getNamedContestCategory(category: ContestCategory): INamedContestCategory {
+    return { id: category, name: getName(category) };
   }
 }
