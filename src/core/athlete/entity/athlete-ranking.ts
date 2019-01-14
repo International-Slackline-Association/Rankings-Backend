@@ -1,4 +1,7 @@
+import * as moment from 'moment';
+
 import { AgeCategory, Discipline, Gender } from 'shared/enums';
+import { Utils } from 'shared/utils';
 
 export class AthleteRanking {
   public readonly id: string;
@@ -12,4 +15,31 @@ export class AthleteRanking {
   public readonly points: number;
   public readonly discipline: Discipline;
   public readonly year: number;
+
+  public get age(): number {
+    const birthYear = Utils.dateToMoment(this.birthdate).year();
+    const age =
+      moment()
+        .utc()
+        .year() - birthYear;
+    return age;
+  }
+
+  constructor(init: {
+    id: string;
+    name: string;
+    surname: string;
+    gender: Gender;
+    country: string;
+    birthdate: Date;
+    ageCategory: AgeCategory;
+    lastUpdatedAt?: number;
+    points: number;
+    discipline: Discipline;
+    year: number;
+  }) {
+    if (init) {
+      Object.assign(this, init);
+    }
+  }
 }

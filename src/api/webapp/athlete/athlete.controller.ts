@@ -1,6 +1,7 @@
 import { Body, Controller, Get, Param, Post, Req, UsePipes } from '@nestjs/common';
 
 import { AthleteService } from 'core/athlete/athlete.service';
+import { RankingsService } from 'core/athlete/rankings.service';
 import { CategoriesService } from 'core/category/categories.service';
 import { ContestCategoryUtility, DisciplineUtility } from 'shared/enums/enums-utility';
 import { JoiValidationPipe } from 'shared/pipes/JoiValidation.pipe';
@@ -17,6 +18,7 @@ import { AthleteContestsResponse, IAthleteContestItem } from './dto/contests.res
 export class AthleteController {
   constructor(
     private readonly athleteService: AthleteService,
+    private readonly rankingsService: RankingsService,
     private readonly categoriesService: CategoriesService,
     private readonly countryService: CountryService,
     private readonly contestService: ContestService,
@@ -58,7 +60,7 @@ export class AthleteController {
       return new AthleteResponse(null);
     }
     const countryName = this.countryService.getCountryName(athlete.country);
-    const overallRank = await this.athleteService.getOverallRank(params.id);
+    const overallRank = await this.rankingsService.getOverallRank(params.id);
     return new AthleteResponse({
       id: athlete.id,
       name: athlete.name,

@@ -42,5 +42,5 @@ export const contestListDtoSchema = Joi.object().keys({
         .valid([...DisciplineUtility.CategoricalDisciplines, ...DisciplineUtility.CompetitionDisciplines])
         .error(new APIErrors.JoiValidationError('Invalid discipline')),
     })
-    .and('athleteId', 'points'),
+    .and('contestId', 'date', 'discipline'),
 });

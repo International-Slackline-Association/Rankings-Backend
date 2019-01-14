@@ -34,10 +34,17 @@ export class ContestService {
       );
     }
 
-    const contests = await this.db.queryContestsByDate(limit, opts.year, opts.after, {
-      disciplines: filterDisciplines,
-      name: Utils.normalizeString(opts.name),
-      id: opts.contestId,
+    if (opts.contestId) {
+      limit = 1;
+    }
+    const contests = await this.db.queryContestsByDate(limit, {
+      year: opts.year,
+      after: opts.after,
+      filter: {
+        disciplines: filterDisciplines,
+        name: Utils.normalizeString(opts.name),
+        id: opts.contestId,
+      },
     });
     return contests;
   }

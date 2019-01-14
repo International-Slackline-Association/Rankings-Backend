@@ -103,7 +103,7 @@ export class AthleteContestRecordService {
         const updatedPoints = athleteRanking.points + pointsToAdd;
         await this.db.updatePointsOfAthleteRanking(pk, updatedPoints);
       } else {
-        const item: AthleteRanking = {
+        const item = new AthleteRanking({
           ageCategory: combination.ageCategory,
           country: athlete.country,
           discipline: combination.discipline,
@@ -114,7 +114,7 @@ export class AthleteContestRecordService {
           points: pointsToAdd,
           surname: athlete.surname,
           year: combination.year,
-        };
+        });
         await this.db.putAthleteRanking(item);
       }
     }

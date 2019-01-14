@@ -28,7 +28,7 @@ export class EntityTransformer {
     if (!dbItem) {
       return null;
     }
-    return {
+    return new AthleteRanking({
       ageCategory: dbItem.ageCategory || AgeCategory.All,
       id: dbItem.athleteId,
       country: dbItem.country,
@@ -40,6 +40,6 @@ export class EntityTransformer {
       points: dbItem.points,
       year: dbItem.year,
       birthdate: new Date(dbItem.birthdate),
-    };
+    });
   }
 }

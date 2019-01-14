@@ -49,16 +49,18 @@ export class DDBAthleteContestsRepository extends DDBRepository {
   public async queryAthleteContestsByDate(
     athleteId: string,
     limit: number,
-    year?: number,
-    after?: {
-      contestId: string;
-      discipline: Discipline;
-      date: string;
-    },
-    filter: { disciplines?: Discipline[] } = { disciplines: [] },
+    opts: {
+      year?: number;
+      after?: {
+        contestId: string;
+        discipline: Discipline;
+        date: string;
+      };
+      filter?: { disciplines?: Discipline[] };
+    } = {},
   ) {
-    const exclusiveStartKey = this.createLSIExclusiveStartKey(athleteId, after);
-    const { filterExpression, filterExpAttrNames, filterExpAttrValues } = this.createFilterExpression(filter);
+    const exclusiveStartKey = this.createLSIExclusiveStartKey(athleteId, opts.after);
+    const { filterExpression, filterExpAttrNames, filterExpAttrValues } = this.createFilterExpression(opts.filter);
 
     const params: AWS.DynamoDB.DocumentClient.QueryInput = {
       TableName: this._tableName,
@@ -75,7 +77,7 @@ export class DDBAthleteContestsRepository extends DDBRepository {
       },
       ExpressionAttributeValues: {
         ':pk': this.transformer.itemToAttrsTransformer.PK(athleteId),
-        ':sortKeyPrefix': this.transformer.itemToAttrsTransformer.LSI((year || '').toString()),
+        ':sortKeyPrefix': this.transformer.itemToAttrsTransformer.LSI((opts.year || '').toString()),
         ...filterExpAttrValues,
       },
     };
@@ -182,7 +184,7 @@ export class DDBAthleteContestsRepository extends DDBRepository {
     return startKey;
   }
 
-  private createFilterExpression(filter: { disciplines?: Discipline[] }) {
+  private createFilterExpression(filter?: { disciplines?: Discipline[] }) {
     let filterExpression = '';
     const filterExpAttrNames = {};
     const filterExpAttrValues = {};

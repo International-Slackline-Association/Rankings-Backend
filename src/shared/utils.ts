@@ -35,7 +35,7 @@ export namespace Utils {
     return latinize(str).toLowerCase();
   }
 
-  export function omitReject<T>(promise: Promise<T>) {
+  export async function omitReject<T>(promise: Promise<T>) {
     return promise.then<T>(d => d).catch<null>(err => {
       logger.debug('OmitReject Error', { err: JSON.stringify(err) });
       return null;

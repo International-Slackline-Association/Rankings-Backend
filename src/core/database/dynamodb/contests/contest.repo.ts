@@ -79,20 +79,18 @@ export class DDBContestRepository extends DDBRepository {
 
   public async queryContestsByDate(
     limit: number,
-    year?: number,
-    after?: {
-      contestId: string;
-      discipline: Discipline;
-      date: string;
-    },
-    filter: { disciplines?: Discipline[]; name?: string; id?: string } = {
-      disciplines: [],
-      name: undefined,
-      id: undefined,
-    },
+    opts: {
+      year?: number;
+      after?: {
+        contestId: string;
+        discipline: Discipline;
+        date: string;
+      };
+      filter?: { disciplines?: Discipline[]; name?: string; id?: string };
+    } = {},
   ) {
-    const exclusiveStartKey = this.createLSIExclusiveStartKey(after);
-    const { filterExpression, filterExpAttrNames, filterExpAttrValues } = this.createFilterExpression(filter);
+    const exclusiveStartKey = this.createLSIExclusiveStartKey(opts.after);
+    const { filterExpression, filterExpAttrNames, filterExpAttrValues } = this.createFilterExpression(opts.filter);
 
     const params: AWS.DynamoDB.DocumentClient.QueryInput = {
       TableName: this._tableName,
@@ -109,7 +107,7 @@ export class DDBContestRepository extends DDBRepository {
       },
       ExpressionAttributeValues: {
         ':pk': this.transformer.itemToAttrsTransformer.PK(),
-        ':sortKeyPrefix': this.transformer.itemToAttrsTransformer.LSI((year || '').toString()),
+        ':sortKeyPrefix': this.transformer.itemToAttrsTransformer.LSI((opts.year || '').toString()),
         ...filterExpAttrValues,
       },
     };
@@ -153,7 +151,7 @@ export class DDBContestRepository extends DDBRepository {
     return startKey;
   }
 
-  private createFilterExpression(filter: { disciplines?: Discipline[]; name?: string; id?: string }) {
+  private createFilterExpression(filter?: { disciplines?: Discipline[]; name?: string; id?: string }) {
     let filterExpression = '';
     const filterExpAttrNames = {};
     const filterExpAttrValues = {};

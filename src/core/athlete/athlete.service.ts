@@ -21,18 +21,6 @@ export class AthleteService {
     return athlete;
   }
 
-  public async getOverallRank(id: string) {
-    const pk = {
-      ageCategory: AgeCategory.All,
-      athleteId: id,
-      discipline: Discipline.Overall,
-      gender: Gender.All,
-      year: Year.All,
-    };
-    const place = await this.db.getAthleteRankingPlace(pk);
-    return place;
-  }
-
   public async getContests(
     id: string,
     year: number,
@@ -46,8 +34,10 @@ export class AthleteService {
     const filterDisciplines = [discipline, ...DisciplineUtility.getAllChildren(discipline)].filter(
       d => DisciplineUtility.getType(d) === DisciplineType.Competition,
     );
-    const contests = await this.db.queryAthleteContestsByDate(id, 10, year, after, {
-      disciplines: filterDisciplines,
+    const contests = await this.db.queryAthleteContestsByDate(id, 10, {
+      year: year,
+      after: after,
+      filter: { disciplines: filterDisciplines },
     });
     return contests;
   }

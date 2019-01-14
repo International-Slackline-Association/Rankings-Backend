@@ -1,4 +1,4 @@
-import { AgeCategory, Discipline, Gender } from 'shared/enums';
+import { AgeCategory, Discipline, Gender, Year } from 'shared/enums';
 import { DDBTableKeyAttrs } from '../../interfaces/table.interface';
 
 type KeyAttrs = DDBTableKeyAttrs;
@@ -24,10 +24,13 @@ export interface DDBAthleteRankingsItem extends Attrs {
   readonly points: number;
 }
 
-export interface DDBAthleteRankingsItemPrimaryKey {
-  readonly athleteId: string;
+export interface DDBRankingsItemPrimaryKey {
   readonly discipline: Discipline;
   readonly ageCategory: AgeCategory;
   readonly gender: Gender;
-  readonly year: number;
+  readonly year: Year;
+}
+
+export interface DDBAthleteRankingsItemPrimaryKey extends DDBRankingsItemPrimaryKey {
+  readonly athleteId: string;
 }
