@@ -8,6 +8,7 @@ import { DDBAthleteContestsRepository } from 'core/database/dynamodb/athlete/con
 import { isRecordOfTypeOfKeys } from 'dynamodb-streams/utils';
 import { AgeCategory, Discipline, Gender } from 'shared/enums';
 import { AgeCategoryUtility, DisciplineUtility, GenderUtility, YearUtility } from 'shared/enums/enums-utility';
+import { logger } from 'shared/logger';
 import { Utils } from 'shared/utils';
 
 interface RankingCombination {
@@ -31,15 +32,20 @@ export class AthleteContestRecordService {
   public async processNewRecord(record: DynamoDBRecord) {
     if (record.eventName === 'INSERT') {
       const item = this.athleteContestsRepo.transformFromDynamoDBType(record.dynamodb.NewImage);
+      logger.debug('New Contest Record ', { item });
       await this.processNewContestResult(item);
     }
     if (record.eventName === 'MODIFY') {
       const oldItem = this.athleteContestsRepo.transformFromDynamoDBType(record.dynamodb.OldImage);
       const newItem = this.athleteContestsRepo.transformFromDynamoDBType(record.dynamodb.NewImage);
+      logger.debug('Modified Contest Record ', { oldItem, newItem });
+
       await this.processModifiedContestResult(oldItem, newItem);
     }
     if (record.eventName === 'REMOVE') {
       const oldItem = this.athleteContestsRepo.transformFromDynamoDBType(record.dynamodb.OldImage);
+      logger.debug('Removed Contest Record ', { oldItem });
+
       await this.processRemovedContestResult(oldItem);
     }
   }
@@ -94,7 +100,8 @@ export class AthleteContestRecordService {
       };
       const athleteRanking = await this.db.getAthleteRanking(pk);
       if (athleteRanking) {
-        await this.db.updatePointsOfAthleteRanking(pk, pointsToAdd);
+        const updatedPoints = athleteRanking.points + pointsToAdd;
+        await this.db.updatePointsOfAthleteRanking(pk, updatedPoints);
       } else {
         const item: AthleteRanking = {
           ageCategory: combination.ageCategory,

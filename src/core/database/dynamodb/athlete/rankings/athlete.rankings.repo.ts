@@ -64,7 +64,7 @@ export class DDBAthleteRankingsRepository extends DDBRepository {
       },
       ExpressionAttributeValues: {
         ':unixTime': moment().unix(),
-        ':points': points.toString(),
+        ':points': this.transformer.itemToAttrsTransformer.GSI_SK(points),
       },
       ReturnValues: 'UPDATED_NEW',
     };

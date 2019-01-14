@@ -34,7 +34,7 @@ export namespace Utils {
 
   export function omitReject<T>(promise: Promise<T>) {
     return promise.then<T>(d => d).catch<null>(err => {
-      logger.debug('OmitReject Error', err.message);
+      logger.debug('OmitReject Error', {err: JSON.stringify(err)});
       return null;
     });
   }

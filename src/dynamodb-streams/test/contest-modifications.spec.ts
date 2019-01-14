@@ -14,13 +14,13 @@ describe('DynamoDB Streams', () => {
   describe('Contest Modifications', () => {
     it('should pretend new athlete contest result has inserted', async () => {
       const newImage = athleteContestRepo.transformToDynamoDBType({
-        athleteId: 'can-sahin',
-        contestId: 'test_2018',
+        athleteId: 'alpha-test',
+        contestId: 'alpha_2015',
         createdAt: 123,
         date: '2015-10-25',
-        discipline: 2,
+        discipline: 8,
         place: 1,
-        points: 4,
+        points: 1000,
       });
       const dynamobRecord: StreamRecord = {
         Keys: {
