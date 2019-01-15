@@ -170,12 +170,12 @@ export class DDBAthleteRankingsRepository extends DDBRepository {
       return { filterExpression: undefined, filterExpAttrNames, filterExpAttrValues };
     }
     if (filter.country) {
-      filterExpression = (filterExpression ? filterExpression + ' and ' : '') + `contains(#country, :country)`;
+      filterExpression = (filterExpression ? `(${filterExpression}) and ` : '') + `contains(#country, :country)`;
       filterExpAttrNames['#country'] = this.transformer.attrName('country');
       filterExpAttrValues[':country'] = filter.country;
     }
     if (filter.id) {
-      filterExpression = (filterExpression ? filterExpression + ' and ' : '') + `contains(#pk, :id)`;
+      filterExpression = (filterExpression ? `(${filterExpression}) and ` : '') + `contains(#pk, :id)`;
       filterExpAttrNames['#pk'] = this.transformer.attrName('PK');
       filterExpAttrValues[':id'] = filter.id;
     }

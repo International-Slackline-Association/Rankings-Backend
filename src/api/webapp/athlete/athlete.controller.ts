@@ -3,16 +3,17 @@ import { Body, Controller, Get, Param, Post, Req, UsePipes } from '@nestjs/commo
 import { AthleteService } from 'core/athlete/athlete.service';
 import { RankingsService } from 'core/athlete/rankings.service';
 import { CategoriesService } from 'core/category/categories.service';
-import { ContestCategoryUtility, DisciplineUtility } from 'shared/enums/enums-utility';
+import { Discipline } from 'shared/enums';
+import { ContestCategoryUtility, DisciplineUtility, YearUtility } from 'shared/enums/enums-utility';
 import { JoiValidationPipe } from 'shared/pipes/JoiValidation.pipe';
 import { Utils } from 'shared/utils';
 import { ContestService } from '../../../core/contest/contest.service';
 import { CountryService } from '../country/country.service';
-import { AthleteSuggestionsResponse } from './dto/athlete-suggestions.response';
 import { AthleteResponse } from './dto/athlete.response';
 import { CategoriesResponse } from './dto/categories.response';
 import { AthleteContestsDto, athleteContestsDtoSchema } from './dto/contests.dto';
 import { AthleteContestsResponse, IAthleteContestItem } from './dto/contests.response';
+import { AthleteSuggestionsResponse } from './dto/suggestions.response';
 
 @Controller('athlete')
 export class AthleteController {
@@ -23,6 +24,26 @@ export class AthleteController {
     private readonly countryService: CountryService,
     private readonly contestService: ContestService,
   ) {}
+
+  @Get('details/:id')
+  public async getAthlete(@Param() params): Promise<AthleteResponse> {
+    const athlete = await this.athleteService.getAthlete(params.id);
+    if (!athlete) {
+      return new AthleteResponse(null);
+    }
+    const countryName = this.countryService.getCountryName(athlete.country);
+    const overallRank = await this.rankingsService.getOverallRank(params.id);
+    return new AthleteResponse({
+      id: athlete.id,
+      name: athlete.name,
+      surname: athlete.surname,
+      age: athlete.age,
+      country: countryName,
+      profileUrl: athlete.profileUrl,
+      infoUrl: athlete.infoUrl,
+      overallRank: overallRank ? overallRank.toString() : '',
+    });
+  }
 
   @Get('suggestions/:name')
   public async getAthleteSuggestions(
@@ -50,33 +71,20 @@ export class AthleteController {
   @Get('categories')
   public getCategories(): CategoriesResponse {
     const categories = this.categoriesService.getCategories(false);
+    categories.discipline.options[0].label = 'All';
     return new CategoriesResponse([categories.discipline, categories.year]);
-  }
-
-  @Get(':id')
-  public async getAthlete(@Param() params): Promise<AthleteResponse> {
-    const athlete = await this.athleteService.getAthlete(params.id);
-    if (!athlete) {
-      return new AthleteResponse(null);
-    }
-    const countryName = this.countryService.getCountryName(athlete.country);
-    const overallRank = await this.rankingsService.getOverallRank(params.id);
-    return new AthleteResponse({
-      id: athlete.id,
-      name: athlete.name,
-      surname: athlete.surname,
-      age: athlete.age,
-      country: countryName,
-      profileUrl: athlete.profileUrl,
-      infoUrl: athlete.infoUrl,
-      overallRank: overallRank ? overallRank.toString() : '-',
-    });
   }
 
   @Post('contests')
   @UsePipes(new JoiValidationPipe(athleteContestsDtoSchema))
-  public async getContests(@Body() dto: AthleteContestsDto): Promise<any> {
-    const results = await this.athleteService.getContests(dto.id, dto.year, dto.discipline, dto.next);
+  public async getContests(@Body() dto: AthleteContestsDto): Promise<AthleteContestsResponse> {
+    let categories = dto.selectedCategories || [];
+    if (categories.length < 2) {
+      categories = [Discipline.Overall, YearUtility.Current];
+    }
+    const discipline = categories[0];
+    const year = categories[1];
+    const results = await this.athleteService.getContests(dto.id, year, discipline, dto.next);
 
     const athletesWithContests = await Promise.all(
       results.items.map(async item => {

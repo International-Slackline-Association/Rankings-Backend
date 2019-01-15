@@ -169,12 +169,12 @@ export class DDBContestRepository extends DDBRepository {
     }
     if (filter.name) {
       filterExpression =
-        (filterExpression ? filterExpression + ' and ' : '') + `contains(#normalizedName, :queryString)`;
+        (filterExpression ? `(${filterExpression}) and ` : '') + `contains(#normalizedName, :queryString)`;
       filterExpAttrNames['#normalizedName'] = this.transformer.attrName('normalizedName');
       filterExpAttrValues[':queryString'] = filter.name;
     }
     if (filter.id) {
-      filterExpression = (filterExpression ? filterExpression + ' and ' : '') + `contains(#sk_gsi, :id)`;
+      filterExpression = (filterExpression ? `(${filterExpression}) and ` : '') + `contains(#sk_gsi, :id)`;
       filterExpAttrNames['#sk_gsi'] = this.transformer.attrName('SK_GSI');
       filterExpAttrValues[':id'] = filter.id;
     }

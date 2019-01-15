@@ -6,20 +6,22 @@ import { APIErrors } from 'shared/exceptions/api.exceptions';
 
 export class ContestSuggestionsDto {
   public readonly query: string;
-  public readonly year?: number;
-  public readonly discipline?: Discipline;
+  public readonly selectedCategories?: number[];
 }
 
 export const contestSuggestionsDtoSchema = Joi.object().keys({
   query: Joi.string()
     .required()
     .error(new APIErrors.JoiValidationError('Unknown query')),
-  year: Joi.number()
-    .optional()
-    .allow(null),
-  discipline: Joi.number()
-    .optional()
+  selectedCategories: Joi.array()
+    .length(2)
     .allow(null)
-    .valid([Discipline.Overall, ...DisciplineUtility.CompetitionDisciplines])
-    .error(new APIErrors.JoiValidationError('Invalid discipline')),
+    .optional()
+    .items(
+      Joi.number()
+        .required()
+        .error(new APIErrors.JoiValidationError('Unknown category value')),
+    )
+    .error(new APIErrors.JoiValidationError('Invalid categories')),
+
 });

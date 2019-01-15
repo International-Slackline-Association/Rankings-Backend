@@ -5,8 +5,8 @@ import { DisciplineUtility } from 'shared/enums/enums-utility';
 import { APIErrors } from 'shared/exceptions/api.exceptions';
 
 export class RankingsListDto {
-  public readonly selectedCategories: number[];
-  public readonly athleteId: string;
+  public readonly selectedCategories?: number[];
+  public readonly athleteId?: string;
   public readonly country?: string;
   public readonly next?: {
     athleteId: string;
@@ -16,9 +16,9 @@ export class RankingsListDto {
 
 export const rankingsListDtoSchema = Joi.object().keys({
   selectedCategories: Joi.array()
-    .allow(null)
     .length(4)
-    .required()
+    .allow(null)
+    .optional()
     .items(
       Joi.number()
         .required()
@@ -26,10 +26,10 @@ export const rankingsListDtoSchema = Joi.object().keys({
     )
     .error(new APIErrors.JoiValidationError('Invalid categories')),
   athleteId: Joi.string()
-    .allow(null)
+    .allow(null, '')
     .error(new APIErrors.JoiValidationError('Invalid athleteId')),
   country: Joi.string()
-    .allow(null)
+    .allow(null, '')
     .error(new APIErrors.JoiValidationError('Invalid country')),
   next: Joi.object()
     .allow(null)

@@ -5,7 +5,7 @@ import { DisciplineUtility } from 'shared/enums/enums-utility';
 import { APIErrors } from 'shared/exceptions/api.exceptions';
 
 export class ContestListDto {
-  public readonly selectedCategories: number[];
+  public readonly selectedCategories?: number[];
   public readonly contestId: string;
   public readonly next?: {
     contestId: string;
@@ -17,7 +17,8 @@ export class ContestListDto {
 export const contestListDtoSchema = Joi.object().keys({
   selectedCategories: Joi.array()
     .length(2)
-    .required()
+    .allow(null)
+    .optional()
     .items(
       Joi.number()
         .required()
@@ -25,7 +26,7 @@ export const contestListDtoSchema = Joi.object().keys({
     )
     .error(new APIErrors.JoiValidationError('Invalid categories')),
   contestId: Joi.string()
-    .allow(null)
+    .allow(null, '')
     .error(new APIErrors.JoiValidationError('Invalid contestId')),
   next: Joi.object()
     .allow(null)

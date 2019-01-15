@@ -6,8 +6,7 @@ import { APIErrors } from 'shared/exceptions/api.exceptions';
 
 export class AthleteContestsDto {
   public readonly id: string;
-  public readonly discipline: Discipline;
-  public readonly year: number;
+  public readonly selectedCategories?: number[];
   public readonly next?: {
     contestId: string;
     discipline: Discipline;
@@ -17,15 +16,17 @@ export class AthleteContestsDto {
 
 export const athleteContestsDtoSchema = Joi.object().keys({
   id: Joi.string()
-  .required()
-  .error(new APIErrors.JoiValidationError('Unknown id')),
-  discipline: Joi.number()
     .required()
-    .valid([...DisciplineUtility.CategoricalDisciplines, ...DisciplineUtility.CompetitionDisciplines])
-    .error(new APIErrors.JoiValidationError('Invalid discipline')),
-  year: Joi.number()
+    .error(new APIErrors.JoiValidationError('Unknown id')),
+  selectedCategories: Joi.array()
+    .allow(null)
+    .length(2)
     .required()
-    .error(new APIErrors.JoiValidationError('Invalid year')),
+    .items(
+      Joi.number()
+        .required()
+        .error(new APIErrors.JoiValidationError('Unknown category value')),
+    ),
   next: Joi.object()
     .allow(null)
     .keys({

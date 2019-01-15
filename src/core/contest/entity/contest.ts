@@ -18,6 +18,10 @@ export class Contest {
   public get year(): number {
     return Utils.dateToMoment(this.date).year();
   }
+
+  public get prizeString(): string {
+    return this.prize.toString() + ' Euro';
+  }
   constructor(init: {
     id: string;
     name: string;

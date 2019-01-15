@@ -4,7 +4,7 @@ import { AthleteService } from 'core/athlete/athlete.service';
 import { CategoriesService } from 'core/category/categories.service';
 import { ContestService } from 'core/contest/contest.service';
 import { Discipline } from 'shared/enums';
-import { ContestCategoryUtility, DisciplineUtility } from 'shared/enums/enums-utility';
+import { ContestCategoryUtility, DisciplineUtility, YearUtility } from 'shared/enums/enums-utility';
 import { JoiValidationPipe } from 'shared/pipes/JoiValidation.pipe';
 import { Utils } from 'shared/utils';
 import { CategoriesResponse } from './dto/categories.response';
@@ -24,7 +24,7 @@ export class ContestController {
     private readonly athleteService: AthleteService,
   ) {}
 
-  @Get(':id/:discipline')
+  @Get('details/:id/:discipline')
   public async getContest(
     @Param('id') id: string,
     @Param('discipline', new ParseIntPipe())
@@ -44,7 +44,7 @@ export class ContestController {
       date: Utils.dateToMoment(contest.date).format('DD/MM/YYYY'),
       infoUrl: contest.infoUrl,
       name: contest.name,
-      prize: contest.prize.toString(),
+      prize: contest.prizeString,
       profileUrl: contest.profileUrl,
     });
   }
@@ -52,8 +52,12 @@ export class ContestController {
   @Post('list')
   @UsePipes(new JoiValidationPipe(contestListDtoSchema))
   public async getContestList(@Body() dto: ContestListDto): Promise<ContestListResponse> {
-    const discipline = dto.selectedCategories[0];
-    const year = dto.selectedCategories[1];
+    let categories = dto.selectedCategories || [];
+    if (categories.length < 2) {
+      categories = [Discipline.Overall, YearUtility.Current];
+    }
+    const discipline = categories[0];
+    const year = categories[1];
 
     const contests = await this.contestService.queryContests(10, {
       year: year,
@@ -68,7 +72,7 @@ export class ContestController {
           name: contest.name,
           discipline: DisciplineUtility.getNamedDiscipline(contest.discipline),
           year: contest.year,
-          prize: contest.prize.toString(),
+          prize: contest.prizeString,
           contestCategory: ContestCategoryUtility.getNamedContestCategory(contest.contestCategory),
           smallProfileUrl: contest.profileUrl,
           date: Utils.dateToMoment(contest.date).format('DD/MM/YYYY'),
@@ -85,10 +89,14 @@ export class ContestController {
     if (lookup.length < 3) {
       return new ContestSuggestionsResponse([]);
     }
+    const categories = dto.selectedCategories || [];
+
+    const discipline = categories[0];
+    const year = categories[1];
     const contests = await this.contestService.queryContests(5, {
-      year: dto.year,
-      discipline: dto.discipline,
-      name: dto.query,
+      year: year,
+      discipline: discipline,
+      name: lookup,
     });
     return new ContestSuggestionsResponse(
       contests.items.map(contest => {
