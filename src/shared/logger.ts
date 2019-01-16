@@ -10,7 +10,6 @@ function cloudWatchMessageFormatter(log: winston.LogObject): string {
   const meta = { ...log.meta };
   delete meta.level;
   delete meta.message;
-
   const obj = {
     logLevel: log.level,
     message: log.msg,
@@ -33,34 +32,24 @@ const winstonCloudWatchTransport = new WinstonCloudWatch({
 export const waitForLogger = async () => {
   return new Promise((r, j) => {
     winstonCloudWatchTransport.kthxbye(() => {
-      // waitForTransports(logger).then(() => {
-      r();
-      // });
+      waitForTransports(logger).then(() => {
+        r();
+      });
     });
   });
 };
 
 async function waitForTransports(l) {
-  const transportsFinished = l.transports.map(
-    t => new Promise(resolve => t.on('finish', resolve)),
-  );
+  const transportsFinished = l.transports.map(t => new Promise(resolve => t.on('finish', resolve)));
   l.end();
   return Promise.all(transportsFinished);
 }
 
 const winstonFormat = () => {
   if (env_variables.IS_OFFLINE) {
-    // tslint:disable-next-line:ban-comma-operator
-    return winston.format.combine(
-      winston.format.splat(),
-      winston.format.colorize(),
-      winston.format.simple(),
-    );
+    return winston.format.combine(winston.format.splat(), winston.format.colorize(), winston.format.simple());
   }
-  return winston.format.combine(
-    winston.format.splat(),
-    winston.format.simple(),
-  );
+  return winston.format.combine(winston.format.splat(), winston.format.simple());
 };
 
 const winstonTransports = () => {

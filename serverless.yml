@@ -13,7 +13,8 @@ custom:
   defaultStage: Dev
   defaultProfile: ISA-Rankings_Serverless
   defaultRegion: eu-west-1
-  
+  s3ImageBucket: isa.rankings.${self:provider.region}.images
+
   isProdCase:
     Dev: false
     Prod: true
@@ -79,6 +80,13 @@ provider:
       Action:
         - cloudwatch:PutMetricData
       Resource: '*'
+    - Effect: Allow
+      Action:
+        - 's3:GetObject'
+        - 's3:PutObject'
+        - 's3:ListBucket'
+      Resource: 'arn:aws:s3:::${self:custom.s3ImageBucket}/*'
+
   deploymentBucket:
     name: isa.serverless.${self:provider.region}.deploys
 
@@ -121,6 +129,16 @@ functions:
               - ISARankingsTable
               - StreamArn
           batchSize: 100
+  ImageResizer:
+    handler: src/image-resizer/index.handler
+    description: Rankings Image resizer service
+    environment: ${file(./serverless/environment.yml)}
+    events:
+     - s3:
+          bucket: ${self:custom.s3ImageBucket}
+          event: s3:ObjectCreated:*
+          rules:
+            - prefix: public/
 resources:
   Resources:
     ISARankingsTable:
