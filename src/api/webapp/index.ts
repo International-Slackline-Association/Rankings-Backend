@@ -10,6 +10,8 @@ import { AppModule } from './api.module';
 dotenv.config({ override: true });
 
 import * as serverless from 'aws-serverless-express';
+import { eventContext } from 'aws-serverless-express/middleware';
+
 import { Server } from 'http';
 let cachedServer: Server;
 
@@ -21,8 +23,10 @@ async function bootstrapServer(): Promise<any> {
     bodyParser: true,
   })
     .then(app => {
+      app.use(eventContext());
       app.useGlobalFilters(new AllExceptionsFilter());
       app.setGlobalPrefix('api');
+      app.enableCors();
       return app.init();
     })
     .then(() => {
@@ -30,26 +34,25 @@ async function bootstrapServer(): Promise<any> {
     });
 }
 
-export const handler: Handler = (event: APIGatewayEvent, context: Context, callback: Callback) => {
+export const handler: Handler = async (event: APIGatewayEvent, context: Context) => {
+  // context.callbackWaitsForEmptyEventLoop = false;
+  context.succeed = succeedWaitsLogger(context.succeed);
   if (!cachedServer) {
-    bootstrapServer().then(server => {
-      cachedServer = server;
-      return serverless.proxy(server, event, context, 'CALLBACK', callbackWaitsLogger(callback));
-    });
-  } else {
-    return serverless.proxy(cachedServer, event, context, 'CALLBACK', callbackWaitsLogger(callback));
+    cachedServer = await bootstrapServer();
   }
+  return serverless.proxy(cachedServer, event, context, 'PROMISE').promise;
 };
 
-function callbackWaitsLogger(callback: Callback): Callback {
-  return (err, response) => {
+function succeedWaitsLogger(succeed: Context['succeed']): Context['succeed'] {
+  return (messageObject: any) => {
     waitForLogger()
       .then(() => {
-        callback(err, response);
+        console.log('Response: ', messageObject);
+        succeed(messageObject);
       })
       .catch(error => {
         console.error('Callback error: ', error);
-        callback(err, response);
+        succeed(messageObject);
       });
   };
 }

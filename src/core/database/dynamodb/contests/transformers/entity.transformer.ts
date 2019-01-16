@@ -9,7 +9,7 @@ export class EntityTransformer {
   public toDBItem(contest: Contest): DDBContestItem {
     return {
       contestId: contest.id,
-      category: contest.contestCategory,
+      category: contest.contestType,
       city: contest.city,
       country: contest.country,
       createdAt: contest.createdAt || moment().unix(),
@@ -34,7 +34,7 @@ export class EntityTransformer {
       country: contest.country,
       createdAt: contest.createdAt,
       date: new Date(contest.date),
-      contestCategory: contest.category,
+      contestType: contest.category,
       discipline: contest.discipline,
       name: contest.name,
       prize: contest.prize,

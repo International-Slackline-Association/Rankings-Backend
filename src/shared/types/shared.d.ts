@@ -3,7 +3,7 @@ export interface INamedDiscipline {
   name: string;
 }
 
-export interface INamedContestCategory {
+export interface INamedContestType {
   id: number;
   name: string;
 }

@@ -2,10 +2,10 @@ import * as moment from 'moment';
 
 import { Utils } from 'shared/utils';
 import { AgeCategory, Gender, Year } from '.';
-import { ContestCategoryUtility } from './contestCategory-utility';
+import { ContestTypeUtility } from './contestType-utility';
 import { DisciplineUtility } from './discipline-utility';
 
-export { DisciplineUtility, ContestCategoryUtility };
+export { DisciplineUtility, ContestTypeUtility };
 
 // tslint:disable-next-line:no-namespace
 export namespace YearUtility {

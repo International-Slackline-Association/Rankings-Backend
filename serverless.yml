@@ -1,5 +1,7 @@
 service: ISA-Rankings
 description: ISA-Rankings Application Serverless template
+app: isa-rankings
+tenant: cansahin
 
 plugins:
   - serverless-webpack

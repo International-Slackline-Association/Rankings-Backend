@@ -1,4 +1,4 @@
-import { ContestCategory } from './enums';
+import { ContestType } from './enums';
 import env_variables from './env_variables';
 
 // tslint:disable-next-line:no-namespace
@@ -7,40 +7,40 @@ export namespace Constants {
 
   export const ContestScoringRange = 16;
 
-  export function ContestCategoryTopPoints(category: ContestCategory): number {
+  export function ContestTypeTopPoints(category: ContestType): number {
     switch (category) {
-      case ContestCategory.WorldGames:
+      case ContestType.WorldGames:
         return 1500;
-      case ContestCategory.WorldCup:
+      case ContestType.WorldCup:
         return 1000;
-      case ContestCategory.Masters:
+      case ContestType.Masters:
         return 750;
-      case ContestCategory.NationalChampionship:
+      case ContestType.NationalChampionship:
         return 500;
-      case ContestCategory.Open:
+      case ContestType.Open:
         return 125;
-      case ContestCategory.Challenge:
+      case ContestType.Challenge:
         return 35;
       default:
         throw new Error('Contest Category Top Points not found: ' + category);
     }
   }
-  export function ContestCategoryMinParticipantsLimit(category: ContestCategory): number {
+  export function ContestTypeMinParticipantsLimit(category: ContestType): number {
     if (env_variables.isDev) {
       return 2;
     }
     switch (category) {
-      case ContestCategory.WorldGames:
+      case ContestType.WorldGames:
         return 12;
-      case ContestCategory.WorldCup:
+      case ContestType.WorldCup:
         return 10;
-      case ContestCategory.Masters:
+      case ContestType.Masters:
         return 8;
-      case ContestCategory.NationalChampionship:
+      case ContestType.NationalChampionship:
         return 6;
-      case ContestCategory.Open:
+      case ContestType.Open:
         return 4;
-      case ContestCategory.Challenge:
+      case ContestType.Challenge:
         return 4;
       default:
         throw new Error('Contest Category Participant Limit not found: ' + category);

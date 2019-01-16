@@ -1,4 +1,4 @@
-import { ContestCategory, Discipline } from 'shared/enums';
+import { ContestType, Discipline } from 'shared/enums';
 import { Utils } from 'shared/utils';
 
 export class Contest {
@@ -8,7 +8,7 @@ export class Contest {
   public readonly city: string;
   public readonly country: string;
   public readonly discipline: Discipline;
-  public readonly contestCategory: ContestCategory;
+  public readonly contestType: ContestType;
   public readonly prize: number;
   public readonly profileUrl: string;
   public readonly thumbnailUrl: string;
@@ -29,7 +29,7 @@ export class Contest {
     city: string;
     country: string;
     discipline: Discipline;
-    contestCategory: ContestCategory;
+    contestType: ContestType;
     prize: number;
     profileUrl: string;
     thumbnailUrl: string;

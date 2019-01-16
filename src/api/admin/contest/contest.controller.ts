@@ -1,6 +1,6 @@
 import { Controller, Get, Param, ParseIntPipe, Req } from '@nestjs/common';
 import { Discipline } from 'shared/enums';
-import { ContestCategoryUtility, DisciplineUtility } from 'shared/enums/enums-utility';
+import { ContestTypeUtility, DisciplineUtility } from 'shared/enums/enums-utility';
 import { ISelectOption } from 'shared/types/shared';
 import { ContestService } from './contest.service';
 import { CategoriesResponse } from './dto/categories.response';
@@ -18,10 +18,10 @@ export class ContestController {
     disciplineParam: Discipline,
   ): Promise<ContestResponse> {
     const contest = await this.contestService.getContest(id, disciplineParam);
-    const { createdAt, date, discipline, contestCategory, thumbnailUrl, ...rest } = contest;
+    const { createdAt, date, discipline, contestType, thumbnailUrl, ...rest } = contest;
     const item: IContestResponseItem = {
       discipline: DisciplineUtility.getNamedDiscipline(discipline),
-      contestCategory: ContestCategoryUtility.getNamedContestCategory(contestCategory),
+      contestType: ContestTypeUtility.getNamedContestType(contestType),
       date: date.toISODate(),
       ...rest,
     };

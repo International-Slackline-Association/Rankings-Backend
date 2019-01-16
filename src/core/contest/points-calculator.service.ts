@@ -2,10 +2,10 @@ import { Injectable } from '@nestjs/common';
 import { ContestResult } from 'api/admin/submit/results/dto/submit-contest-result.dto';
 import { groupBy } from 'lodash';
 import { Constants } from 'shared/constants';
-import { ContestCategory } from 'shared/enums';
+import { ContestType } from 'shared/enums';
 
 export interface DetailedContestResult extends ContestResult {
-  readonly category: ContestCategory;
+  readonly category: ContestType;
 }
 
 export interface AthletePointsDictionary {
@@ -42,14 +42,14 @@ export class ContestPointsCalculatorService {
     return athletePoints;
   }
 
-  private calculatePoint(contestCategory: ContestCategory, place: number, numberOfParticipants: number) {
+  private calculatePoint(contestType: ContestType, place: number, numberOfParticipants: number) {
     // For details check ISA's score calculation algoritm
 
-    const minParticipantThreshold = Constants.ContestCategoryMinParticipantsLimit(contestCategory);
+    const minParticipantThreshold = Constants.ContestTypeMinParticipantsLimit(contestType);
     if (numberOfParticipants < minParticipantThreshold) {
       return 0;
     }
-    const pointOfFirstPlace = Constants.ContestCategoryTopPoints(contestCategory);
+    const pointOfFirstPlace = Constants.ContestTypeTopPoints(contestType);
     const maxRange = Constants.ContestScoringRange;
     const A = (1 - pointOfFirstPlace) / Math.log(Math.min(numberOfParticipants, maxRange));
     const B = pointOfFirstPlace;

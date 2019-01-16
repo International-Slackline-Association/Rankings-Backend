@@ -37,7 +37,7 @@ export enum AgeCategory {
   Youth = 1,
 }
 
-export enum ContestCategory {
+export enum ContestType {
   WorldGames = 0,
   WorldCup = 1,
   Masters = 2,

@@ -1,10 +1,10 @@
-import { INamedContestCategory, INamedDiscipline } from 'shared/types/shared';
+import { INamedContestType, INamedDiscipline } from 'shared/types/shared';
 
 export interface IAthleteContestItem {
   readonly id: string;
   readonly name: string;
   readonly rank: number;
-  readonly contestCategory: INamedContestCategory;
+  readonly contestType: INamedContestType;
   readonly date: string;
   readonly discipline: INamedDiscipline;
   readonly smallProfileUrl: string;

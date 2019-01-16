@@ -1,4 +1,4 @@
-import { ContestCategory, Discipline } from 'shared/enums';
+import { ContestType, Discipline } from 'shared/enums';
 import { DDBTableKeyAttrs } from '../interfaces/table.interface';
 
 type KeyAttrs = DDBTableKeyAttrs;
@@ -9,7 +9,7 @@ interface Attrs {
   readonly city: string;
   readonly country: string;
   readonly prize: number;
-  readonly category: ContestCategory;
+  readonly category: ContestType;
   readonly profileUrl: string;
   readonly thumbnailUrl: string;
   readonly infoUrl: string;

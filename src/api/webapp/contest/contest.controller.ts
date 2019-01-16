@@ -4,7 +4,7 @@ import { AthleteService } from 'core/athlete/athlete.service';
 import { CategoriesService } from 'core/category/categories.service';
 import { ContestService } from 'core/contest/contest.service';
 import { Discipline } from 'shared/enums';
-import { ContestCategoryUtility, DisciplineUtility, YearUtility } from 'shared/enums/enums-utility';
+import { ContestTypeUtility, DisciplineUtility, YearUtility } from 'shared/enums/enums-utility';
 import { JoiValidationPipe } from 'shared/pipes/JoiValidation.pipe';
 import { Utils } from 'shared/utils';
 import { CategoriesResponse } from './dto/categories.response';
@@ -39,7 +39,7 @@ export class ContestController {
       id: contest.id,
       city: contest.city,
       discipline: DisciplineUtility.getNamedDiscipline(contest.discipline),
-      contestCategory: ContestCategoryUtility.getNamedContestCategory(contest.contestCategory),
+      contestType: ContestTypeUtility.getNamedContestType(contest.contestType),
       country: contest.country,
       date: Utils.dateToMoment(contest.date).format('DD/MM/YYYY'),
       infoUrl: contest.infoUrl,
@@ -73,7 +73,7 @@ export class ContestController {
           discipline: DisciplineUtility.getNamedDiscipline(contest.discipline),
           year: contest.year,
           prize: contest.prizeString,
-          contestCategory: ContestCategoryUtility.getNamedContestCategory(contest.contestCategory),
+          contestType: ContestTypeUtility.getNamedContestType(contest.contestType),
           smallProfileUrl: contest.profileUrl,
           date: Utils.dateToMoment(contest.date).format('DD/MM/YYYY'),
         };

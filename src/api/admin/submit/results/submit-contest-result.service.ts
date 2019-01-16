@@ -7,7 +7,7 @@ import {
   DetailedContestResult,
 } from 'core/contest/points-calculator.service';
 import { DatabaseService } from 'core/database/database.service';
-import { ContestCategory } from 'shared/enums';
+import { ContestType } from 'shared/enums';
 import { APIErrors } from 'shared/exceptions/api.exceptions';
 import { SubmitContestResultDto } from './dto/submit-contest-result.dto';
 
@@ -23,7 +23,7 @@ export class SubmitContestResultService {
 
     const athletes = await this.findAthletes(dto);
 
-    const athletePointsDict = this.calculatePoints(dto, contest.contestCategory);
+    const athletePointsDict = this.calculatePoints(dto, contest.contestType);
     const failures = await this.putResultsIntoDB(contest, dto, athletePointsDict);
     if (failures.length > 0) {
       throw new APIErrors.OperationFailedError(
@@ -59,7 +59,7 @@ export class SubmitContestResultService {
     return dbFailedAthleteResults;
   }
 
-  private calculatePoints(contestScores: SubmitContestResultDto, category: ContestCategory) {
+  private calculatePoints(contestScores: SubmitContestResultDto, category: ContestType) {
     const contestResults: DetailedContestResult = {
       contestId: contestScores.contestId,
       discipline: contestScores.discipline,

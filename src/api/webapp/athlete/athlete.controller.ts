@@ -4,7 +4,7 @@ import { AthleteService } from 'core/athlete/athlete.service';
 import { RankingsService } from 'core/athlete/rankings.service';
 import { CategoriesService } from 'core/category/categories.service';
 import { Discipline } from 'shared/enums';
-import { ContestCategoryUtility, DisciplineUtility, YearUtility } from 'shared/enums/enums-utility';
+import { ContestTypeUtility, DisciplineUtility, YearUtility } from 'shared/enums/enums-utility';
 import { JoiValidationPipe } from 'shared/pipes/JoiValidation.pipe';
 import { Utils } from 'shared/utils';
 import { ContestService } from '../../../core/contest/contest.service';
@@ -95,7 +95,7 @@ export class AthleteController {
     return new AthleteContestsResponse(
       athletesWithContests.map<IAthleteContestItem>(obj => ({
         id: obj.contest.id,
-        contestCategory: ContestCategoryUtility.getNamedContestCategory(obj.contest.contestCategory),
+        contestType: ContestTypeUtility.getNamedContestType(obj.contest.contestType),
         date: Utils.dateToMoment(obj.contest.date).format('DD/MM/YYYY'),
         discipline: DisciplineUtility.getNamedDiscipline(obj.contest.discipline),
         name: obj.contest.name,
