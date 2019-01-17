@@ -130,7 +130,7 @@ functions:
               - StreamArn
           batchSize: 100
   ImageResizer:
-    handler: src/image-resizer/index.handler
+    handler: src/s3-events/index.handler
     description: Rankings Image resizer service
     environment: ${file(./serverless/environment.yml)}
     events:

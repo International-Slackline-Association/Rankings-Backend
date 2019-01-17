@@ -5,3 +5,4 @@ REDISHOST: ${self:custom.secrets.REDISHOST}
 REDISPASSWORD: ${self:custom.secrets.REDISPASSWORD}
 REDISPORT: ${self:custom.secrets.REDISPORT}
 LoggerDebugLevel: debug
+S3ImagesBucket: ${self:custom.s3ImageBucket}

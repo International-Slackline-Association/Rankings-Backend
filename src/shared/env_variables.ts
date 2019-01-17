@@ -37,6 +37,10 @@ class EnvironmentVariables {
   get redis_password(): string {
     return process.env.REDISPASSWORD;
   }
+
+  get s3_images_bucket(): string {
+    return process.env.S3ImagesBucket;
+  }
 }
 
 export default new EnvironmentVariables();
