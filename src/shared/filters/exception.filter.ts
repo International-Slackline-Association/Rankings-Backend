@@ -12,12 +12,12 @@ export class AllExceptionsFilter implements ExceptionFilter {
     let apiError = exception;
 
     if (exception instanceof APIError) {
-      logger.debug('Expected API Exception', { ...exception });
+      logger.debug('Expected API Exception', { data: exception });
     } else if (exception instanceof HttpException) {
-      logger.warn('Unexpected HttpException', { ...exception });
+      logger.warn('Unexpected HttpException', { data: exception });
       apiError = this.transformHttpExceptionToAPIError(exception);
     } else {
-      logger.error(exception);
+      logger.error('Exception', { data: exception });
       apiError = this.transformToAPIError(exception);
     }
 
@@ -50,9 +50,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
   }
 
   private transformToAPIError(exception: any): APIError {
-    const errMessage = env_variables.isProd
-      ? 'Unknow error'
-      : exception.message;
+    const errMessage = env_variables.isProd ? 'Unknow error' : exception.message;
     const convertedError = new APIError({
       alias: APIErrorAlias.Unknown,
       message: errMessage,

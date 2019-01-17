@@ -5,24 +5,19 @@ const WinstonCloudWatch = WSCloudWatch as any; // Types are incompatible with wi
 import env_variables from './env_variables';
 
 const debugLevel = env_variables.LoggerDebugLevel;
-
-function cloudWatchMessageFormatter(log: winston.LogObject): string {
-  const meta = { ...log.meta };
-  delete meta.level;
-  delete meta.message;
+function cloudWatchMessageFormatter(log: any): string {
   const obj = {
     logLevel: log.level,
-    message: log.msg,
-    data: meta,
+    message: log.message,
+    data: log.data,
   };
-
   return JSON.stringify(obj);
 }
 
 const winstonCloudWatchTransport = new WinstonCloudWatch({
   level: debugLevel,
   messageFormatter: cloudWatchMessageFormatter,
-  logGroupName: 'ISA_Rankings/ApplicationLogs',
+  logGroupName: 'ISA-Rankings/ApplicationLogs',
   logStreamName: () => {
     const date = new Date().toISOString().split('T')[0];
     return date;
@@ -31,10 +26,9 @@ const winstonCloudWatchTransport = new WinstonCloudWatch({
 
 export const waitForLogger = async () => {
   return new Promise((r, j) => {
-    winstonCloudWatchTransport.kthxbye(() => {
-      waitForTransports(logger).then(() => {
-        r();
-      });
+    winstonCloudWatchTransport.kthxbye(err => {
+      // waitForTransports(logger).then(() => {
+      r();
     });
   });
 };
@@ -53,9 +47,9 @@ const winstonFormat = () => {
 };
 
 const winstonTransports = () => {
-  if (env_variables.IS_OFFLINE) {
-    return [new winston.transports.Console()];
-  }
+  // if (env_variables.IS_OFFLINE) {
+  //   return [new winston.transports.Console()];
+  // }
   return [new winston.transports.Console(), winstonCloudWatchTransport];
 };
 

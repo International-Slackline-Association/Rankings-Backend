@@ -32,19 +32,19 @@ export class AthleteContestRecordService {
   public async processNewRecord(record: DynamoDBRecord) {
     if (record.eventName === 'INSERT') {
       const item = this.athleteContestsRepo.transformFromDynamoDBType(record.dynamodb.NewImage);
-      logger.debug('New Contest Record ', { item });
+      logger.debug('New Contest Record ', { data: item });
       await this.processNewContestResult(item);
     }
     if (record.eventName === 'MODIFY') {
       const oldItem = this.athleteContestsRepo.transformFromDynamoDBType(record.dynamodb.OldImage);
       const newItem = this.athleteContestsRepo.transformFromDynamoDBType(record.dynamodb.NewImage);
-      logger.debug('Modified Contest Record ', { oldItem, newItem });
+      logger.debug('Modified Contest Record ', { data: { oldItem, newItem } });
 
       await this.processModifiedContestResult(oldItem, newItem);
     }
     if (record.eventName === 'REMOVE') {
       const oldItem = this.athleteContestsRepo.transformFromDynamoDBType(record.dynamodb.OldImage);
-      logger.debug('Removed Contest Record ', { oldItem });
+      logger.debug('Removed Contest Record ', { data: oldItem });
 
       await this.processRemovedContestResult(oldItem);
     }

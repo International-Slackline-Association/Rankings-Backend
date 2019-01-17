@@ -18,19 +18,17 @@ export function repositoryFactory(Repo, dynamodbService: IDynamoDBService) {
   };
 }
 
-export function logDynamoDBError(
-  errorDesc: string,
-  err: AWSError,
-  params: any,
-) {
+export function logDynamoDBError(errorDesc: string, err: AWSError, params: any) {
   let errMessage;
   if (!err.requestId) {
     // Not AWSError
     errMessage = err.message;
   }
   logger.error(`DynamoDB Error: ${errorDesc}`, {
-    params: params,
-    error: errMessage || err,
+    data: {
+      params: params,
+      error: errMessage || err,
+    },
   });
 }
 

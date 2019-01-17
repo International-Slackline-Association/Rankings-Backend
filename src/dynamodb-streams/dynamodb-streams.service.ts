@@ -28,8 +28,10 @@ export class DynamoDBStreamsService {
       promises.push(
         this.processRecord(record).catch(err => {
           logger.error('Processing Streams Error', {
-            record: record,
-            err: err.message,
+            data: {
+              record: record,
+              err: err.message,
+            },
           });
         }),
       );

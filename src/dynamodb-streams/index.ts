@@ -14,27 +14,19 @@ async function bootstrap(records: DynamoDBRecord[]) {
   await service.processRecords(records);
 }
 
-export const handler: DynamoDBStreamHandler = async (event, context, callback) => {
-  logger.debug('DynamoDB Event', { event });
+export const handler: DynamoDBStreamHandler = async (event, context) => {
+  logger.debug('DynamoDB Event', { data: event });
   // Socket connections (redis) keeps waiting lamba functions. Dont want that
-  context.callbackWaitsForEmptyEventLoop = false;
+  // context.callbackWaitsForEmptyEventLoop = false;
 
   await bootstrap(event.Records);
 
   if (process.env.IS_OFFLINE === 'true') {
     clearEventLoop();
   }
-  end(null, callback);
+  await waitForLogger();
 };
 
 const clearEventLoop = () => {
   // terminateConnections();
-};
-
-const end = async (err, callback) => {
-  waitForLogger()
-    .then(() => {
-      callback(err);
-    })
-    .catch(_ => callback(err));
 };
