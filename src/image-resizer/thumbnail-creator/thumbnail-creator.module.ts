@@ -3,7 +3,7 @@ import { S3 } from 'aws-sdk';
 
 import { AWSServices } from 'core/aws/aws.services';
 import { S3Service } from './s3.service';
-import { S3ImageResizerService } from './S3ImageResizer.service';
+import { ThumbnailCreatorService } from './thumbnail-creator.service';
 
 const s3Factory = {
   provide: S3,
@@ -13,7 +13,7 @@ const s3Factory = {
 };
 
 @Module({
-  providers: [S3ImageResizerService, S3Service, s3Factory],
-  exports: [S3ImageResizerService],
+  providers: [ThumbnailCreatorService, S3Service, s3Factory],
+  exports: [ThumbnailCreatorService],
 })
-export class S3ImageResizerModule {}
+export class ThumbnailCreatorModule {}

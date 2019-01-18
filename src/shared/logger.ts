@@ -47,9 +47,9 @@ const winstonFormat = () => {
 };
 
 const winstonTransports = () => {
-  // if (env_variables.IS_OFFLINE) {
-  //   return [new winston.transports.Console()];
-  // }
+  if (env_variables.IS_OFFLINE) {
+    return [new winston.transports.Console()];
+  }
   return [new winston.transports.Console(), winstonCloudWatchTransport];
 };
 

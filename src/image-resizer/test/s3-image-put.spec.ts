@@ -1,5 +1,5 @@
 import { S3EventRecord } from 'aws-lambda';
-import { handler } from 's3-events';
+import { handler } from 'image-resizer';
 import { createS3Event, triggerLambdaHandlerWithEvent } from './lambda-trigger';
 
 describe('S3 Events', () => {
@@ -25,7 +25,7 @@ describe('S3 Events', () => {
             arn: undefined,
           },
           object: {
-            key: 'public/athlete/48394760_522469564923484_3859156689596973056_o.jpg',
+            key: 'public/athlete/test.png',
             size: undefined,
             eTag: undefined,
             versionId: undefined,

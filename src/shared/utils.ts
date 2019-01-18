@@ -63,4 +63,25 @@ export namespace Utils {
   export function isNil(value: any) {
     return _isNil(value);
   }
+
+  export function logThrowError(errorDesc: string, params: any) {
+    return err => {
+      logError(errorDesc, err, params);
+      throw err;
+    };
+  }
+
+  export function logError(errorDesc: string, err: any, params: any) {
+    let errMessage;
+    if (!err.requestId) {
+      // Not AWSError
+      errMessage = err.message;
+    }
+    logger.error(`Error: ${errorDesc}`, {
+      data: {
+        params: params,
+        error: errMessage || err,
+      },
+    });
+  }
 }

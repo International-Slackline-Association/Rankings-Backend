@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { S3EventRecord } from 'aws-lambda';
 import { logger } from 'shared/logger';
-import { S3ImageResizerService } from './image-resizer/S3ImageResizer.service';
+import { ThumbnailCreatorService } from './thumbnail-creator/thumbnail-creator.service';
 
 function reflect(promise: Promise<any>) {
   return promise.then(
@@ -16,7 +16,7 @@ function reflect(promise: Promise<any>) {
 
 @Injectable()
 export class S3EventsService {
-  constructor(private readonly s3ImageResizer: S3ImageResizerService) {}
+  constructor(private readonly thumbnailCreator: ThumbnailCreatorService) {}
 
   public async processRecords(records: S3EventRecord[]) {
     const promises = [];
@@ -36,6 +36,6 @@ export class S3EventsService {
   }
 
   private async processRecord(record: S3EventRecord) {
-    await this.s3ImageResizer.resize(record.s3.object.key);
+    await this.thumbnailCreator.createThumbnail(record.s3.object.key, record.s3.bucket.name);
   }
 }

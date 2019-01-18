@@ -8,60 +8,55 @@ require('source-map-support').install();
 // const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
 // const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
-const rootDir = path.join(__dirname, "../");
+const rootDir = path.join(__dirname, '../');
 
 const defaults = {
-    entry: slsw.lib.entries,
-    target: 'node',
-    // mode: slsw.lib.webpack.isLocal ? "development" : "production",
-    mode: 'none',
-    externals: nodeExternals({ whitelist: ['winston-cloudwatch'] }),
-    plugins: [
-        // new BundleAnalyzerPlugin()
-        // new UglifyJsPlugin({
-        //     sourceMap: false,
-        // }),
-    ],
-    optimization: {
-        nodeEnv: false
-    },
-    resolve: {
-        modules: ['src', 'node_modules'],
-        extensions: [
-            '.js',
-            '.jsx',
-            '.json',
-            '.ts',
-            '.tsx',
-        ],
-        alias: {
+  entry: slsw.lib.entries,
+  target: 'node',
+  // mode: slsw.lib.webpack.isLocal ? "development" : "production",
+  mode: 'none',
+  externals: nodeExternals({ whitelist: ['winston-cloudwatch'] }), // packages using awssdk are problem. Lambda has it default
+  plugins: [
+    // new BundleAnalyzerPlugin()
+    // new UglifyJsPlugin({
+    //     sourceMap: false,
+    // }),
+  ],
+  optimization: {
+    nodeEnv: false,
+  },
+  resolve: {
+    modules: ['src', 'node_modules'],
+    extensions: ['.js', '.jsx', '.json', '.ts', '.tsx'],
+    alias: {},
+  },
+  output: {
+    libraryTarget: 'commonjs',
+    path: path.join(rootDir, '.webpack'),
+    filename: '[name].js',
+  },
+  module: {
+    rules: [
+      {
+        test: /\.ts(x?)$/,
+        loader: 'ts-loader',
+      },
+      {
+        test: /\.ts$/,
+        enforce: 'pre',
+        loader: 'tslint-loader',
+        options: {
+          /* Loader options go here */
         },
-    },
-    output: {
-        libraryTarget: 'commonjs',
-        path: path.join(rootDir, '.webpack'),
-        filename: '[name].js',
-    },
-    module: {
-        rules: [
-            {
-                test: /\.ts(x?)$/,
-                loader: 'ts-loader',
-            },
-            {
-                test: /\.ts$/,
-                enforce: 'pre',
-                loader: 'tslint-loader',
-                options: { /* Loader options go here */ }
-            }
-        ],
-    },
+      },
+    ],
+  },
 };
 
 module.exports.defaults = defaults;
 
 module.exports.merge = function merge(config) {
-    return _.merge({}, defaults, config);
+  return _.merge({}, defaults, config);
 };
 
 /* Nest scaffold webpack options
