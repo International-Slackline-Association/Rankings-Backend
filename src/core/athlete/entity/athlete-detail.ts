@@ -45,6 +45,13 @@ export class AthleteDetail {
     createdAt?: number;
   }) {
     if (init) {
+      if (!init.thumbnailUrl && init.profileUrl) {
+        const [fileType, ...url] = init.profileUrl.split('.').reverse();
+        if (fileType === 'jpg' || fileType === 'png') {
+          const thumbnailUrl = `${url.reverse().join('.')}_thumbnail.${fileType}`;
+          init.thumbnailUrl = thumbnailUrl;
+        }
+      }
       Object.assign(this, init);
     }
   }

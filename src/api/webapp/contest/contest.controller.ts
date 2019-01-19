@@ -7,6 +7,7 @@ import { Discipline } from 'shared/enums';
 import { ContestTypeUtility, DisciplineUtility, YearUtility } from 'shared/enums/enums-utility';
 import { JoiValidationPipe } from 'shared/pipes/JoiValidation.pipe';
 import { Utils } from 'shared/utils';
+import { CountryService } from '../country/country.service';
 import { CategoriesResponse } from './dto/categories.response';
 import { ContestListDto, contestListDtoSchema } from './dto/contest-list.dto';
 import { ContestListResponse, IContestListItem } from './dto/contest-list.response';
@@ -22,6 +23,7 @@ export class ContestController {
     private readonly contestService: ContestService,
     private readonly categoriesService: CategoriesService,
     private readonly athleteService: AthleteService,
+    private readonly countryService: CountryService,
   ) {}
 
   @Get('details/:id/:discipline')
@@ -31,16 +33,16 @@ export class ContestController {
     discipline: Discipline,
   ): Promise<ContestResponse> {
     const contest = await this.contestService.getContest(id, discipline);
+    const countryName = this.countryService.getCountryName(contest.country);
     if (!contest) {
       return new ContestResponse(null);
     }
-    const {} = contest;
     return new ContestResponse({
       id: contest.id,
       city: contest.city,
       discipline: DisciplineUtility.getNamedDiscipline(contest.discipline),
       contestType: ContestTypeUtility.getNamedContestType(contest.contestType),
-      country: contest.country,
+      country: countryName || contest.country,
       date: Utils.dateToMoment(contest.date).format('DD/MM/YYYY'),
       infoUrl: contest.infoUrl,
       name: contest.name,
@@ -74,7 +76,7 @@ export class ContestController {
           year: contest.year,
           prize: contest.prizeString,
           contestType: ContestTypeUtility.getNamedContestType(contest.contestType),
-          smallProfileUrl: contest.profileUrl,
+          thumbnailUrl: contest.thumbnailUrl || contest.profileUrl,
           date: Utils.dateToMoment(contest.date).format('DD/MM/YYYY'),
         };
       }),

@@ -63,7 +63,7 @@ export class RankingsController {
           name: obj.ranking.name,
           points: obj.ranking.points.toString(),
           rank: obj.place + 1,
-          smallProfileUrl: obj.athlete.profileUrl,
+          thumbnailUrl: obj.athlete.thumbnailUrl || obj.athlete.profileUrl,
           surname: obj.ranking.surname,
         };
       }),

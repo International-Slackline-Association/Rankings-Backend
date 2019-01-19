@@ -23,9 +23,6 @@ export class ThumbnailCreatorService {
     }
     return null;
   }
-  private async updateThumbnailUrl() {
-    
-  }
   private shouldResize(s3Key: string) {
     const { prefix, type, name, rest } = this.extractImagePropsFromKey(s3Key);
     if (

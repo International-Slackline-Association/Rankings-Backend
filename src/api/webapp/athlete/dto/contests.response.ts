@@ -7,7 +7,7 @@ export interface IAthleteContestItem {
   readonly contestType: INamedContestType;
   readonly date: string;
   readonly discipline: INamedDiscipline;
-  readonly smallProfileUrl: string;
+  readonly thumbnailUrl: string;
 }
 
 export class AthleteContestsResponse {

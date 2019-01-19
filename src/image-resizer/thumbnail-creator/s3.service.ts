@@ -30,6 +30,7 @@ export class S3Service {
       Key: key,
       ACL: 'public-read',
       Body: body,
+      ContentType: 'image/jpg'
     };
     return await this.s3
       .putObject(params)

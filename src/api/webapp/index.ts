@@ -47,11 +47,9 @@ function succeedWaitsLogger(succeed: Context['succeed']): Context['succeed'] {
   return (messageObject: any) => {
     waitForLogger()
       .then(() => {
-        console.log('Response: ', messageObject);
         succeed(messageObject);
       })
       .catch(error => {
-        console.error('Callback error: ', error);
         succeed(messageObject);
       });
   };

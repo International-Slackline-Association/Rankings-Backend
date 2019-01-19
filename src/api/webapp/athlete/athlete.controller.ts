@@ -38,7 +38,7 @@ export class AthleteController {
       name: athlete.name,
       surname: athlete.surname,
       age: athlete.age,
-      country: countryName,
+      country: countryName || athlete.country,
       profileUrl: athlete.profileUrl,
       infoUrl: athlete.infoUrl,
       overallRank: overallRank ? overallRank.toString() : '',
@@ -100,7 +100,7 @@ export class AthleteController {
         discipline: DisciplineUtility.getNamedDiscipline(obj.contest.discipline),
         name: obj.contest.name,
         rank: obj.item.place,
-        smallProfileUrl: obj.contest.profileUrl,
+        thumbnailUrl: obj.contest.thumbnailUrl || obj.contest.profileUrl,
       })),
       results.lastKey,
     );
