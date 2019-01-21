@@ -161,8 +161,8 @@ resources:
           - AttributeName: SK_GSI
             KeyType: RANGE
         ProvisionedThroughput:
-          ReadCapacityUnits: 1
-          WriteCapacityUnits: 1
+          ReadCapacityUnits: 15
+          WriteCapacityUnits: 15
         LocalSecondaryIndexes: 
           - IndexName: 'PK-LSI-index'
             KeySchema: 
@@ -182,8 +182,8 @@ resources:
             Projection: 
               ProjectionType: ALL
             ProvisionedThroughput:
-              ReadCapacityUnits: 1
-              WriteCapacityUnits: 1
+              ReadCapacityUnits: 10
+              WriteCapacityUnits: 10
         StreamSpecification:
           StreamViewType: NEW_AND_OLD_IMAGES
         # PointInTimeRecoverySpecification:

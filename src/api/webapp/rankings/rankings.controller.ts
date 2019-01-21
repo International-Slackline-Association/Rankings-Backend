@@ -49,7 +49,6 @@ export class RankingsController {
         let place = index;
         if (dto.athleteId || dto.country) {
           place = await this.rankingsService.getAthleteRankInCategory({ athleteId: item.id, ...category });
-          console.log('place: ', place);
         }
         return { athlete, ranking: item, place };
       }),
@@ -62,7 +61,7 @@ export class RankingsController {
           country: obj.ranking.country,
           name: obj.ranking.name,
           points: obj.ranking.points.toString(),
-          rank: obj.place + 1,
+          rank: obj.place ? obj.place + 1 : null,
           thumbnailUrl: obj.athlete.thumbnailUrl || obj.athlete.profileUrl,
           surname: obj.ranking.surname,
         };
