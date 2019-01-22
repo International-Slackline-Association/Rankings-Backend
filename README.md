@@ -82,9 +82,14 @@ To start with, serverless installation must be completed on your local comptuter
 
 How to: [Installation Guide](https://serverless.com/framework/docs/providers/aws/guide/installation/)
 
+There are 2 environment stages, therefore you should have valid credentials for them. Checkout the `secrets.example.yml` under `serverless` folder.
+Replace the values with real ones
+
 > For deployment `aws-cli` should be installed and configured with `Profiles` needed in the `serverless.yml` file. To get your credentials contact to ISA.
 
 ### Running on local
+
+First, credentials are obtained from `.env` file. Replace the values in `.env.example` file with real ones depending on the stage you want to run (in `secrets.yml` you can see the stages)
 
 Install dependencies
 
