@@ -2,14 +2,15 @@
 
 ### Main Table
 
-| PK           | SK_GSI                                              | LSI            | GSI_SK           | ...Attributes                                                 |
-| ------------ | --------------------------------------------------- | -------------- | ---------------- | ------------------------------------------------------------- |
-| Athlete:{id} | AthleteDetails                                      |                | {normalizedName} | name, surname, birth, gender, country, ageCategory, createdAt |
-| Athlete:{id} | Contest:{discipline}:{id}                           | Contest:{date} | {points}         | place                                                         |
-| Athlete:{id} | Rankings:{year}:{discipline}:{gender}:{ageCategory} |                | {points}         | normalizedName, name, surname country, birthdate              |
-| Contests     | Contest:{discipline}:{id}                           | Contest:{date} |                  | name, city, country, prize, category, profile, createdAt      |
+| PK           | SK_GSI                                              | LSI            | GSI_SK           | ...Attributes |
+| ------------ | --------------------------------------------------- | -------------- | ---------------- | ------------- |
+| Athlete:{id} | AthleteDetails                                      |                | {normalizedName} | ...           |
+| Athlete:{id} | Contest:{discipline}:{id}                           | Contest:{date} | {points}         | ...           |
+| Athlete:{id} | Rankings:{year}:{discipline}:{gender}:{ageCategory} |                | {points}         | ...           |
+| Contests     | Contest:{discipline}:{id}                           | Contest:{date} |                  | ...           |
 
 **Possible Query Patterns:**
+
 - Get details of athlete
 - List contests of an athlete sorted by date
 - Get a contest of an athlete
@@ -21,13 +22,14 @@
 
 ### GSI Table
 
-| GSI                                                 | SK               | PK           | ...Attributes                                                 |
-| --------------------------------------------------- | ---------------- | ------------ | ------------------------------------------------------------- |
-| AthleteDetails                                      | {normalizedName} | Athlete:{id} | name, surname, birth, gender, country, ageCategory, createdAt |
-| Contest:{discipline}:{id}                           | {points}         | Athlete:{id} | place                                                         |
-| Rankings:{year}:{discipline}:{gender}:{ageCategory} | {points}         | Athlete:{id} | normalizedName, name, surname country, birthdate              |
+| GSI                                                 | SK               | PK           | ...Attributes |
+| --------------------------------------------------- | ---------------- | ------------ | ------------- |
+| AthleteDetails                                      | {normalizedName} | Athlete:{id} | ...           |
+| Contest:{discipline}:{id}                           | {points}         | Athlete:{id} | ...           |
+| Rankings:{year}:{discipline}:{gender}:{ageCategory} | {points}         | Athlete:{id} | ...           |
 
 **Possible Query Patterns:**
+
 - List details of athlete sorted by name
 - List athletes of a contest sorted by points
 - List athletes of a ranking sorted by points
