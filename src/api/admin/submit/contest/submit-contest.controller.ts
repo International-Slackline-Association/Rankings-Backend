@@ -18,7 +18,7 @@ export class SubmitContestController {
   // @UseGuards(RolesGuard)
   @UsePipes(new JoiValidationPipe(submitContestDtoSchema))
   public async submitContest(@Body() dto: SubmitContestDto) {
-    logger.debug('Submit Contest', { data: dto });
+    logger.info('Submit Contest', { data: dto });
     let rsp: { id: string; discipline: Discipline };
     if (dto.id) {
       rsp = await this.service.modifyContest(dto);

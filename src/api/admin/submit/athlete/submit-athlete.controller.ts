@@ -18,7 +18,7 @@ export class SubmitAthleteController {
   // @UseGuards(RolesGuard) // Lambda Authorizer is applied
   @UsePipes(new JoiValidationPipe(submitAthleteDtoSchema))
   public async submitAthlete(@Body() dto: SubmitAthleteDto) {
-    logger.debug('Submit Athlete', { data: dto });
+    logger.info('Submit Athlete', { data: dto });
     let id: string;
     if (dto.id) {
       id = await this.service.modifyAthlete(dto);

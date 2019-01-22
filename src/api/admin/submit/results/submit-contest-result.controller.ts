@@ -16,7 +16,7 @@ export class SubmitContestResultController {
   // @UseGuards(RolesGuard)
   @UsePipes(new JoiValidationPipe(submitContestResultDtoSchema))
   public async submitContestResults(@Body() dto: SubmitContestResultDto) {
-    logger.debug('Submit Results', { data: dto });
+    logger.info('Submit Results', { data: dto });
     return await this.service.submitContestResult(dto);
   }
 }

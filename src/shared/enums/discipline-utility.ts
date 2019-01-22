@@ -162,7 +162,7 @@ export namespace DisciplineUtility {
       case Discipline.Trickline:
         return 'Trickline';
       case Discipline.Contact_HighLongWaterline:
-        return 'Contact - High-/Long-/Waterline';
+        return withoutParent ? 'High-/Long-/Waterline' : 'Contact - High-/Long-/Waterline' ;
       case Discipline.Speedline:
         return 'Speedline';
       case Discipline.Endurance:
