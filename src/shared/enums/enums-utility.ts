@@ -1,5 +1,6 @@
 import * as moment from 'moment';
 
+import { Constants } from 'shared/constants';
 import { Utils } from 'shared/utils';
 import { AgeCategory, Gender, Year } from '.';
 import { ContestTypeUtility } from './contestType-utility';
@@ -9,11 +10,21 @@ export { DisciplineUtility, ContestTypeUtility };
 
 // tslint:disable-next-line:no-namespace
 export namespace YearUtility {
-  export const AllYears = [Year.All, ...Utils.yearList()];
-  export const Years = Utils.yearList();
-  export const Current = moment()
-    .utc()
-    .year();
+  // export const Current = moment()
+  //   .utc()
+  //   .year();
+  export const Current = 2018;
+
+  export function yearList() {
+    const years: number[] = [];
+    for (let year = Constants.BaseYear; year <= Current; year++) {
+      years.push(year);
+    }
+    return years.reverse();
+  }
+
+  export const AllYears = [Year.All, ...yearList()];
+  export const Years = yearList();
 
   export function getName(year: number) {
     switch (year) {
@@ -66,7 +77,7 @@ export namespace AgeCategoryUtility {
       case AgeCategory.All:
         return 'All';
       case AgeCategory.Youth:
-        return 'Youth';
+        return 'Youth (<18)';
     }
   }
   export function getParents(category: AgeCategory) {

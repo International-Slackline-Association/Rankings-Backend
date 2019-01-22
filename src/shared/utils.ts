@@ -49,17 +49,6 @@ export namespace Utils {
     return isNil(request.cognitoClaims);
   }
 
-  export function yearList() {
-    const currentYear = moment()
-      .utc()
-      .year();
-    const years: number[] = [];
-    for (let year = Constants.BaseYear; year <= currentYear; year++) {
-      years.push(year);
-    }
-    return years.reverse();
-  }
-
   export function isNil(value: any) {
     return _isNil(value);
   }
