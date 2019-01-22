@@ -28,6 +28,12 @@ Server-side client of [isa-rankings.org]
 
 ----
 
+## Architecture Overview
+
+![Architecture]
+
+---
+
 ## DynamoDB - (Database Design)
 
 **DynamoDB is designed in such a way (primary keys and sort keys) so that it supports all the query patterns this application needs. It has only a single table with aggregated GSIs, hierarchical SKs.**
@@ -101,3 +107,4 @@ API is served at `localhost:3000/`
 [DynamoDB]: <https://aws.amazon.com/dynamodb/>
 [Serverless Framework]:<https://serverless.com/framework/docs/providers/aws/guide/quick-start/>
 [isa-rankings.org]: <https://www.isa-rankings.org>
+[Architecture]: <docs/AWS_Architecure.png>
