@@ -1,42 +1,80 @@
 # Rankings-Backend
 
-Server-side client of ISA Rankings
+Server-side client of [isa-rankings.org]
 
 **Technical Overview:**
 
-* The server-side is entirely designed to be `Serverless` on AWS.
+* The server-side is entirely designed to be `serverless` on AWS.
 * Requires knowledge on followings
-    * Required for local development and running
-        * [Webpack]
-        * [NestJS]
-        * Typescript
-        * AWS DynamoDB
-        * AWS DynamoDB Streams
-        * Redis
-    * Required for deployment and infrastructure management
-        * [Serverless Framework] (with [Serverless-Offline] plugin)
-        * AWS Api Gateway
-        * AWS Lambda
-        * AWS CloudFormation (infrastructure as a code)
-        * AWS IAM Management (user, roles, policies)
+    * [Webpack]
+    * [NestJS]
+    * Typescript
+    * [Serverless Framework] (with [Serverless-Offline] plugin)
+    * AWS DynamoDB (main database)
+    * AWS DynamoDB Streams
+    * AWS Api Gateway
+    * AWS Lambda
+    * AWS CloudFormation (infrastructure as a code)
+    * AWS IAM Management (user, roles, policies)
+    * Redis (read through cache)
 
-**Understanding this repo:**
+---
 
-It uses serverless-offline for local testing the APIGateway/Lambda combination. So it looks, on practice, its not different than hosting a node server at localhost:3000. Good to keep in mind that the underlying runtime and developer experience is Node but the the underlying logic is different than traditional node servers. 
+### Why `serverless`?
 
-Lambda is about microservices but in this repo Web API is bundled into a single function via webpack. This isn't exactly a microservice approach but considering the simplicity and scale of this project, doing such thing is very handy. 
+* **Pay as you go:** You only pay for the resources you actively use, not when they are sitting idle. Perfect for low|inconsistent traffic applications.
+* **Costs:** Extremely **cheap** . This applications costs less than 3 dolar/month.
+* **Maintenance & Operation:** You never manage infrastructure or any problem that comes with it. Only write the code and it works. Since its a volunteered project nobody wants to do anything but writing the application code
 
-Serverless is used because it is extremely low cost, pratically free, scalable, easily maintainable etc...
+----
+
+## DynamoDB - (Database Design)
+
+**DynamoDB is designed in such a way (primary keys and sort keys) so that it supports all the query patterns this application needs. It has only a single table with aggregated GSIs, hierarchical SKs.**
+
+In short, it is customized for application's access patterns.
+
+***Overview of the table:***
+
+### Main Table
+
+| PK           | SK_GSI                                              | LSI            | GSI_SK           | ...Attributes |
+| ------------ | --------------------------------------------------- | -------------- | ---------------- | ------------- |
+| Athlete:{id} | AthleteDetails                                      |                | {normalizedName} | ...           |
+| Athlete:{id} | Contest:{discipline}:{id}                           | Contest:{date} | {points}         | ...           |
+| Athlete:{id} | Rankings:{year}:{discipline}:{gender}:{ageCategory} |                | {points}         | ...           |
+| Contests     | Contest:{discipline}:{id}                           | Contest:{date} |                  | ...           |
+
+**Possible Query Patterns:**
+
+- Get details of athlete
+- List contests of an athlete sorted by date
+- Get a contest of an athlete
+- Get a ranking of athlete
+- Get details of a contest
+- List details of contests sorted by date
+
+
+### GSI Table
+
+| GSI                                                 | SK               | PK           | ...Attributes |
+| --------------------------------------------------- | ---------------- | ------------ | ------------- |
+| AthleteDetails                                      | {normalizedName} | Athlete:{id} | ...           |
+| Contest:{discipline}:{id}                           | {points}         | Athlete:{id} | ...           |
+| Rankings:{year}:{discipline}:{gender}:{ageCategory} | {points}         | Athlete:{id} | ...           |
+
+**Possible Query Patterns:**
+- List details of athlete sorted by name
+- List athletes of a contest sorted by points
+- List athletes of a ranking sorted by points
+
+---
 
 # Getting Started
 
-Following npm packages are assumed to be installed globally
-
-* typescript
-
 To start with, serverless installation must be completed on your local comptuter.
 
-Howto: [Installation Guide](https://serverless.com/framework/docs/providers/aws/guide/installation/)
+How to: [Installation Guide](https://serverless.com/framework/docs/providers/aws/guide/installation/)
 
 > For deployment `aws-cli` should be installed and configured with `Profiles` needed in the `serverless.yml` file. To get your credentials contact to ISA.
 
@@ -62,3 +100,4 @@ API is served at `localhost:3000/`
 [Webpack]: <https://webpack.js.org/>
 [DynamoDB]: <https://aws.amazon.com/dynamodb/>
 [Serverless Framework]:<https://serverless.com/framework/docs/providers/aws/guide/quick-start/>
+[isa-rankings.org]: <https://www.isa-rankings.org>

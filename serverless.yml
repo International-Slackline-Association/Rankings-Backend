@@ -192,7 +192,7 @@ resources:
       Type: AWS::Logs::LogGroup
       DeletionPolicy: Retain
       Properties:
-        LogGroupName: ISA_Rankings/ApplicationLogs
+        LogGroupName: ISA-Rankings/ApplicationLogs
         RetentionInDays: 60    
     SnsNotificationTopic:
       Type: AWS::SNS::Topic
