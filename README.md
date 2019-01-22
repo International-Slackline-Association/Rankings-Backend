@@ -107,4 +107,4 @@ API is served at `localhost:3000/`
 [DynamoDB]: <https://aws.amazon.com/dynamodb/>
 [Serverless Framework]:<https://serverless.com/framework/docs/providers/aws/guide/quick-start/>
 [isa-rankings.org]: <https://www.isa-rankings.org>
-[Architecture]: <docs/AWS_Architecure.png>
+[Architecture]: <docs/AWS_Architecture.png>
