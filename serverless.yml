@@ -13,13 +13,18 @@ custom:
   defaultStage: Dev
   defaultProfile: ISA-Rankings_Serverless
   defaultRegion: eu-west-1
-  s3ImageBucket: isa.rankings.${self:provider.region}.images
+  defaultS3ImageBucketName: isa.rankings.${self:provider.region}.images
+
+  s3ImageBucketName: 
+    Dev: isa.rankings.${self:provider.region}.images
+    Prod: images.isa-rankings.org
 
   isProdCase:
     Dev: false
     Prod: true
     other: false
   
+  s3ImageBucketArn: arn:aws:s3:::${self:custom.s3ImageBucketName.${self:custom.currentStage}, self:custom.defaultS3ImageBucketName}
   isProd: ${self:custom.isProdCase.${self:custom.currentStage}, self:custom.isProdCase.other}
   currentStage: ${opt:stage, 'Dev'}
   secrets: ${file(./serverless/secrets.yml):${self:custom.currentStage}}
@@ -85,7 +90,7 @@ provider:
         - 's3:GetObject'
         - 's3:PutObject*'
         - 's3:ListBucket'
-      Resource: 'arn:aws:s3:::${self:custom.s3ImageBucket}/*'
+      Resource: '${self:custom.s3ImageBucketArn}/*'
 
   deploymentBucket:
     name: isa.serverless.${self:provider.region}.deploys
@@ -135,7 +140,7 @@ functions:
     environment: ${file(./serverless/environment.yml)}
     events:
      - s3:
-          bucket: ${self:custom.s3ImageBucket}
+          bucket: ${self:custom.s3ImageBucketName.${self:custom.currentStage}, self:custom.defaultS3ImageBucketName}
           event: s3:ObjectCreated:*
           rules:
             - prefix: public/
