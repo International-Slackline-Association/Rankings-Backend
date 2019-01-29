@@ -1,12 +1,11 @@
 import { NestFactory } from '@nestjs/core';
 import { DynamoDBRecord, DynamoDBStreamHandler } from 'aws-lambda';
-import * as dotenv from 'dotenv-override';
+
+import 'shared';
+
 import { logger, waitForLogger } from 'shared/logger';
 import { DynamoDBStreamsModule } from './dynamodb-streams.module';
 import { DynamoDBStreamsService } from './dynamodb-streams.service';
-
-dotenv.config({ path: '../../.env', override: true });
-import 'shared';
 
 async function bootstrap(records: DynamoDBRecord[]) {
   const app = await NestFactory.createApplicationContext(DynamoDBStreamsModule, { logger: false });

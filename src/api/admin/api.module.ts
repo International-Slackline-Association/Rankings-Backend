@@ -9,8 +9,6 @@ import { SubmitAthleteModule } from './submit/athlete/submit-athlete.module';
 import { SubmitContestModule } from './submit/contest/submit-contest.module';
 import { SubmitContestResultsModule } from './submit/results/submit-contest-result.module';
 
-import 'shared';
-
 @Module({
   imports: [SubmitContestModule, SubmitAthleteModule, SubmitContestResultsModule, ContestModule, AthleteModule],
   providers: [],

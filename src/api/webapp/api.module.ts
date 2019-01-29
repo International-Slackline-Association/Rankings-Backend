@@ -3,7 +3,6 @@ import { MethodOverrideMiddleware } from '@nest-middlewares/method-override';
 import { MorganMiddleware } from '@nest-middlewares/morgan';
 import { MiddlewareConsumer, Module } from '@nestjs/common';
 
-import 'shared';
 import env_variables from 'shared/env_variables';
 
 import { AthleteModule } from './athlete/athlete.module';
