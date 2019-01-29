@@ -21,7 +21,6 @@ export class DDBContestRepository extends DDBRepository {
   }
 
   public async get(contestId: string, discipline: Discipline) {
-    const year = IdGenerator.stripYearFromContestId(contestId);
     const params: DocumentClient.GetItemInput = {
       TableName: this._tableName,
       Key: this.transformer.primaryKey(discipline, contestId),

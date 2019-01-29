@@ -18,6 +18,11 @@ export class SubmitAthleteDto {
   public readonly infoUrl: string;
 }
 
+// tslint:disable-next-line:max-classes-per-file
+export class BatchSubmitAthleteDto {
+  public readonly data: SubmitAthleteDto[];
+}
+
 export const submitAthleteDtoSchema = Joi.object().keys({
   id: Joi.string()
     .allow('')
@@ -60,6 +65,10 @@ export const submitAthleteDtoSchema = Joi.object().keys({
   infoUrl: Joi.string()
     .allow('')
     .optional()
-    .uri()
+    // .uri()
     .error(new APIErrors.JoiValidationError('Unknown infoUrl')),
+});
+
+export const batchSubmitAthleteDtoSchema = Joi.object().keys({
+  data: Joi.array().items(submitAthleteDtoSchema),
 });

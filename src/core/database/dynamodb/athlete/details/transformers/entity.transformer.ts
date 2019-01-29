@@ -17,6 +17,7 @@ export class EntityTransformer {
       gender: athlete.gender,
       name: athlete.name,
       normalizedName: Utils.normalizeString(athlete.name),
+      normalizedFullname: `${Utils.normalizeString(athlete.name)} ${Utils.normalizeString(athlete.surname)}`,
       profileUrl: athlete.profileUrl || undefined,
       thumbnailUrl: athlete.thumbnailUrl || undefined,
       surname: athlete.surname,

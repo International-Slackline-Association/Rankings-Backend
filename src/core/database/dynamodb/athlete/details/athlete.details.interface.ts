@@ -6,6 +6,7 @@ export type KeyAttrs = DDBTableKeyAttrs;
 interface Attrs {
   readonly name: string;
   readonly surname: string;
+  readonly normalizedFullname: string;
   readonly birthdate: string;
   readonly gender: Gender;
   readonly country: string;

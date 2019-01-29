@@ -56,6 +56,33 @@ export class DatabaseService {
     return dbItems.map(dbItem => this.athleteDetailsRepo.entityTransformer.fromDBItem(dbItem));
   }
 
+  public async queryAthletes(
+    limit: number,
+    opts: {
+      after?: { athleteId: string; name: string };
+      filter?: {
+        fullName?: string;
+      };
+    } = {},
+  ) {
+    let queryLimit: number = limit;
+    if (opts.filter && opts.filter.fullName) {
+      queryLimit = 30; // random paginator;
+    }
+    const queryResult = await this.athleteDetailsRepo.queryAthletes(queryLimit, opts);
+    let items = queryResult.items.map(dbItem => this.athleteDetailsRepo.entityTransformer.fromDBItem(dbItem));
+    let lastKey = queryResult.lastKey;
+    if (lastKey && items.length < limit) {
+      const moreQueryResults = await this.queryAthletes(limit - items.length, {
+        ...opts,
+        after: queryResult.lastKey,
+      });
+      items = items.concat(moreQueryResults.items);
+      lastKey = queryResult.lastKey;
+    }
+    return { items: items.slice(0, limit), lastKey: lastKey };
+  }
+
   public async putAthlete(athlete: AthleteDetail) {
     const dbItem = this.athleteDetailsRepo.entityTransformer.toDBItem(athlete);
     return this.athleteDetailsRepo.put(dbItem);

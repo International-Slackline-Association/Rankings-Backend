@@ -4,10 +4,9 @@ export class IdGenerator {
   /** contestName + year is a unique human readable entity */
   public static generateContestId(name: string, year: number): string {
     // example swiss-open_2018, slackline_2019,
-    const dashedName = name
+    const dashedName = Utils.normalizeString(name)
       .split(' ')
-      .join('-')
-      .toLowerCase();
+      .join('-');
     const id = `${dashedName}_${year}`;
     return id;
   }
@@ -19,14 +18,15 @@ export class IdGenerator {
   }
 
   /** name-surname + suffix (if collision happens) is a unique human readable entity */
-  public static generateAthleteId(
-    name: string,
-    surname: string,
-    suffix?: string,
-  ): string {
+  public static generateAthleteId(name: string, surname: string, suffix?: string): string {
     // example name_surname, name_surname_1
-    name = Utils.normalizeString(name);
-    surname = Utils.normalizeString(surname);
-    return suffix ? `${name}-${surname}_${suffix}` : `${name}-${surname}`;
+    const n = Utils.normalizeString(name)
+      .split(' ')
+      .join('-');
+    const s = Utils.normalizeString(surname)
+      .split(' ')
+      .join('-');
+
+    return suffix ? `${n}-${s}_${suffix}` : `${n}-${s}`;
   }
 }

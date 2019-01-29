@@ -22,6 +22,7 @@ export class AttrsTransformer extends DDBOverloadedTableTransformer<
 
   public attrsToItemTransformer = {
     athleteId: (pk: string) => destructCompositeKey(pk, 1),
+    normalizedName: (gsi_sk: string) => gsi_sk,
   };
 
   public itemToAttrsTransformer = {

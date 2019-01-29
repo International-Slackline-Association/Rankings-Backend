@@ -16,6 +16,12 @@ export class AthleteService {
     return athletes;
   }
 
+  public async queryAthletes(fullName: string, limit: number, after?: { athleteId: string; name: string }) {
+    const normalizedFullName = Utils.normalizeString(fullName);
+    const athletes = await this.db.queryAthletes(limit, { after, filter: { fullName: normalizedFullName } });
+    return athletes;
+  }
+
   public async getAthlete(id: string): Promise<AthleteDetail> {
     const athlete = await this.db.getAthleteDetails(id);
     return athlete;

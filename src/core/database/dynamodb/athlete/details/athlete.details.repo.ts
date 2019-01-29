@@ -9,6 +9,7 @@ import { AttrsTransformer } from './transformers/attributes.transformer';
 import { EntityTransformer } from './transformers/entity.transformer';
 
 import dynamoDataTypes = require('dynamodb-data-types');
+import { GSILastEvaluatedKey } from '../../interfaces/table.interface';
 const dynamoDbAttrValues = dynamoDataTypes.AttributeValue;
 
 @Injectable()
@@ -153,6 +154,89 @@ export class DDBAthleteDetailsRepository extends DDBRepository {
         });
         return items;
       })
-      .catch(logThrowDynamoDBError('DDBAthleteDetailsRepository queryAthleteByName', params));
+      .catch(logThrowDynamoDBError('DDBAthleteDetailsRepository queryAthletesByName', params));
+  }
+
+  public async queryAthletes(
+    limit: number,
+    opts: {
+      after?: { athleteId: string; name: string };
+      filter?: { fullName?: string };
+    } = {},
+  ) {
+    const exclusiveStartKey = this.createGSIExclusiveStartKey(opts.after);
+
+    const { filterExpression, filterExpAttrNames, filterExpAttrValues } = this.createFilterExpression(opts.filter);
+
+    const params: AWS.DynamoDB.DocumentClient.QueryInput = {
+      TableName: this._tableName,
+      IndexName: GlobalSecondaryIndexName,
+      Limit: limit,
+      ExclusiveStartKey: exclusiveStartKey,
+      KeyConditionExpression: '#sk_gsi = :sk_gsi',
+      FilterExpression: filterExpression,
+      ExpressionAttributeNames: {
+        '#sk_gsi': this.transformer.attrName('SK_GSI'),
+        ...filterExpAttrNames,
+      },
+      ExpressionAttributeValues: {
+        ':sk_gsi': this.transformer.itemToAttrsTransformer.SK_GSI(),
+        ...filterExpAttrValues,
+      },
+    };
+    return this.client
+      .query(params)
+      .promise()
+      .then(data => {
+        const items = data.Items.map((item: AllAttrs) => {
+          return this.transformer.transformAttrsToItem(item);
+        });
+        return { items: items, lastKey: this.extractGSILastEvaluatedKey(data.LastEvaluatedKey as GSILastEvaluatedKey) };
+      })
+      .catch(logThrowDynamoDBError('DDBAthleteDetailsRepository queryAthletes', params));
+  }
+
+  private extractGSILastEvaluatedKey(lastEvaluatedKey: GSILastEvaluatedKey) {
+    let lastKey: any;
+    if (lastEvaluatedKey) {
+      lastKey = {
+        athleteId: this.transformer.attrsToItemTransformer.athleteId(lastEvaluatedKey.PK),
+        name: this.transformer.attrsToItemTransformer.normalizedName(lastEvaluatedKey.GSI_SK),
+      };
+    }
+    return lastKey;
+  }
+
+  private createGSIExclusiveStartKey(after?: { athleteId: string; name: string }) {
+    let startKey: GSILastEvaluatedKey;
+    if (after && after.athleteId && after.name) {
+      startKey = {
+        PK: this.transformer.itemToAttrsTransformer.PK(after.athleteId),
+        SK_GSI: this.transformer.itemToAttrsTransformer.SK_GSI(),
+        GSI_SK: this.transformer.itemToAttrsTransformer.GSI_SK(after.name),
+      };
+    }
+    return startKey;
+  }
+
+  private createFilterExpression(filter?: { fullName?: string }) {
+    let filterExpression = '';
+    const filterExpAttrNames = {};
+    const filterExpAttrValues = {};
+
+    if (!filter) {
+      return { filterExpression: undefined, filterExpAttrNames, filterExpAttrValues };
+    }
+    if (filter.fullName) {
+      filterExpression =
+        (filterExpression ? `(${filterExpression}) and ` : '') + `contains(#normalizedFullName, :fullName)`;
+      filterExpAttrNames['#normalizedFullName'] = this.transformer.attrName('normalizedFullname');
+      filterExpAttrValues[':fullName'] = filter.fullName;
+    }
+    return {
+      filterExpression: filterExpression || undefined,
+      filterExpAttrNames,
+      filterExpAttrValues,
+    };
   }
 }

@@ -55,9 +55,9 @@ export class AthleteController {
     if (lookup.length < 3) {
       return new AthleteSuggestionsResponse([]);
     }
-    const athletes = await this.athleteService.queryAthletesByName(params.name, 5);
+    const results = await this.athleteService.queryAthletes(params.name, 5);
     return new AthleteSuggestionsResponse(
-      athletes.map(athlete => {
+      results.items.map(athlete => {
         return {
           id: athlete.id,
           name: athlete.name,

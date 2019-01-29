@@ -4,7 +4,12 @@ import { AuthenticationRole } from 'shared/enums';
 import { RolesGuard } from 'shared/guards/roles.guard';
 import { logger } from 'shared/logger';
 import { JoiValidationPipe } from 'shared/pipes/JoiValidation.pipe';
-import { SubmitAthleteDto, submitAthleteDtoSchema } from './dto/submit-athlete.dto';
+import {
+  BatchSubmitAthleteDto,
+  batchSubmitAthleteDtoSchema,
+  SubmitAthleteDto,
+  submitAthleteDtoSchema,
+} from './dto/submit-athlete.dto';
 import { SubmitAthleteResponse } from './dto/submit-athlete.response';
 import { SubmitAthletePictureDto, submitAthletePictureDtoSchema } from './dto/submit-picture.dto';
 import { SubmitAthleteService } from './submit-athlete.service';
@@ -27,6 +32,14 @@ export class SubmitAthleteController {
     }
     const response = new SubmitAthleteResponse(id);
     return response;
+  }
+
+  @Post('batch')
+  @UsePipes(new JoiValidationPipe(batchSubmitAthleteDtoSchema))
+  public async batchSubmitAthlete(@Body() dto: BatchSubmitAthleteDto) {
+    for (const athlete of dto.data) {
+      await this.submitAthlete(athlete);
+    }
   }
 
   @Post('picture')
