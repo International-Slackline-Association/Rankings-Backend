@@ -22,10 +22,6 @@ class EnvironmentVariables {
     return process.env.NODE_ENV === 'production' ? 'tiny' : 'combined';
   }
 
-  get adminRoleSecret(): string {
-    return process.env.ADMIN_ROLE_SECRET;
-  }
-
   get redis_host(): string {
     return process.env.REDISHOST;
   }
@@ -36,10 +32,6 @@ class EnvironmentVariables {
 
   get redis_password(): string {
     return process.env.REDISPASSWORD;
-  }
-
-  get s3_images_bucket(): string {
-    return process.env.S3ImagesBucket;
   }
 }
 

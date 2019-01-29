@@ -11,6 +11,7 @@ import * as serverless from 'aws-serverless-express';
 import { eventContext } from 'aws-serverless-express/middleware';
 
 import { Server } from 'http';
+import env_variables from 'shared/env_variables';
 let cachedServer: Server;
 
 // tslint:disable-next-line:no-var-requires
@@ -19,6 +20,7 @@ const express = require('express')();
 async function bootstrapServer(): Promise<any> {
   return NestFactory.create(AppModule, express, {
     bodyParser: true,
+    logger: env_variables.isDev ? undefined : false,
   })
     .then(app => {
       app.use(eventContext());

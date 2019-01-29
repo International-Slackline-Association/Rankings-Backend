@@ -28,6 +28,7 @@ custom:
   isProd: ${self:custom.isProdCase.${self:custom.currentStage}, self:custom.isProdCase.other}
   currentStage: ${opt:stage, 'Dev'}
   secrets: ${file(./serverless/secrets.yml):${self:custom.currentStage}}
+  environmentVars: ${file(./serverless/environment.yml):${self:custom.currentStage}}
 
   profiles:
     Dev: ISA-Rankings_Serverless
@@ -104,7 +105,7 @@ functions:
   AdminAPI:
     handler: src/api/admin/index.handler
     description: Rankings Admin WebAPI service
-    environment: ${file(./serverless/environment.yml)}
+    environment: ${self:custom.environmentVars}
     events:
       - http: 
           method: any
@@ -115,7 +116,7 @@ functions:
   WebAppAPI:
     handler: src/api/webapp/index.handler
     description: Rankings WebAPI service
-    environment: ${file(./serverless/environment.yml)}
+    environment: ${self:custom.environmentVars}
     events:
       - http:
           method: any
@@ -124,7 +125,7 @@ functions:
   Streams:
     handler: src/dynamodb-streams/index.handler
     description: DynamoDB Streams handler
-    environment: ${file(./serverless/environment.yml)}
+    environment: ${self:custom.environmentVars}
     timeout: 10
     events:
       - stream:
@@ -137,7 +138,7 @@ functions:
   Image-Resizer:
     handler: src/image-resizer/index.handler
     description: Rankings Image resizer service
-    environment: ${file(./serverless/environment.yml)}
+    environment: ${self:custom.environmentVars}
     events:
      - s3:
           bucket: ${self:custom.s3ImageBucketName.${self:custom.currentStage}, self:custom.defaultS3ImageBucketName}

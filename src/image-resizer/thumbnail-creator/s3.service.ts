@@ -6,7 +6,6 @@ import { Utils } from 'shared/utils';
 
 @Injectable()
 export class S3Service {
-  // private bucket = env_variables.s3_images_bucket;
   constructor(private readonly s3: S3) {}
 
   public async getObject(key: string, bucket: string) {
