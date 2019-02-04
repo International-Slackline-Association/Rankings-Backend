@@ -1,26 +1,35 @@
 import { StreamRecord } from 'aws-lambda';
 import { DynamoDBServices } from 'core/aws/aws.services';
 import { DDBAthleteContestsRepository } from 'core/database/dynamodb/athlete/contests/athlete.contests.repo';
+import { DDBContestRepository } from 'core/database/dynamodb/contests/contest.repo';
 import { handler } from 'dynamodb-streams';
 import { createDynamoDBEvent, triggerLambdaHandlerWithEvent } from './lambda-trigger';
 
 describe('DynamoDB Streams', () => {
   let athleteContestRepo: DDBAthleteContestsRepository;
+  let contestRepo: DDBContestRepository;
 
   beforeAll(async () => {
     athleteContestRepo = new DDBAthleteContestsRepository(new DynamoDBServices());
+    contestRepo = new DDBContestRepository(new DynamoDBServices());
   });
 
   describe('Contest Modifications', () => {
-    it('should pretend new athlete contest result has inserted', async () => {
-      const newImage = athleteContestRepo.transformToDynamoDBType({
-        athleteId: 'alpha-test',
-        contestId: 'alpha_2015',
-        createdAt: 123,
-        date: '2015-10-25',
-        discipline: 8,
-        place: 1,
-        points: 1000,
+    it('', async () => {
+      const newImage = contestRepo.transformToDynamoDBType({
+        category: undefined,
+        city: undefined,
+        contestId: 'bern-city-slack-9_2018',
+        country: undefined,
+        createdAt: undefined,
+        date: '2018-08-25',
+        discipline: 7,
+        infoUrl: undefined,
+        name: undefined,
+        normalizedName: undefined,
+        prize: undefined,
+        profileUrl: undefined,
+        thumbnailUrl: undefined,
       });
       const dynamobRecord: StreamRecord = {
         Keys: {
@@ -34,7 +43,7 @@ describe('DynamoDB Streams', () => {
         SequenceNumber: '111',
         SizeBytes: 26,
       };
-      const event = createDynamoDBEvent('INSERT', dynamobRecord);
+      const event = createDynamoDBEvent('MODIFY', dynamobRecord);
 
       await triggerLambdaHandlerWithEvent(handler, event);
     });

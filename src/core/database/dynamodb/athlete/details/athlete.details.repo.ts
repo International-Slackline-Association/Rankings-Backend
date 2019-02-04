@@ -3,13 +3,13 @@ import { AttributeValue, StreamRecord } from 'aws-lambda';
 import { DocumentClient } from 'aws-sdk/clients/dynamodb';
 import { IDynamoDBService } from 'core/aws/aws.services.interface';
 import { DDBRepository, GlobalSecondaryIndexName } from '../../dynamodb.repo';
+import { GSILastEvaluatedKey } from '../../interfaces/table.interface';
 import { logDynamoDBError, logThrowDynamoDBError } from '../../utils/utils';
 import { AllAttrs, DDBAthleteDetailItem, KeyAttrs } from './athlete.details.interface';
 import { AttrsTransformer } from './transformers/attributes.transformer';
 import { EntityTransformer } from './transformers/entity.transformer';
 
 import dynamoDataTypes = require('dynamodb-data-types');
-import { GSILastEvaluatedKey } from '../../interfaces/table.interface';
 const dynamoDbAttrValues = dynamoDataTypes.AttributeValue;
 
 @Injectable()

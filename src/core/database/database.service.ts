@@ -216,6 +216,10 @@ export class DatabaseService {
     return this.contestRepo.entityTransformer.fromDBItem(dbItem);
   }
 
+  public async clearContestCache(contestId: string, discipline: Discipline) {
+    return this.redisRepo.clearContest(contestId, discipline);
+  }
+
   public async queryContestsByDate(
     limit: number,
     opts: {

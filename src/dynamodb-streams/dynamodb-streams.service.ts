@@ -3,6 +3,7 @@ import { DynamoDBRecord } from 'aws-lambda';
 import { logger } from 'shared/logger';
 import { AthleteContestRecordService } from './athlete/athlete-contest-record.service';
 import { AthleteDetailsRecordService } from './athlete/athlete-details-record.service';
+import { ContestRecordService } from './contest/contest-record.service';
 
 function reflect(promise: Promise<any>) {
   return promise.then(
@@ -20,6 +21,7 @@ export class DynamoDBStreamsService {
   constructor(
     private readonly athleteContestResultService: AthleteContestRecordService,
     private readonly athleteDetailsService: AthleteDetailsRecordService,
+    private readonly contestService: ContestRecordService,
   ) {}
 
   public async processRecords(records: DynamoDBRecord[]) {
@@ -45,6 +47,9 @@ export class DynamoDBStreamsService {
     }
     if (this.athleteDetailsService.isRecordValidForThisService(record.dynamodb)) {
       await this.athleteDetailsService.processNewRecord(record);
+    }
+    if (this.contestService.isRecordValidForThisService(record.dynamodb)) {
+      await this.contestService.processNewRecord(record);
     }
   }
 }

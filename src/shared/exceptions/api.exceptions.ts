@@ -46,7 +46,7 @@ export namespace APIErrors {
     constructor(message: string, params: any) {
       super({
         message: `Operation Failed: ${message}, Params: ${params}`,
-        alias: APIErrorAlias.Unknown,
+        alias: APIErrorAlias.OperationFailed,
         status: HttpStatus.BAD_REQUEST,
       });
     }

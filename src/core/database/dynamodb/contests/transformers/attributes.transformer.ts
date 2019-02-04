@@ -16,6 +16,7 @@ export class AttrsTransformer extends DDBOverloadedTableTransformer<AllAttrs, DD
     PK: 'Contests',
     SK_GSI: 'Contest',
     LSI: 'Contest',
+    GSI_SK: '',
   };
 
   public attrsToItemTransformer = {

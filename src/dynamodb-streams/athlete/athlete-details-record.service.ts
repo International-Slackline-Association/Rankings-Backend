@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { DynamoDBRecord, StreamRecord } from 'aws-lambda';
 import { DatabaseService } from 'core/database/database.service';
 import { DDBAthleteDetailsRepository } from 'core/database/dynamodb/athlete/details/athlete.details.repo';
-import { RedisRepository } from 'core/database/redis/redis.repo';
 import { isRecordOfTypeOfKeys } from 'dynamodb-streams/utils';
 
 @Injectable()

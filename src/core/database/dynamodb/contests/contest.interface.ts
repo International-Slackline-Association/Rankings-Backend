@@ -1,7 +1,7 @@
 import { ContestType, Discipline } from 'shared/enums';
 import { DDBTableKeyAttrs } from '../interfaces/table.interface';
 
-type KeyAttrs = DDBTableKeyAttrs;
+export type KeyAttrs = DDBTableKeyAttrs;
 
 interface Attrs {
   readonly name: string;

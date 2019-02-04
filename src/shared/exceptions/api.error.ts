@@ -5,6 +5,7 @@ export enum APIErrorAlias {
   Unknown = 'Unknown',
   ValidationError = 'ValidationError',
   NotFound = 'NotFound',
+  OperationFailed = 'OperationFailed',
 }
 
 export interface IAPIError {

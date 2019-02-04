@@ -55,6 +55,12 @@ export class RedisRepository {
     return Utils.omitReject(set);
   }
 
+  public async clearContest(contestId: string, discipline: Discipline) {
+    const key = this.redisKeyOfContest(contestId, discipline);
+    const del = this.redis.del(key);
+    return Utils.omitReject(del);
+  }
+
   public async updatePointsOfAthleteInRankingCategory(pk: DDBAthleteRankingsItemPrimaryKey, points: number) {
     const key = this.redisKeyOfRankingCategory(pk);
     const zadd = this.redis.zadd(key, [points, pk.athleteId]);
