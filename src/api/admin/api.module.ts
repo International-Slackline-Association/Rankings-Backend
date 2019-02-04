@@ -2,15 +2,24 @@ import { HelmetMiddleware } from '@nest-middlewares/helmet';
 import { MethodOverrideMiddleware } from '@nest-middlewares/method-override';
 import { MorganMiddleware } from '@nest-middlewares/morgan';
 import { MiddlewareConsumer, Module } from '@nestjs/common';
+
 import env_variables from 'shared/env_variables';
 import { AthleteModule } from './athlete/athlete.module';
 import { ContestModule } from './contest/contest.module';
+import { ResultsModule } from './results/results.module';
 import { SubmitAthleteModule } from './submit/athlete/submit-athlete.module';
 import { SubmitContestModule } from './submit/contest/submit-contest.module';
 import { SubmitContestResultsModule } from './submit/results/submit-contest-result.module';
 
 @Module({
-  imports: [SubmitContestModule, SubmitAthleteModule, SubmitContestResultsModule, ContestModule, AthleteModule],
+  imports: [
+    SubmitContestModule,
+    SubmitAthleteModule,
+    SubmitContestResultsModule,
+    ContestModule,
+    AthleteModule,
+    ResultsModule,
+  ],
   providers: [],
   exports: [],
 })

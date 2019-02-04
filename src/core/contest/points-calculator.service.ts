@@ -3,6 +3,7 @@ import { ContestResult } from 'api/admin/submit/results/dto/submit-contest-resul
 import { groupBy } from 'lodash';
 import { Constants } from 'shared/constants';
 import { ContestType } from 'shared/enums';
+import { Utils } from 'shared/utils';
 
 export interface DetailedContestResult extends ContestResult {
   readonly category: ContestType;
@@ -15,6 +16,7 @@ export interface AthletePointsDictionary {
 interface IAthletePoint {
   athlete: { athleteId: string; place: number };
   points: number;
+  isPointsStaticallyGiven: boolean;
 }
 
 @Injectable()
@@ -26,10 +28,16 @@ export class ContestPointsCalculatorService {
     const sortedPlaces = results.places.sort((a, b) => a.place - b.place);
     let calculatedAthletePoints = sortedPlaces.map<IAthletePoint>((athlete, index) => {
       const defaultPlace = index + 1;
-      const points = this.calculatePoint(results.category, defaultPlace, numOfParticipants);
+      let points = athlete.points;
+      let isPointsStaticallyGiven = false;
+      if (Utils.isNil(points)) {
+        points = this.calculatePoint(results.category, defaultPlace, numOfParticipants);
+        isPointsStaticallyGiven = true;
+      }
       return {
         athlete: athlete,
         points: points,
+        isPointsStaticallyGiven: isPointsStaticallyGiven,
       };
     });
 
@@ -67,7 +75,13 @@ export class ContestPointsCalculatorService {
         const athletePointArray = pointsGroup[place];
         if (athletePointArray.length > 1) {
           const average = athletePointArray.map(a => a.points).reduce((a, b) => a + b, 0) / athletePointArray.length;
-          athletePointArray.forEach(a => modifiedAthletePointArray.push({ ...a, points: Math.round(average) }));
+          athletePointArray.forEach(a => {
+            if (a.isPointsStaticallyGiven) {
+              modifiedAthletePointArray.push({ ...a }); // dont change the points
+            } else {
+              modifiedAthletePointArray.push({ ...a, points: Math.round(average) });
+            }
+          });
         } else {
           modifiedAthletePointArray.push(...athletePointArray);
         }

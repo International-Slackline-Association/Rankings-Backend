@@ -6,11 +6,11 @@ import { APIErrors } from 'shared/exceptions/api.exceptions';
 export interface ContestResult {
   readonly contestId: string;
   readonly discipline: number;
-  readonly places: { athleteId: string; place: number }[];
+  readonly places: { athleteId: string; place: number; points?: number }[];
 }
 
 export class SubmitContestResultDto implements ContestResult {
-  public readonly places: { athleteId: string; place: number }[];
+  public readonly places: { athleteId: string; place: number; points?: number }[];
   public readonly contestId: string;
   public readonly discipline: Discipline;
 }
@@ -35,6 +35,10 @@ export const submitContestResultDtoSchema = Joi.object().keys({
           place: Joi.number()
             .required()
             .error(new APIErrors.JoiValidationError('Unknown place')),
+          points: Joi.number()
+            .optional()
+            .allow(null, '')
+            .error(new APIErrors.JoiValidationError('Unknown points')),
         })
         .required(),
     )
