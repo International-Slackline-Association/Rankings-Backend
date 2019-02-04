@@ -46,8 +46,9 @@ export namespace YearUtility {
 
 // tslint:disable-next-line:no-namespace
 export namespace GenderUtility {
-  export const AllGenders = [Gender.All, Gender.Men, Gender.Women];
-  export const ValidGenders = [Gender.Men, Gender.Women];
+  export const AllGenders = [Gender.All, Gender.Men, Gender.Women, Gender.Other];
+  export const CategoricalGenders = [Gender.All, Gender.Men, Gender.Women];
+  export const ValidGenders = [Gender.Men, Gender.Women, Gender.Other];
   export function getName(gender: Gender) {
     switch (gender) {
       case Gender.All:
@@ -56,6 +57,8 @@ export namespace GenderUtility {
         return 'Men';
       case Gender.Women:
         return 'Women';
+      case Gender.Other:
+        return 'Other';
     }
   }
   export function getParents(gender: Gender) {

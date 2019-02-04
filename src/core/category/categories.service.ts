@@ -11,7 +11,7 @@ export class CategoriesService {
   public getCategories(includeAllYears: boolean = true) {
     const disciplines = DisciplineUtility.AllDisciplines;
     const years = includeAllYears ? YearUtility.AllYears : YearUtility.Years;
-    const genders = GenderUtility.AllGenders;
+    const genders = GenderUtility.CategoricalGenders;
     const ageCategories = AgeCategoryUtility.AllAgeCategories;
 
     const discipline: ICategoryItem = {

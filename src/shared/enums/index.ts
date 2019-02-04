@@ -30,6 +30,7 @@ export enum Gender {
   All = 0,
   Men = 1,
   Women = 2,
+  Other = 3,
 }
 
 export enum AgeCategory {
