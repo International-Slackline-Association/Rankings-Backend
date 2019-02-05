@@ -10,10 +10,10 @@ export { DisciplineUtility, ContestTypeUtility };
 
 // tslint:disable-next-line:no-namespace
 export namespace YearUtility {
-  // export const Current = moment()
-  //   .utc()
-  //   .year();
-  export const Current = 2018;
+  export const Current = moment()
+    .utc()
+    .year();
+  // export const Current = 2018;
 
   export function yearList() {
     const years: number[] = [];

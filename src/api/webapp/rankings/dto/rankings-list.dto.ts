@@ -30,6 +30,7 @@ export const rankingsListDtoSchema = Joi.object().keys({
     .error(new APIErrors.JoiValidationError('Invalid athleteId')),
   country: Joi.string()
     .allow(null, '')
+    .lowercase()
     .error(new APIErrors.JoiValidationError('Invalid country')),
   next: Joi.object()
     .allow(null)

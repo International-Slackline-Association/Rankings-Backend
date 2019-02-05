@@ -49,6 +49,7 @@ export const submitContestDtoSchema = Joi.object().keys({
     .error(new APIErrors.JoiValidationError('Invalid category')),
   prize: Joi.number()
     .required()
+    .allow(0)
     .error(new APIErrors.JoiValidationError('Unknown prize')),
   profileUrl: Joi.string()
     .allow('')
@@ -63,7 +64,7 @@ export const submitContestDtoSchema = Joi.object().keys({
   infoUrl: Joi.string()
     .allow('')
     .optional()
-    .uri()
+    // .uri()
     .error(new APIErrors.JoiValidationError('Unknown infoUrl')),
 });
 

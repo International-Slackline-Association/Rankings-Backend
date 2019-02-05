@@ -34,7 +34,7 @@ export const athleteContestsDtoSchema = Joi.object().keys({
         .required()
         .error(new APIErrors.JoiValidationError('Unknown contestId')),
       date: Joi.string()
-        .isoDate()
+        // .isoDate()
         .required()
         .error(new APIErrors.JoiValidationError('Unknown date')),
       discipline: Joi.number()
