@@ -18,11 +18,8 @@ export class AthleteDetail {
   public readonly createdAt?: number;
 
   public get age(): number {
-    const birthYear = Utils.dateToMoment(this.birthdate).year();
-    const age =
-      moment()
-        .utc()
-        .year() - birthYear;
+    const birthDate = Utils.dateToMoment(this.birthdate);
+    const age = moment().utc().diff(birthDate, 'years');
     return age;
   }
 
