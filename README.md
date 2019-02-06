@@ -106,6 +106,12 @@ npm start
 API is served at `localhost:3000/`
 
 
+### Project Folder Overview
+
+[Gource] output
+
+![GourceImage]
+
 [NestJS]: <https://github.com/nestjs/nest>
 [Serverless-Offline]: <https://github.com/dherault/serverless-offline>
 [Webpack]: <https://webpack.js.org/>
@@ -113,3 +119,5 @@ API is served at `localhost:3000/`
 [Serverless Framework]:<https://serverless.com/framework/docs/providers/aws/guide/quick-start/>
 [isa-rankings.org]: <https://www.isa-rankings.org>
 [Architecture]: <docs/AWS_Architecture.png>
+[Gource]: <https://github.com/acaudwell/Gource>
+[GourceImage]: <docs/GourceOutput.png>
