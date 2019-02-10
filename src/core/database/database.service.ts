@@ -88,6 +88,10 @@ export class DatabaseService {
     return this.athleteDetailsRepo.put(dbItem);
   }
 
+  public async deleteAthlete(athleteId: string) {
+    return this.athleteDetailsRepo.delete(athleteId);
+  }
+
   public async updateAthleteProfileUrl(athleteId: string, url: string) {
     return this.athleteDetailsRepo.updateProfileUrl(athleteId, url);
   }

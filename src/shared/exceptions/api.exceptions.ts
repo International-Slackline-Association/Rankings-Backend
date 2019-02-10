@@ -42,6 +42,17 @@ export namespace APIErrors {
   }
 
   // tslint:disable-next-line:max-classes-per-file
+  export class DuplicateAthleteError extends APIError {
+    constructor(email: string) {
+      super({
+        message: `Athlete with email: ${email} already exists`,
+        alias: APIErrorAlias.OperationFailed,
+        status: HttpStatus.BAD_REQUEST,
+      });
+    }
+  }
+
+  // tslint:disable-next-line:max-classes-per-file
   export class OperationFailedError extends APIError {
     constructor(message: string, params: any) {
       super({

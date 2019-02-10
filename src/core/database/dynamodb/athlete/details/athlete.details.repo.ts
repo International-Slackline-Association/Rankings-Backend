@@ -94,6 +94,7 @@ export class DDBAthleteDetailsRepository extends DDBRepository {
       })
       .catch(logThrowDynamoDBError('DDBAthleteDetailsRepository batchGet', params));
   }
+
   public async put(athlete: DDBAthleteDetailItem) {
     const params = {
       TableName: this._tableName,
@@ -104,6 +105,18 @@ export class DDBAthleteDetailsRepository extends DDBRepository {
       .promise()
       .then(data => data)
       .catch(logThrowDynamoDBError('DDBAthleteDetailsRepository Put', params));
+  }
+
+  public async delete(id: string) {
+    const params: DocumentClient.DeleteItemInput = {
+      TableName: this._tableName,
+      Key: this.transformer.primaryKey(id),
+    };
+    return this.client
+      .delete(params)
+      .promise()
+      .then(data => data)
+      .catch(logThrowDynamoDBError('DDBAthleteDetailsRepository delete', params));
   }
 
   public async updateProfileUrl(athleteId: string, url: string) {
