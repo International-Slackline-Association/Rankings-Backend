@@ -57,8 +57,11 @@ export class ContestPointsCalculatorService {
     if (numberOfParticipants < minParticipantThreshold) {
       return 0;
     }
+    const maxRange = Constants.ContestScoringRange(contestType);
+    if (place > maxRange) {
+      return 1;
+    }
     const pointOfFirstPlace = Constants.ContestTypeTopPoints(contestType);
-    const maxRange = Constants.ContestScoringRange;
     const A = (1 - pointOfFirstPlace) / Math.log(Math.min(numberOfParticipants, maxRange));
     const B = pointOfFirstPlace;
 
