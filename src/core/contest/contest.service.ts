@@ -13,6 +13,7 @@ export class ContestService {
   public async queryContests(
     limit: number,
     opts: {
+      descending: boolean;
       year?: number;
       discipline?: Discipline;
       contestId?: string;
@@ -22,7 +23,7 @@ export class ContestService {
         discipline: Discipline;
         date: string;
       };
-    } = {},
+    } = { descending: true },
   ) {
     const discipline = opts.discipline;
     let filterDisciplines: Discipline[] = [];
@@ -38,6 +39,7 @@ export class ContestService {
       limit = 1;
     }
     const contests = await this.db.queryContestsByDate(limit, {
+      descending: opts.descending,
       year: opts.year,
       after: opts.after,
       filter: {

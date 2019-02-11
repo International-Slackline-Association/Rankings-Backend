@@ -30,7 +30,7 @@ export class CategoriesService {
 
     const year: ICategoryItem = {
       title: 'Year',
-      selectedValue: years[includeAllYears ? 1 : 0].toString(),
+      selectedValue: years[0].toString(),
       options: years.map<UISelectOption>(y => {
         return {
           label: YearUtility.getName(y),

@@ -62,6 +62,7 @@ export class ContestController {
     const year = categories[1];
 
     const contests = await this.contestService.queryContests(10, {
+      descending: Utils.Now().month() > 6,
       year: year,
       contestId: dto.contestId,
       after: dto.next,

@@ -30,7 +30,7 @@ export class RankingsController {
   public async getRankingsList(@Body() dto: RankingsListDto): Promise<RankingsListResponse> {
     let categories = dto.selectedCategories || [];
     if (categories.length < 4) {
-      categories = [Discipline.Overall, YearUtility.Current, Gender.All, AgeCategory.All];
+      categories = [Discipline.Overall, YearUtility.AllYears[0], Gender.All, AgeCategory.All];
     }
     const discipline = categories[0];
     const year = categories[1];
@@ -46,11 +46,12 @@ export class RankingsController {
     const rankingsWithAthletes = await Promise.all(
       rankings.items.map(async (item, index) => {
         const athlete = await this.athleteService.getAthlete(item.id);
-        let place = index;
+        let place;
         if (dto.athleteId || dto.country) {
           place = await this.rankingsService.getAthleteRankInCategory({ athleteId: item.id, ...category });
         }
-        return { athlete, ranking: item, place: place + 1 };
+        place = place === 0 ? null : place ? place + 1 : undefined;
+        return { athlete, ranking: item, place: place };
       }),
     );
     return new RankingsListResponse(
@@ -61,7 +62,7 @@ export class RankingsController {
           country: obj.ranking.country,
           name: obj.ranking.name,
           points: obj.ranking.points.toString(),
-          rank: obj.place || null,
+          rank: obj.place,
           thumbnailUrl: obj.athlete.thumbnailUrl || obj.athlete.profileUrl,
           surname: obj.ranking.surname,
         };

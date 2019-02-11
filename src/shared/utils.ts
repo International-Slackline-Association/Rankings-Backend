@@ -20,6 +20,10 @@ export namespace Utils {
     return str;
   }
 
+  export function Now() {
+    return moment().utc();
+  }
+
   export function unixToDate(unix: number): moment.Moment {
     return moment.unix(unix);
   }

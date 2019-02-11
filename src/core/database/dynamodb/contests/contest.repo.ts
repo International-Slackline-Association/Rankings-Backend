@@ -94,6 +94,7 @@ export class DDBContestRepository extends DDBRepository {
   public async queryContestsByDate(
     limit: number,
     opts: {
+      descending: boolean;
       year?: number;
       after?: {
         contestId: string;
@@ -101,7 +102,7 @@ export class DDBContestRepository extends DDBRepository {
         date: string;
       };
       filter?: { disciplines?: Discipline[]; name?: string; id?: string };
-    } = {},
+    } = {descending: true},
   ) {
     const exclusiveStartKey = this.createLSIExclusiveStartKey(opts.after);
     const { filterExpression, filterExpAttrNames, filterExpAttrValues } = this.createFilterExpression(opts.filter);
@@ -110,7 +111,7 @@ export class DDBContestRepository extends DDBRepository {
       TableName: this._tableName,
       IndexName: LocalSecondaryIndexName,
       Limit: limit,
-      ScanIndexForward: false,
+      ScanIndexForward: !opts.descending,
       ExclusiveStartKey: exclusiveStartKey,
       KeyConditionExpression: '#pk = :pk and begins_with(#lsi, :sortKeyPrefix) ',
       FilterExpression: filterExpression,

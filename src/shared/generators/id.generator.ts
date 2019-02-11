@@ -16,13 +16,11 @@ export class IdGenerator {
   /** name-surname + suffix (if collision happens) is a unique human readable entity */
   public static generateAthleteId(name: string, surname: string, suffix?: string): string {
     // example name_surname, name_surname_1
-    const urlName = this.replaceUnsafeUrlCharacters(name);
-    const n = Utils.normalizeString(urlName)
-      .split(' ')
-      .join('-');
+    const urlName = this.replaceUnsafeUrlCharacters(Utils.normalizeString(name));
+    const n = urlName.split(' ').join('-');
 
-    const urlSurname = this.replaceUnsafeUrlCharacters(surname);
-    const s = Utils.normalizeString(urlSurname)
+    const urlSurname = this.replaceUnsafeUrlCharacters(Utils.normalizeString(surname));
+    const s = urlSurname
       .split(' ')
       .join('-');
     const id = suffix ? `${n}-${s}_${suffix}` : `${n}-${s}`;

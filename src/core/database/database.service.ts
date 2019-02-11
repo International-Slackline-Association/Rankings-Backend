@@ -78,7 +78,7 @@ export class DatabaseService {
         after: queryResult.lastKey,
       });
       items = items.concat(moreQueryResults.items);
-      lastKey = queryResult.lastKey;
+      lastKey = moreQueryResults.lastKey;
     }
     return { items: items.slice(0, limit), lastKey: lastKey };
   }
@@ -142,7 +142,7 @@ export class DatabaseService {
         after: queryResult.lastKey,
       });
       items = items.concat(moreQueryResults.items);
-      lastKey = queryResult.lastKey;
+      lastKey = moreQueryResults.lastKey;
     }
     return { items: items.slice(0, limit), lastKey: lastKey };
   }
@@ -187,7 +187,7 @@ export class DatabaseService {
     } = {},
   ) {
     let queryLimit: number = limit;
-    if (opts.filter && opts.filter.id) {
+    if (opts.filter && opts.filter.country) {
       queryLimit = 30; // random paginator;
     }
     const queryResult = await this.athleteRankingsRepo.queryRankings(queryLimit, category, {
@@ -202,7 +202,7 @@ export class DatabaseService {
         after: queryResult.lastKey,
       });
       items = items.concat(moreQueryResults.items);
-      lastKey = queryResult.lastKey;
+      lastKey = moreQueryResults.lastKey;
     }
     return { items: items.slice(0, limit), lastKey: lastKey };
   }
@@ -227,6 +227,7 @@ export class DatabaseService {
   public async queryContestsByDate(
     limit: number,
     opts: {
+      descending: boolean;
       year?: number;
       after?: {
         contestId: string;
@@ -234,7 +235,7 @@ export class DatabaseService {
         date: string;
       };
       filter?: { disciplines?: Discipline[]; name?: string; id?: string };
-    } = {},
+    } = { descending: true },
   ) {
     let queryLimit: number = limit;
     if (opts.filter) {
@@ -255,7 +256,7 @@ export class DatabaseService {
         after: queryResult.lastKey,
       });
       items = items.concat(moreQueryResults.items);
-      lastKey = queryResult.lastKey;
+      lastKey = moreQueryResults.lastKey;
     }
     return { items: items.slice(0, limit), lastKey: lastKey };
   }
