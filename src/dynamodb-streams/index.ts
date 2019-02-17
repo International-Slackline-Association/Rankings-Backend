@@ -17,7 +17,6 @@ async function bootstrap(records: DynamoDBRecord[]) {
 }
 
 export const handler: DynamoDBStreamHandler = async (event, context) => {
-  logger.debug('DynamoDB Event', { data: event });
   // Socket connections (redis) keeps waiting lamba functions. Dont want that
   context.callbackWaitsForEmptyEventLoop = false;
 

@@ -30,22 +30,23 @@ export class AthleteContestRecordService {
   }
 
   public async processNewRecord(record: DynamoDBRecord) {
+    logger.info('DynamoDB Event', { data: record });
+
     if (record.eventName === 'INSERT') {
       const item = this.athleteContestsRepo.transformFromDynamoDBType(record.dynamodb.NewImage);
-      logger.debug('New Contest Record ', { data: item });
+      logger.info('New Contest Record ', { data: item });
       await this.processNewContestResult(item);
     }
     if (record.eventName === 'MODIFY') {
       const oldItem = this.athleteContestsRepo.transformFromDynamoDBType(record.dynamodb.OldImage);
       const newItem = this.athleteContestsRepo.transformFromDynamoDBType(record.dynamodb.NewImage);
-      logger.debug('Modified Contest Record ', { data: { oldItem, newItem } });
+      logger.info('Modified Contest Record ', { data: { oldItem, newItem } });
 
       await this.processModifiedContestResult(oldItem, newItem);
     }
     if (record.eventName === 'REMOVE') {
       const oldItem = this.athleteContestsRepo.transformFromDynamoDBType(record.dynamodb.OldImage);
-      logger.debug('Removed Contest Record ', { data: oldItem });
-
+      logger.info('Removed Contest Record ', { data: oldItem });
       await this.processRemovedContestResult(oldItem);
     }
   }
@@ -73,7 +74,7 @@ export class AthleteContestRecordService {
     await this.updateRankingsForCombinations(oldItem.athleteId, oldItem.contestDiscipline, year, pointsToAdd);
   }
 
-  private async updateRankingsForCombinations(
+  public async updateRankingsForCombinations(
     athleteId: string,
     discipline: Discipline,
     year: number,

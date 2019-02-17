@@ -33,6 +33,9 @@ export class ContestController {
     discipline: Discipline,
   ): Promise<ContestResponse> {
     const contest = await this.contestService.getContest(id, discipline);
+    if (!contest) {
+      return new ContestResponse(null);
+    }
     const countryName = this.countryService.getCountryName(contest.country);
     if (!contest) {
       return new ContestResponse(null);
@@ -97,6 +100,7 @@ export class ContestController {
     const discipline = categories[0];
     const year = categories[1];
     const contests = await this.contestService.queryContests(5, {
+      descending: false,
       year: year,
       discipline: discipline,
       name: lookup,

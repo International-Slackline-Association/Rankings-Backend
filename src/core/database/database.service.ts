@@ -39,11 +39,12 @@ export class DatabaseService {
 
   public async getAthleteDetails(athleteId: string) {
     // Read-through cache
-    let dbItem = await this.redisRepo.getAthleteDetail(athleteId);
-    if (!dbItem) {
-      dbItem = await this.athleteDetailsRepo.get(athleteId);
-      await this.redisRepo.setAthleteDetail(dbItem);
-    }
+    // let dbItem = await this.redisRepo.getAthleteDetail(athleteId);
+    // if (!dbItem) {
+    //   dbItem = await this.athleteDetailsRepo.get(athleteId);
+    //   await this.redisRepo.setAthleteDetail(dbItem);
+    // }
+    const dbItem = await this.athleteDetailsRepo.get(athleteId);
     return this.athleteDetailsRepo.entityTransformer.fromDBItem(dbItem);
   }
 
@@ -174,7 +175,9 @@ export class DatabaseService {
     await this.redisRepo.updatePointsOfAthleteInRankingCategory(pk, points);
     return this.athleteRankingsRepo.updatePoints(pk, points);
   }
-
+  public async deleteAthleteRankings(athleteId: string) {
+    await this.athleteRankingsRepo.deleteAthleteRankings(athleteId);
+  }
   public async queryAthleteRankings(
     limit: number,
     category: DDBRankingsItemPrimaryKey,
@@ -212,11 +215,12 @@ export class DatabaseService {
   //#region Contest
   public async getContest(contestId: string, discipline: Discipline) {
     // Read-through cache
-    let dbItem = await this.redisRepo.getContest(contestId, discipline);
-    if (!dbItem) {
-      dbItem = await this.contestRepo.get(contestId, discipline);
-      await this.redisRepo.setContest(dbItem);
-    }
+    // let dbItem = await this.redisRepo.getContest(contestId, discipline);
+    // if (!dbItem) {
+    //   dbItem = await this.contestRepo.get(contestId, discipline);
+    //   await this.redisRepo.setContest(dbItem);
+    // }
+    const dbItem = await this.contestRepo.get(contestId, discipline);
     return this.contestRepo.entityTransformer.fromDBItem(dbItem);
   }
 

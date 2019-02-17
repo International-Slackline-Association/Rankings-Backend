@@ -82,6 +82,51 @@ export class DDBAthleteRankingsRepository extends DDBRepository {
       .catch(logThrowDynamoDBError('DDBAthleteRankingsRepository addPoints', params));
   }
 
+  public async getAllAthleteRankings(athleteId: string) {
+    const params: AWS.DynamoDB.DocumentClient.QueryInput = {
+      TableName: this._tableName,
+      KeyConditionExpression: '#pk = :pk and begins_with(#sk_gsi, :sortKeyPrefix) ',
+      ExpressionAttributeNames: {
+        '#pk': this.transformer.attrName('PK'),
+        '#sk_gsi': this.transformer.attrName('SK_GSI'),
+      },
+      ExpressionAttributeValues: {
+        ':pk': this.transformer.itemToAttrsTransformer.PK(athleteId),
+        ':sortKeyPrefix': this.transformer.itemToAttrsTransformer.SK_GSI(undefined, undefined, undefined, undefined),
+      },
+    };
+    return this.client
+      .query(params)
+      .promise()
+      .then(data => {
+        const items = data.Items.map((item: AllAttrs) => {
+          return this.transformer.transformAttrsToItem(item);
+        });
+        return { items: items, lastKey: this.extractGSILastEvaluatedKey(data.LastEvaluatedKey as GSILastEvaluatedKey) };
+      })
+      .catch(logThrowDynamoDBError('DDBAthleteRankingsRepository getAllAthleteRankings', params));
+  }
+  public async deleteAthleteRankings(athleteId: string) {
+    const allRankings = await this.getAllAthleteRankings(athleteId);
+    for (const ranking of allRankings.items) {
+      const params: AWS.DynamoDB.DocumentClient.DeleteItemInput = {
+        TableName: this._tableName,
+        Key: this.transformer.primaryKey(
+          athleteId,
+          ranking.year,
+          ranking.discipline,
+          ranking.gender,
+          ranking.ageCategory,
+        ),
+      };
+      await this.client
+        .delete(params)
+        .promise()
+        .then(data => {})
+        .catch(logThrowDynamoDBError('DDBAthleteRankingsRepository delete', params));
+    }
+  }
+
   public async queryRankings(
     limit: number,
     category: DDBRankingsItemPrimaryKey,
