@@ -3,7 +3,7 @@ import { Body, Controller, Get, Param, Post, Req, UsePipes } from '@nestjs/commo
 import { AthleteService } from 'core/athlete/athlete.service';
 import { RankingsService } from 'core/athlete/rankings.service';
 import { CategoriesService } from 'core/category/categories.service';
-import { Discipline } from 'shared/enums';
+import { Discipline, Year } from 'shared/enums';
 import { ContestTypeUtility, DisciplineUtility, YearUtility } from 'shared/enums/enums-utility';
 import { JoiValidationPipe } from 'shared/pipes/JoiValidation.pipe';
 import { Utils } from 'shared/utils';
@@ -70,7 +70,7 @@ export class AthleteController {
 
   @Get('categories')
   public getCategories(): CategoriesResponse {
-    const categories = this.categoriesService.getCategories(false);
+    const categories = this.categoriesService.getCategories();
     categories.discipline.options[0].label = 'All';
     return new CategoriesResponse([categories.discipline, categories.year]);
   }
@@ -80,11 +80,11 @@ export class AthleteController {
   public async getContests(@Body() dto: AthleteContestsDto): Promise<AthleteContestsResponse> {
     let categories = dto.selectedCategories || [];
     if (categories.length < 2) {
-      categories = [Discipline.Overall, YearUtility.Current];
+      categories = [Discipline.Overall, undefined];
     }
     const discipline = categories[0];
     const year = categories[1];
-    const results = await this.athleteService.getContests(dto.id, year, discipline, dto.next);
+    const results = await this.athleteService.getContests(dto.id, discipline, year, dto.next);
 
     const athletesWithContests = await Promise.all(
       results.items.map(async item => {

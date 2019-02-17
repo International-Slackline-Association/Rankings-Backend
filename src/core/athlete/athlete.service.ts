@@ -29,8 +29,8 @@ export class AthleteService {
 
   public async getContests(
     id: string,
-    year: number,
     discipline: Discipline,
+    year?: number,
     after?: {
       contestId: string;
       discipline: Discipline;
