@@ -41,7 +41,7 @@ export class AthleteController {
       country: countryName || athlete.country,
       profileUrl: athlete.profileUrl,
       infoUrl: athlete.infoUrl,
-      overallRank: overallRank ? overallRank.toString() : '',
+      overallRank: !Utils.isNil(overallRank) ? (overallRank + 1).toString() : '',
     });
   }
 
