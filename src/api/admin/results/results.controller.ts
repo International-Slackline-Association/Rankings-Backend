@@ -42,7 +42,7 @@ export class ResultsController {
       })),
     );
   }
-  @Get('fixrankings/:id')
+  @Post('fixrankings/:id')
   public async fixAthleteRankings(@Param('id') id: string): Promise<string> {
     // const allAthletes = await this.databaseService.queryAthletes(undefined);
     const athlete = await this.databaseService.getAthleteDetails(id);

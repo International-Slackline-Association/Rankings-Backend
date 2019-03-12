@@ -81,7 +81,7 @@ export class DatabaseService {
       items = items.concat(moreQueryResults.items);
       lastKey = moreQueryResults.lastKey;
     }
-    return { items: items.slice(0, limit), lastKey: lastKey };
+    return { items, lastKey: lastKey };
   }
 
   public async putAthlete(athlete: AthleteDetail) {
@@ -145,7 +145,7 @@ export class DatabaseService {
       items = items.concat(moreQueryResults.items);
       lastKey = moreQueryResults.lastKey;
     }
-    return { items: items.slice(0, limit), lastKey: lastKey };
+    return { items, lastKey: lastKey };
   }
 
   public async getAthleteRanking(pk: DDBAthleteRankingsItemPrimaryKey) {
@@ -207,7 +207,7 @@ export class DatabaseService {
       items = items.concat(moreQueryResults.items);
       lastKey = moreQueryResults.lastKey;
     }
-    return { items: items.slice(0, limit), lastKey: lastKey };
+    return { items: items, lastKey: lastKey };
   }
 
   //#endregion
@@ -262,7 +262,7 @@ export class DatabaseService {
       items = items.concat(moreQueryResults.items);
       lastKey = moreQueryResults.lastKey;
     }
-    return { items: items.slice(0, limit), lastKey: lastKey };
+    return { items, lastKey: lastKey };
   }
 
   public async putContest(contest: Contest) {
