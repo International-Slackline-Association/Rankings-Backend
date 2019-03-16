@@ -16,7 +16,7 @@ export class RankingsListDto {
 
 export const rankingsListDtoSchema = Joi.object().keys({
   selectedCategories: Joi.array()
-    .length(4)
+    .length(5)
     .allow(null)
     .optional()
     .items(

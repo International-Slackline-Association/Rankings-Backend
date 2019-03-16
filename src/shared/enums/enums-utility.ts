@@ -2,7 +2,7 @@ import * as moment from 'moment';
 
 import { Constants } from 'shared/constants';
 import { Utils } from 'shared/utils';
-import { AgeCategory, Gender, Year } from '.';
+import { AgeCategory, Gender, RankingType, Year } from '.';
 import { ContestTypeUtility } from './contestType-utility';
 import { DisciplineUtility } from './discipline-utility';
 
@@ -97,5 +97,25 @@ export namespace AgeCategoryUtility {
       return AgeCategory.Youth;
     }
     return AgeCategory.All;
+  }
+}
+
+// tslint:disable-next-line:no-namespace
+export namespace RankingTypeUtility {
+  export const AllRankingTypes = [RankingType.TopScore, RankingType.PointScore];
+
+  export function getName(category: RankingType) {
+    switch (category) {
+      case RankingType.TopScore:
+        return 'Top Score';
+      case RankingType.PointScore:
+        return 'Point Score';
+    }
+  }
+  export function getParents(category: RankingType) {
+    switch (category) {
+      default:
+        return [];
+    }
   }
 }

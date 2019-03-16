@@ -160,6 +160,7 @@ export class DatabaseService {
 
   public async putAthleteRanking(item: AthleteRanking) {
     const pk: DDBAthleteRankingsItemPrimaryKey = {
+      rankingType: item.rankingType,
       ageCategory: item.ageCategory,
       athleteId: item.id,
       discipline: item.discipline,

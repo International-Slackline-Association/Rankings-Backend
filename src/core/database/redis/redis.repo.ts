@@ -76,6 +76,7 @@ export class RedisRepository {
   protected redisKeyOfRankingCategory(pk: DDBAthleteRankingsItemPrimaryKey): string {
     return this.concatWithKeynamePrefix(
       'Rankings',
+      pk.rankingType.toString(),
       pk.year.toString(),
       pk.discipline.toString(),
       pk.gender.toString(),

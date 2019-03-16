@@ -12,6 +12,15 @@ export namespace ContestTypeUtility {
     ContestType.Challenge,
   ];
 
+  export const ContestTypesBySize = [
+    ContestType.WorldGames,
+    ContestType.WorldCup,
+    ContestType.Masters,
+    ContestType.NationalChampionship,
+    ContestType.Open,
+    ContestType.Challenge,
+  ];
+
   export function getName(category: ContestType) {
     switch (category) {
       case ContestType.WorldGames:

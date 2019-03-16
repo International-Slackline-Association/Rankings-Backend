@@ -1,7 +1,13 @@
 import { Injectable } from '@nestjs/common';
 
 import { Discipline, DisciplineType } from 'shared/enums';
-import { AgeCategoryUtility, DisciplineUtility, GenderUtility, YearUtility } from 'shared/enums/enums-utility';
+import {
+  AgeCategoryUtility,
+  DisciplineUtility,
+  GenderUtility,
+  RankingTypeUtility,
+  YearUtility,
+} from 'shared/enums/enums-utility';
 import { ICategoryItem, UISelectOption } from 'shared/types/shared';
 
 @Injectable()
@@ -9,10 +15,24 @@ export class CategoriesService {
   constructor() {}
 
   public getCategories(includeAllYears: boolean = true) {
+    const rankingTypes = RankingTypeUtility.AllRankingTypes;
     const disciplines = DisciplineUtility.AllDisciplines;
     const years = includeAllYears ? YearUtility.AllYears : YearUtility.Years;
     const genders = GenderUtility.CategoricalGenders;
     const ageCategories = AgeCategoryUtility.AllAgeCategories;
+
+    const rankingType: ICategoryItem = {
+      title: 'Ranking Type',
+      selectedValue: rankingTypes[0].toString(),
+      options: rankingTypes.map<UISelectOption>(r => {
+        const parents = RankingTypeUtility.getParents(r);
+        return {
+          label: RankingTypeUtility.getName(r),
+          value: r.toString(),
+          inlineLevel: parents ? parents.length : 0,
+        };
+      }),
+    };
 
     const discipline: ICategoryItem = {
       title: 'Discipline',
@@ -64,6 +84,6 @@ export class CategoriesService {
       }),
     };
 
-    return { discipline, year, gender, age };
+    return { rankingType, discipline, year, gender, age };
   }
 }

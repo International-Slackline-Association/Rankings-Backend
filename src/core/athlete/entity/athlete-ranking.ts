@@ -1,6 +1,6 @@
 import * as moment from 'moment';
 
-import { AgeCategory, Discipline, Gender } from 'shared/enums';
+import { AgeCategory, Discipline, Gender, RankingType } from 'shared/enums';
 import { Utils } from 'shared/utils';
 
 export class AthleteRanking {
@@ -15,10 +15,13 @@ export class AthleteRanking {
   public readonly points: number;
   public readonly discipline: Discipline;
   public readonly year: number;
+  public readonly rankingType: RankingType;
 
   public get age(): number {
     const birthDate = Utils.dateToMoment(this.birthdate);
-    const age = moment().utc().diff(birthDate, 'years');
+    const age = moment()
+      .utc()
+      .diff(birthDate, 'years');
     return age;
   }
 
@@ -34,6 +37,7 @@ export class AthleteRanking {
     points: number;
     discipline: Discipline;
     year: number;
+    rankingType: RankingType;
   }) {
     if (init) {
       Object.assign(this, init);

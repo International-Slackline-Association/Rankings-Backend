@@ -27,7 +27,7 @@ export class DDBAthleteRankingsRepository extends DDBRepository {
   public async get(pk: DDBAthleteRankingsItemPrimaryKey) {
     const params: DocumentClient.GetItemInput = {
       TableName: this._tableName,
-      Key: this.transformer.primaryKey(pk.athleteId, pk.year, pk.discipline, pk.gender, pk.ageCategory),
+      Key: this.transformer.primaryKey(pk.athleteId, pk.rankingType, pk.year, pk.discipline, pk.gender, pk.ageCategory),
     };
     return this.client
       .get(params)
@@ -59,7 +59,7 @@ export class DDBAthleteRankingsRepository extends DDBRepository {
   public async updatePoints(pk: DDBAthleteRankingsItemPrimaryKey, points: number) {
     const params: DocumentClient.UpdateItemInput = {
       TableName: this._tableName,
-      Key: this.transformer.primaryKey(pk.athleteId, pk.year, pk.discipline, pk.gender, pk.ageCategory),
+      Key: this.transformer.primaryKey(pk.athleteId, pk.rankingType, pk.year, pk.discipline, pk.gender, pk.ageCategory),
       UpdateExpression: 'SET #gsi_sk = :points, #lastUpdatedAt = :unixTime',
       ConditionExpression: 'attribute_exists(#pk)',
       ExpressionAttributeNames: {
@@ -92,7 +92,13 @@ export class DDBAthleteRankingsRepository extends DDBRepository {
       },
       ExpressionAttributeValues: {
         ':pk': this.transformer.itemToAttrsTransformer.PK(athleteId),
-        ':sortKeyPrefix': this.transformer.itemToAttrsTransformer.SK_GSI(undefined, undefined, undefined, undefined),
+        ':sortKeyPrefix': this.transformer.itemToAttrsTransformer.SK_GSI(
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+        ),
       },
     };
     return this.client
@@ -113,6 +119,7 @@ export class DDBAthleteRankingsRepository extends DDBRepository {
         TableName: this._tableName,
         Key: this.transformer.primaryKey(
           athleteId,
+          ranking.rankingType,
           ranking.year,
           ranking.discipline,
           ranking.gender,
@@ -155,6 +162,7 @@ export class DDBAthleteRankingsRepository extends DDBRepository {
       },
       ExpressionAttributeValues: {
         ':sk_gsi': this.transformer.itemToAttrsTransformer.SK_GSI(
+          category.rankingType,
           category.year,
           category.discipline,
           category.gender,
@@ -195,6 +203,7 @@ export class DDBAthleteRankingsRepository extends DDBRepository {
       startKey = {
         PK: this.transformer.itemToAttrsTransformer.PK(after.athleteId),
         SK_GSI: this.transformer.itemToAttrsTransformer.SK_GSI(
+          category.rankingType,
           category.year,
           category.discipline,
           category.gender,

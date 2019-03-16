@@ -38,6 +38,11 @@ export enum AgeCategory {
   Youth = 1,
 }
 
+export enum RankingType {
+  TopScore = 1,
+  PointScore = 2,
+}
+
 export enum ContestType {
   WorldGames = 0,
   WorldCup = 1,

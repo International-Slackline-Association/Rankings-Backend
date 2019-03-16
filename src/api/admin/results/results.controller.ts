@@ -1,12 +1,11 @@
 import { Body, Controller, Get, Param, ParseIntPipe, Post } from '@nestjs/common';
-import { ContestResultsDto, contestResultsDtoSchema } from 'api/webapp/contest/dto/results.dto';
 import { AthleteService } from 'core/athlete/athlete.service';
+import { RankingsService } from 'core/athlete/rankings.service';
 import { ContestService } from 'core/contest/contest.service';
 import { DatabaseService } from 'core/database/database.service';
 import { AthleteContestRecordService } from 'dynamodb-streams/athlete/athlete-contest-record.service';
 import { Discipline } from 'shared/enums';
 import { logger } from 'shared/logger';
-import { JoiValidationPipe } from 'shared/pipes/JoiValidation.pipe';
 import { Utils } from 'shared/utils';
 import { IResultsResponseItem, ResultsResponse } from './dto/results.response';
 
@@ -15,7 +14,7 @@ export class ResultsController {
   constructor(
     private readonly athleteService: AthleteService,
     private readonly contestService: ContestService,
-    private readonly athleteRecordsService: AthleteContestRecordService,
+    private readonly rankingsService: RankingsService,
     private readonly databaseService: DatabaseService,
   ) {}
 
@@ -44,25 +43,30 @@ export class ResultsController {
   }
   @Post('fixrankings/:id')
   public async fixAthleteRankings(@Param('id') id: string): Promise<string> {
-    // const allAthletes = await this.databaseService.queryAthletes(undefined);
-    const athlete = await this.databaseService.getAthleteDetails(id);
-    if (!athlete) {
-      return 'Athlete Not Found';
-    }
-    // for (const athlete of allAthletes.items) {
-    logger.info('Fix Athlete Rankings', id);
-
-    await this.databaseService.deleteAthleteRankings(athlete.id);
-    const contestResults = await this.databaseService.queryAthleteContestsByDate(athlete.id, undefined);
-    for (const contestResult of contestResults.items) {
-      const year = Utils.dateToMoment(contestResult.contestDate).year();
-      await this.athleteRecordsService.updateRankingsForCombinations(
-        athlete.id,
-        contestResult.contestDiscipline,
-        year,
-        contestResult.points,
-      );
-    }
+    const allAthletes = await this.databaseService.queryAthletes(undefined);
+    // const athlete = await this.databaseService.getAthleteDetails(id);
+    // if (!athlete) {
+    //   return 'Athlete Not Found';
     // }
+    let counter = 0;
+    for (const athlete of allAthletes.items) {
+      counter++;
+      console.log(`Fix: ${counter} , ${athlete.id}`);
+      if (counter < 13) {
+        continue;
+      }
+      await this.databaseService.deleteAthleteRankings(athlete.id);
+      const contestResults = await this.databaseService.queryAthleteContestsByDate(athlete.id, undefined);
+      for (const contestResult of contestResults.items) {
+        const year = Utils.dateToMoment(contestResult.contestDate).year();
+        await this.rankingsService.updateRankings(
+          athlete.id,
+          contestResult.contestDiscipline,
+          year,
+          contestResult.points,
+        );
+      }
+    }
+    return 'done';
   }
 }
