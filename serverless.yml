@@ -126,7 +126,7 @@ functions:
     handler: src/dynamodb-streams/index.handler
     description: DynamoDB Streams handler
     environment: ${self:custom.environmentVars}
-    timeout: 10
+    timeout: 30
     events:
       - stream:
           type: dynamodb

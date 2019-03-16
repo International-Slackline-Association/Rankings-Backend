@@ -30,7 +30,7 @@ export class AthleteContestRecordService {
   }
 
   public async processNewRecord(record: DynamoDBRecord) {
-    logger.info('DynamoDB Event', { data: record });
+    // logger.info('DynamoDB Event', { data: record });
 
     if (record.eventName === 'INSERT') {
       const item = this.athleteContestsRepo.transformFromDynamoDBType(record.dynamodb.NewImage);

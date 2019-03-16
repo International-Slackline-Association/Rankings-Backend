@@ -101,7 +101,7 @@ export namespace DisciplineUtility {
   export function getChildren(discipline: Discipline): Discipline[] {
     switch (discipline) {
       case Discipline.Overall:
-        return [Discipline.Freestyle, Discipline.Walking];
+        return [Discipline.Freestyle, Discipline.Walking, Discipline.Rigging];
 
       case Discipline.Freestyle:
         return [Discipline.Trickline, Discipline.Contact_HighLongWaterline];
