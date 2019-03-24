@@ -172,9 +172,13 @@ export class DatabaseService {
     await this.athleteRankingsRepo.put(dbItem);
   }
 
-  public async updatePointsOfAthleteRanking(pk: DDBAthleteRankingsItemPrimaryKey, points: number) {
+  public async updatePointsAndCountOfAthleteRanking(
+    pk: DDBAthleteRankingsItemPrimaryKey,
+    points: number,
+    contestCount?: number,
+  ) {
     await this.redisRepo.updatePointsOfAthleteInRankingCategory(pk, points);
-    return this.athleteRankingsRepo.updatePoints(pk, points);
+    return this.athleteRankingsRepo.updatePointsAndCount(pk, points, contestCount);
   }
   public async deleteAthleteRankings(athleteId: string) {
     await this.athleteRankingsRepo.deleteAthleteRankings(athleteId);

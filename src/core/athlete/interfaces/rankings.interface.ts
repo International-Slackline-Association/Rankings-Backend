@@ -11,3 +11,9 @@ export interface RankingsCategory {
 export interface AthleteRankingsCategory extends RankingsCategory {
   readonly athleteId: string;
 }
+
+export enum RankingsUpdateReason {
+  NewContest = 1,
+  PointsChanged = 2,
+  DeletedContest = 3,
+}

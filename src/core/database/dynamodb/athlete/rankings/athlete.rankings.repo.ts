@@ -2,6 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { DocumentClient } from 'aws-sdk/clients/dynamodb';
 import { IDynamoDBService } from 'core/aws/aws.services.interface';
 import * as moment from 'moment';
+
+import { Utils } from 'shared/utils';
 import { DDBRepository, GlobalSecondaryIndexName } from '../../dynamodb.repo';
 import { GSILastEvaluatedKey } from '../../interfaces/table.interface';
 import { logDynamoDBError, logThrowDynamoDBError } from '../../utils/utils';
@@ -56,30 +58,45 @@ export class DDBAthleteRankingsRepository extends DDBRepository {
       .catch(logThrowDynamoDBError('DDBAthleteRankingsRepository Put', params));
   }
 
-  public async updatePoints(pk: DDBAthleteRankingsItemPrimaryKey, points: number) {
+  public async updatePointsAndCount(pk: DDBAthleteRankingsItemPrimaryKey, points: number, contestCount?: number) {
+    let includeContestCount = true;
+    if (Utils.isNil(contestCount)) {
+      includeContestCount = false;
+    }
+    let exprAttrNames = {};
+    if (includeContestCount) {
+      exprAttrNames = {
+        '#contestCount': this.transformer.attrName('contestCount'),
+      };
+    }
+
     const params: DocumentClient.UpdateItemInput = {
       TableName: this._tableName,
       Key: this.transformer.primaryKey(pk.athleteId, pk.rankingType, pk.year, pk.discipline, pk.gender, pk.ageCategory),
-      UpdateExpression: 'SET #gsi_sk = :points, #lastUpdatedAt = :unixTime',
+      UpdateExpression: `SET #gsi_sk = :points, #lastUpdatedAt = :unixTime
+        ${includeContestCount ? ', #contestCount = :contestCount' : ''}`,
       ConditionExpression: 'attribute_exists(#pk)',
       ExpressionAttributeNames: {
         '#pk': this.transformer.attrName('PK'),
         '#gsi_sk': this.transformer.attrName('GSI_SK'),
         '#lastUpdatedAt': this.transformer.attrName('lastUpdatedAt'),
+        ...exprAttrNames,
       },
       ExpressionAttributeValues: {
         ':unixTime': moment().unix(),
         ':points': this.transformer.itemToAttrsTransformer.GSI_SK(points),
+        ':contestCount': contestCount,
       },
       ReturnValues: 'UPDATED_NEW',
     };
+
     return this.client
       .update(params)
       .promise()
       .then(data => {
         return data.Attributes[this.transformer.attrName('GSI_SK')] as number;
       })
-      .catch(logThrowDynamoDBError('DDBAthleteRankingsRepository addPoints', params));
+      .catch(logThrowDynamoDBError('DDBAthleteRankingsRepository updatePointsAndCount', params));
   }
 
   public async getAllAthleteRankings(athleteId: string) {

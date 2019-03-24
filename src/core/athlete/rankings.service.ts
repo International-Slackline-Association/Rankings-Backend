@@ -12,9 +12,10 @@ import {
   YearUtility,
 } from 'shared/enums/enums-utility';
 import { Utils } from 'shared/utils';
+import { AthleteService } from './athlete.service';
 import { AthleteDetail } from './entity/athlete-detail';
 import { AthleteRanking } from './entity/athlete-ranking';
-import { AthleteRankingsCategory, RankingsCategory } from './interfaces/rankings.interface';
+import { AthleteRankingsCategory, RankingsCategory, RankingsUpdateReason } from './interfaces/rankings.interface';
 
 interface RankingCombination {
   year: number;
@@ -24,7 +25,7 @@ interface RankingCombination {
 }
 @Injectable()
 export class RankingsService {
-  constructor(private readonly db: DatabaseService) {}
+  constructor(private readonly db: DatabaseService, private readonly athleteService: AthleteService) {}
 
   public async getOverallRank(athleteId: string) {
     const category: AthleteRankingsCategory = {
@@ -72,97 +73,27 @@ export class RankingsService {
     athleteId: string,
     discipline: Discipline,
     year: number,
-    pointsToAddToScorePoint: number,
+    pointsToAdd: number,
+    reason: RankingsUpdateReason,
   ) {
     const athlete = await this.db.getAthleteDetails(athleteId);
     if (!athlete) {
       return;
     }
-    const p1 = this.updatePointScoreRankings(athlete, discipline, year, pointsToAddToScorePoint);
+    const p1 = this.updatePointScoreRankings(athlete, discipline, year, pointsToAdd, reason);
     const p2 = this.updateTopScoreRankings(athlete, discipline, year);
     await Promise.all([p1, p2]);
   }
 
+  //#region Point Score
   private async updatePointScoreRankings(
     athlete: AthleteDetail,
     discipline: Discipline,
     year: number,
     pointsToAdd: number,
+    reason?: RankingsUpdateReason,
   ) {
-    await this.updateRankingsCombinations(athlete, RankingType.PointScore, discipline, year, pointsToAdd);
-  }
-
-  public async updateTopScoreRankings(athlete: AthleteDetail, discipline: Discipline, year: number) {
-    const pointsToAddToTopScore = await this.calculatePointsToAddForTopScore(athlete, discipline, year);
-
-    if (pointsToAddToTopScore !== 0) {
-      await this.updateRankingsCombinations(athlete, RankingType.TopScore, discipline, year, pointsToAddToTopScore);
-    }
-  }
-
-  public async calculatePointsToAddForTopScore(athlete: AthleteDetail, discipline: Discipline, year: number) {
-    const newTopScoreOfDiscipline = await this.calculateNewPointsForTopScore(athlete.id, discipline, year);
-    if (Utils.isNil(newTopScoreOfDiscipline)) {
-      return 0;
-    }
-    const pk = {
-      rankingType: RankingType.TopScore,
-      ageCategory: athlete.ageCategory,
-      athleteId: athlete.id,
-      discipline: discipline,
-      gender: athlete.gender,
-      year: year,
-    };
-    const athleteRanking = await this.db.getAthleteRanking(pk);
-    let pointsToAdd = 0;
-    if (athleteRanking) {
-      pointsToAdd = newTopScoreOfDiscipline - athleteRanking.points;
-    } else {
-      pointsToAdd = newTopScoreOfDiscipline;
-    }
-    return pointsToAdd;
-  }
-
-  public async calculateNewPointsForTopScore(athleteId: string, discipline: Discipline, year: number) {
-    const athleteContests = await this.db.queryAthleteContestsByDate(athleteId, undefined, {
-      year: year,
-      filter: { disciplines: [discipline] },
-    });
-    const contests = await Promise.all(
-      athleteContests.items.map(async athleteContest => {
-        const c = await this.db.getContest(athleteContest.contestId, athleteContest.contestDiscipline);
-        return c;
-      }),
-    );
-    contests.sort((a, b) => {
-      if (a.contestType === b.contestType) {
-        return a.date < b.date ? 1 : -1;
-      } else {
-        return (
-          ContestTypeUtility.ContestTypesBySize.indexOf(a.contestType) -
-          ContestTypeUtility.ContestTypesBySize.indexOf(b.contestType)
-        );
-      }
-    });
-    const contestsToConsider = contests.slice(0, Constants.TopScoreContestCount);
-    if (contestsToConsider.length < Constants.TopScoreContestCount) {
-      return null;
-    }
-    const averagePoints =
-      athleteContests.items
-        .filter(i => contestsToConsider.find(c => c.id === i.contestId))
-        .map(c => c.points)
-        .reduce((acc, b) => acc + b) / Constants.TopScoreContestCount;
-    return averagePoints;
-  }
-
-  public async updateRankingsCombinations(
-    athlete: AthleteDetail,
-    rankingType: RankingType,
-    discipline: Discipline,
-    year: number,
-    pointsToAdd: number,
-  ) {
+    const rankingType = RankingType.PointScore;
     const combinations = this.generateAllCombinationsWithParentCategories(
       year,
       discipline,
@@ -179,22 +110,41 @@ export class RankingsService {
         gender: combination.gender,
         year: combination.year,
       };
-      promises.push(this.updateAthleteRanking(pk, athlete, combination, rankingType, pointsToAdd));
+      promises.push(this.updatePointScoreAthleteRanking(pk, athlete, combination, pointsToAdd, reason));
     }
     await Promise.all(promises);
   }
 
-  private async updateAthleteRanking(
+  private async updatePointScoreAthleteRanking(
     pk: DDBAthleteRankingsItemPrimaryKey,
     athlete: AthleteDetail,
     combination: RankingCombination,
-    rankingType: RankingType,
     pointsToAdd: number,
+    reason?: RankingsUpdateReason,
   ) {
+    const rankingType = RankingType.PointScore;
+
     const athleteRanking = await this.db.getAthleteRanking(pk);
+    let numberToAddToContestCount: number;
+    switch (reason) {
+      case RankingsUpdateReason.NewContest:
+        numberToAddToContestCount = 1;
+        break;
+      case RankingsUpdateReason.PointsChanged:
+        numberToAddToContestCount = 0;
+        break;
+      case RankingsUpdateReason.DeletedContest:
+        numberToAddToContestCount = -1;
+        break;
+    }
+
     if (athleteRanking) {
       const updatedPoints = athleteRanking.points + pointsToAdd;
-      await this.db.updatePointsOfAthleteRanking(pk, updatedPoints);
+      let updatedContestCount: number;
+      if (!Utils.isSomeNil(numberToAddToContestCount, athleteRanking.contestCount)) {
+        updatedContestCount = athleteRanking.contestCount + numberToAddToContestCount;
+      }
+      await this.db.updatePointsAndCountOfAthleteRanking(pk, updatedPoints, updatedContestCount);
     } else {
       const item = new AthleteRanking({
         rankingType: rankingType,
@@ -208,10 +158,103 @@ export class RankingsService {
         points: pointsToAdd,
         surname: athlete.surname,
         year: combination.year,
+        contestCount: numberToAddToContestCount,
       });
       await this.db.putAthleteRanking(item);
     }
   }
+  //#endregion
+
+  //#region TopScore
+  private async updateTopScoreRankings(athlete: AthleteDetail, discipline: Discipline, year: number) {
+    const rankingType = RankingType.TopScore;
+
+    const pointsDict = {};
+
+    const combinations = this.generateAllCombinationsWithParentCategories(
+      year,
+      discipline,
+      athlete.gender,
+      athlete.ageCategory,
+    );
+    const promises = [];
+    for (const combination of combinations) {
+      const pk = {
+        rankingType: rankingType,
+        ageCategory: combination.ageCategory,
+        athleteId: athlete.id,
+        discipline: combination.discipline,
+        gender: combination.gender,
+        year: combination.year,
+      };
+      let points = pointsDict[combination.discipline];
+      if (Utils.isNil(points)) {
+        points = await this.calculateNewPointsForTopScore(athlete.id, combination.discipline, year);
+        pointsDict[combination.discipline] = points;
+      }
+
+      promises.push(this.updateTopScoreAthleteRanking(pk, athlete, combination, points));
+    }
+    await Promise.all(promises);
+  }
+
+  private async updateTopScoreAthleteRanking(
+    pk: DDBAthleteRankingsItemPrimaryKey,
+    athlete: AthleteDetail,
+    combination: RankingCombination,
+    points: number,
+  ) {
+    const rankingType = RankingType.TopScore;
+
+    const item = new AthleteRanking({
+      rankingType: rankingType,
+      ageCategory: combination.ageCategory,
+      country: athlete.country,
+      discipline: combination.discipline,
+      gender: combination.gender,
+      id: athlete.id,
+      name: athlete.name,
+      birthdate: athlete.birthdate,
+      points: points,
+      surname: athlete.surname,
+      year: combination.year,
+    });
+    await this.db.putAthleteRanking(item);
+  }
+
+  private async calculateNewPointsForTopScore(athleteId: string, discipline: Discipline, year: number) {
+    const athleteContests = await this.athleteService.getContests(athleteId, discipline, undefined, year);
+    const contests = await Promise.all(
+      athleteContests.items.map(async athleteContest => {
+        const c = await this.db.getContest(athleteContest.contestId, athleteContest.contestDiscipline);
+        return c;
+      }),
+    );
+    const contestsBySizes = contests.sort((a, b) => {
+      if (a.contestType === b.contestType) {
+        return a.date < b.date ? 1 : -1;
+      } else {
+        return (
+          ContestTypeUtility.ContestTypesBySize.indexOf(a.contestType) -
+          ContestTypeUtility.ContestTypesBySize.indexOf(b.contestType)
+        );
+      }
+    });
+    const contestsToConsider = contestsBySizes.slice(0, Constants.TopScoreContestSampleCount);
+    if (contestsToConsider.length === 0) {
+      return null;
+    }
+    const totalPoints = athleteContests.items
+      .filter(i => contestsToConsider.find(c => c.id === i.contestId))
+      .sort((a, b) => b.points - a.points)
+      .slice(0, Constants.TopScoreContestCount)
+      .map(c => c.points)
+      .reduce((acc, b) => acc + b);
+    return totalPoints;
+  }
+
+  //#endregion
+
   private generateAllCombinationsWithParentCategories(
     year: number,
     discipline: Discipline,

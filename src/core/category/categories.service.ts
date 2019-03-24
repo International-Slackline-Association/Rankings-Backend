@@ -22,7 +22,7 @@ export class CategoriesService {
     const ageCategories = AgeCategoryUtility.AllAgeCategories;
 
     const rankingType: ICategoryItem = {
-      title: 'Ranking Type',
+      title: 'World',
       selectedValue: rankingTypes[0].toString(),
       options: rankingTypes.map<UISelectOption>(r => {
         const parents = RankingTypeUtility.getParents(r);
@@ -61,7 +61,7 @@ export class CategoriesService {
     };
 
     const gender: ICategoryItem = {
-      title: 'Gender',
+      title: 'People',
       selectedValue: genders[0].toString(),
       options: genders.map<UISelectOption>(g => {
         return {

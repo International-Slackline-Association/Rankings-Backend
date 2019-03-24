@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { DynamoDBRecord, StreamRecord } from 'aws-lambda';
 
 import { AthleteContestResult } from 'core/athlete/entity/contest-result';
+import { RankingsUpdateReason } from 'core/athlete/interfaces/rankings.interface';
 import { RankingsService } from 'core/athlete/rankings.service';
 import { DatabaseService } from 'core/database/database.service';
 import { DDBAthleteContestsRepository } from 'core/database/dynamodb/athlete/contests/athlete.contests.repo';
@@ -47,7 +48,13 @@ export class AthleteContestRecordService {
   private async processNewContestResult(newItem: AthleteContestResult) {
     const pointsToAdd = newItem.points;
     const year = Utils.dateToMoment(newItem.contestDate).year();
-    await this.rankingsService.updateRankings(newItem.athleteId, newItem.contestDiscipline, year, pointsToAdd);
+    await this.rankingsService.updateRankings(
+      newItem.athleteId,
+      newItem.contestDiscipline,
+      year,
+      pointsToAdd,
+      RankingsUpdateReason.NewContest,
+    );
   }
 
   private async processModifiedContestResult(oldItem: AthleteContestResult, newItem: AthleteContestResult) {
@@ -57,13 +64,25 @@ export class AthleteContestRecordService {
     }
     const year = Utils.dateToMoment(newItem.contestDate).year();
 
-    await this.rankingsService.updateRankings(newItem.athleteId, newItem.contestDiscipline, year, pointsToAdd);
+    await this.rankingsService.updateRankings(
+      newItem.athleteId,
+      newItem.contestDiscipline,
+      year,
+      pointsToAdd,
+      RankingsUpdateReason.PointsChanged,
+    );
   }
 
   private async processRemovedContestResult(oldItem: AthleteContestResult) {
     const pointsToAdd = -oldItem.points;
     const year = Utils.dateToMoment(oldItem.contestDate).year();
 
-    await this.rankingsService.updateRankings(oldItem.athleteId, oldItem.contestDiscipline, year, pointsToAdd);
+    await this.rankingsService.updateRankings(
+      oldItem.athleteId,
+      oldItem.contestDiscipline,
+      year,
+      pointsToAdd,
+      RankingsUpdateReason.DeletedContest,
+    );
   }
 }

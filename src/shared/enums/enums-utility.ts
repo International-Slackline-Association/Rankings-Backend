@@ -73,14 +73,16 @@ export namespace GenderUtility {
 
 // tslint:disable-next-line:no-namespace
 export namespace AgeCategoryUtility {
-  export const AllAgeCategories = [AgeCategory.All, AgeCategory.Youth];
-  export const ValidAgeCategories = [AgeCategory.Youth];
+  export const AllAgeCategories = [AgeCategory.All, AgeCategory.Youth, AgeCategory.Senior];
+  export const ValidAgeCategories = [AgeCategory.Youth, AgeCategory.Senior];
   export function getName(category: AgeCategory) {
     switch (category) {
       case AgeCategory.All:
         return 'All';
       case AgeCategory.Youth:
         return 'Youth (<18)';
+      case AgeCategory.Senior:
+        return 'Senior (>35)';
     }
   }
   export function getParents(category: AgeCategory) {
@@ -95,6 +97,9 @@ export namespace AgeCategoryUtility {
   export function getAgeCategoryOfAge(age: number): AgeCategory {
     if (age < 18) {
       return AgeCategory.Youth;
+    }
+    if (age > 35) {
+      return AgeCategory.Senior;
     }
     return AgeCategory.All;
   }

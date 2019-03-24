@@ -1,5 +1,6 @@
 import { Body, Controller, Get, Param, ParseIntPipe, Post } from '@nestjs/common';
 import { AthleteService } from 'core/athlete/athlete.service';
+import { RankingsUpdateReason } from 'core/athlete/interfaces/rankings.interface';
 import { RankingsService } from 'core/athlete/rankings.service';
 import { ContestService } from 'core/contest/contest.service';
 import { DatabaseService } from 'core/database/database.service';
@@ -44,26 +45,32 @@ export class ResultsController {
   @Post('fixrankings/:id')
   public async fixAthleteRankings(@Param('id') id: string): Promise<string> {
     const allAthletes = await this.databaseService.queryAthletes(undefined);
+    console.log(`Total Athlete Count: ${allAthletes.items.length}`);
+
     // const athlete = await this.databaseService.getAthleteDetails(id);
     // if (!athlete) {
     //   return 'Athlete Not Found';
     // }
     let counter = 0;
     for (const athlete of allAthletes.items) {
-      counter++;
-      console.log(`Fix: ${counter} , ${athlete.id}`);
-      if (counter < 13) {
-        continue;
-      }
+      console.log(`Fix: ${counter++}, ${athlete.id}`);
       await this.databaseService.deleteAthleteRankings(athlete.id);
+      // const disciplineDict = {};
       const contestResults = await this.databaseService.queryAthleteContestsByDate(athlete.id, undefined);
       for (const contestResult of contestResults.items) {
         const year = Utils.dateToMoment(contestResult.contestDate).year();
+        // const disciplineSeenBefore = disciplineDict[contestResult.contestDiscipline];
+        // if (disciplineSeenBefore) {
+        //   continue;
+        // }
+        // disciplineDict[contestResult.contestDiscipline] = true;
+
         await this.rankingsService.updateRankings(
           athlete.id,
           contestResult.contestDiscipline,
           year,
           contestResult.points,
+          RankingsUpdateReason.NewContest,
         );
       }
     }

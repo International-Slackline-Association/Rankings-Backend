@@ -53,10 +53,13 @@ export namespace Utils {
     return isNil(request.cognitoClaims);
   }
 
-  export function isNil(value: any) {
-    return _isNil(value);
+  export function isNil(...value: any) {
+    return value.every((e: any) => _isNil(e));
   }
 
+  export function isSomeNil(...value: any) {
+    return value.some((e: any) => _isNil(e));
+  }
   export function logThrowError(errorDesc: string, params: any) {
     return err => {
       logError(errorDesc, err, params);

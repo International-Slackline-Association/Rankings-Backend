@@ -30,6 +30,7 @@ export class AthleteService {
   public async getContests(
     id: string,
     discipline: Discipline,
+    limit: number,
     year?: number,
     after?: {
       contestId: string;
@@ -40,7 +41,7 @@ export class AthleteService {
     const filterDisciplines = [discipline, ...DisciplineUtility.getAllChildren(discipline)].filter(
       d => DisciplineUtility.getType(d) === DisciplineType.Competition,
     );
-    const contests = await this.db.queryAthleteContestsByDate(id, 10, {
+    const contests = await this.db.queryAthleteContestsByDate(id, limit, {
       year: year,
       after: after,
       filter: { disciplines: filterDisciplines },

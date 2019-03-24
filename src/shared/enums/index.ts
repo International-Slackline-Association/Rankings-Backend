@@ -36,6 +36,7 @@ export enum Gender {
 export enum AgeCategory {
   All = 0,
   Youth = 1,
+  Senior = 2,
 }
 
 export enum RankingType {
