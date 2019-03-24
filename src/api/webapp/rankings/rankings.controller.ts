@@ -72,6 +72,7 @@ export class RankingsController {
           rank: obj.place,
           thumbnailUrl: obj.athlete.thumbnailUrl || obj.athlete.profileUrl,
           surname: obj.ranking.surname,
+          contestCount: obj.ranking.contestCount,
         };
       }),
       rankings.lastKey,

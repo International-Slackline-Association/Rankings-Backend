@@ -8,6 +8,8 @@ export interface IContestListItem {
   readonly date: string;
   readonly discipline: INamedDiscipline;
   readonly thumbnailUrl: string;
+  readonly country: string;
+  readonly resultsAvailable: boolean;
 }
 
 export class ContestListResponse {

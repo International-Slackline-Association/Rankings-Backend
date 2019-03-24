@@ -71,17 +71,27 @@ export class ContestController {
       after: dto.next,
       discipline: discipline,
     });
+
+    const contestWithResultsStatus = await Promise.all(
+      contests.items.map(async (item, index) => {
+        const results = await this.contestService.getResults(item.id, item.discipline, 1);
+        return { contest: item, resultsAvailable: results.items.length > 0 };
+      }),
+    );
+
     return new ContestListResponse(
-      contests.items.map<IContestListItem>(contest => {
+      contestWithResultsStatus.map<IContestListItem>(obj => {
         return {
-          id: contest.id,
-          name: contest.name,
-          discipline: DisciplineUtility.getNamedDiscipline(contest.discipline),
-          year: contest.year,
-          prize: contest.prizeString,
-          contestType: ContestTypeUtility.getNamedContestType(contest.contestType),
-          thumbnailUrl: contest.thumbnailUrl || contest.profileUrl,
-          date: Utils.dateToMoment(contest.date).format('DD/MM/YYYY'),
+          id: obj.contest.id,
+          name: obj.contest.name,
+          discipline: DisciplineUtility.getNamedDiscipline(obj.contest.discipline),
+          year: obj.contest.year,
+          prize: obj.contest.prizeString,
+          contestType: ContestTypeUtility.getNamedContestType(obj.contest.contestType),
+          thumbnailUrl: obj.contest.thumbnailUrl || obj.contest.profileUrl,
+          date: Utils.dateToMoment(obj.contest.date).format('DD/MM/YYYY'),
+          country: obj.contest.country,
+          resultsAvailable: obj.resultsAvailable,
         };
       }),
       contests.lastKey,
