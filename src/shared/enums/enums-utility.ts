@@ -80,9 +80,9 @@ export namespace AgeCategoryUtility {
       case AgeCategory.All:
         return 'All';
       case AgeCategory.Youth:
-        return 'Youth (<18)';
+        return 'Youth';
       case AgeCategory.Senior:
-        return 'Senior (>35)';
+        return 'Senior';
     }
   }
   export function getParents(category: AgeCategory) {
