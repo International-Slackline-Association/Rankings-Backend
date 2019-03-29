@@ -31,7 +31,7 @@ export class AthleteService {
     id: string,
     discipline: Discipline,
     limit: number,
-    year?: number,
+    betweenDates?: { start: Date; end: Date },
     after?: {
       contestId: string;
       discipline: Discipline;
@@ -42,7 +42,7 @@ export class AthleteService {
       d => DisciplineUtility.getType(d) === DisciplineType.Competition,
     );
     const contests = await this.db.queryAthleteContestsByDate(id, limit, {
-      year: year,
+      betweenDates: betweenDates,
       after: after,
       filter: { disciplines: filterDisciplines },
     });

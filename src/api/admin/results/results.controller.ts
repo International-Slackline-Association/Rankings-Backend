@@ -74,6 +74,7 @@ export class ResultsController {
         );
       }
     }
+    console.log('done');
     return 'done';
   }
 }

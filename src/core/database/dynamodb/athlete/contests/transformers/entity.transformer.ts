@@ -1,6 +1,5 @@
 import { AthleteContestResult } from 'core/athlete/entity/contest-result';
 import * as moment from 'moment';
-import { IdGenerator } from 'shared/generators/id.generator';
 import { DDBAthleteContestItem } from '../athlete.contests.interface';
 
 export class EntityTransformer {

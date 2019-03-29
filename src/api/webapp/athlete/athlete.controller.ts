@@ -84,7 +84,12 @@ export class AthleteController {
     }
     const discipline = categories[0];
     const year = categories[1];
-    const results = await this.athleteService.getContests(dto.id, discipline, 10, year, dto.next);
+
+    let betweenDates;
+    if (year) {
+      betweenDates = { start: new Date(year, 0), end: new Date(year + 1, 0) };
+    }
+    const results = await this.athleteService.getContests(dto.id, discipline, 10, betweenDates, dto.next);
 
     const athletesWithContests = await Promise.all(
       results.items.map(async item => {

@@ -6,13 +6,14 @@ export namespace Constants {
   export const BaseYear = 2017;
   export const TopScoreContestSampleCount = 3;
   export const TopScoreContestCount = 2;
+  export const TopScoreYearRange = 2;
 
   export function ContestTypeTopPoints(category: ContestType): number {
     switch (category) {
       case ContestType.WorldGames:
-        return 1500;
+        return 2000;
       case ContestType.WorldCup:
-        return 1250;
+        return 1500;
       case ContestType.Masters:
         return 900;
       case ContestType.NationalChampionship:

@@ -117,7 +117,7 @@ export class DatabaseService {
     athleteId: string,
     limit: number,
     opts: {
-      year?: number;
+      betweenDates?: { start: Date; end?: Date };
       after?: {
         contestId: string;
         discipline: Discipline;

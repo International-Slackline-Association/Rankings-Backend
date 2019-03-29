@@ -3,7 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { DatabaseService } from 'core/database/database.service';
 import { DDBAthleteRankingsItemPrimaryKey } from 'core/database/dynamodb/athlete/rankings/athlete.rankings.interface';
 import { Constants } from 'shared/constants';
-import { AgeCategory, Discipline, Gender, RankingType, Year } from 'shared/enums';
+import { AgeCategory, Discipline, DisciplineType, Gender, RankingType, Year } from 'shared/enums';
 import {
   AgeCategoryUtility,
   ContestTypeUtility,
@@ -187,13 +187,18 @@ export class RankingsService {
         gender: combination.gender,
         year: combination.year,
       };
-      let points = pointsDict[combination.discipline];
+      let points = pointsDict[`${combination.discipline}-${combination.year}`];
       if (Utils.isNil(points)) {
-        points = await this.calculateNewPointsForTopScore(athlete.id, combination.discipline, year);
-        pointsDict[combination.discipline] = points;
+        points = await this.calculateNewPointsForTopScore(
+          athlete.id,
+          combination.discipline,
+          combination.year || undefined,
+        );
+        pointsDict[`${combination.discipline}-${combination.year}`] = points;
       }
-
-      promises.push(this.updateTopScoreAthleteRanking(pk, athlete, combination, points));
+      if (points) {
+        promises.push(this.updateTopScoreAthleteRanking(pk, athlete, combination, points));
+      }
     }
     await Promise.all(promises);
   }
@@ -222,8 +227,19 @@ export class RankingsService {
     await this.db.putAthleteRanking(item);
   }
 
-  private async calculateNewPointsForTopScore(athleteId: string, discipline: Discipline, year: number) {
-    const athleteContests = await this.athleteService.getContests(athleteId, discipline, undefined, year);
+  private async calculateNewPointsForTopScore(athleteId: string, discipline: Discipline, year?: number) {
+    let betweenDates;
+    if (year && DisciplineUtility.getType(discipline) === DisciplineType.Competition) {
+      betweenDates = { start: new Date(year, 0), end: new Date(year + 1, 0) };
+    } else {
+      betweenDates = {
+        start: Utils.DateNow()
+          .add(-Constants.TopScoreYearRange, 'years')
+          .toDate(),
+      };
+    }
+
+    const athleteContests = await this.athleteService.getContests(athleteId, discipline, undefined, betweenDates);
     const contests = await Promise.all(
       athleteContests.items.map(async athleteContest => {
         const c = await this.db.getContest(athleteContest.contestId, athleteContest.contestDiscipline);

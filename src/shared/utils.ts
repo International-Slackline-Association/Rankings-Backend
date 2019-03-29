@@ -20,7 +20,7 @@ export namespace Utils {
     return str;
   }
 
-  export function Now() {
+  export function DateNow() {
     return moment().utc();
   }
 

@@ -11,6 +11,7 @@ import { AttrsTransformer } from './transformers/attributes.transformer';
 import { EntityTransformer } from './transformers/entity.transformer';
 
 import dynamoDataTypes = require('dynamodb-data-types');
+import { Utils } from 'shared/utils';
 const dynamoDbAttrValues = dynamoDataTypes.AttributeValue;
 
 @Injectable()
@@ -50,7 +51,7 @@ export class DDBAthleteContestsRepository extends DDBRepository {
     athleteId: string,
     limit: number,
     opts: {
-      year?: number;
+      betweenDates?: { start: Date; end?: Date };
       after?: {
         contestId: string;
         discipline: Discipline;
@@ -62,13 +63,19 @@ export class DDBAthleteContestsRepository extends DDBRepository {
     const exclusiveStartKey = this.createLSIExclusiveStartKey(athleteId, opts.after);
     const { filterExpression, filterExpAttrNames, filterExpAttrValues } = this.createFilterExpression(opts.filter);
 
+    const startDate = opts.betweenDates ? opts.betweenDates.start.toISODate() : '';
+    const endDate = (opts.betweenDates && !Utils.isNil(opts.betweenDates.end)
+      ? opts.betweenDates.end
+      : Utils.DateNow().toDate()
+    ).toISODate();
+
     const params: AWS.DynamoDB.DocumentClient.QueryInput = {
       TableName: this._tableName,
       IndexName: LocalSecondaryIndexName,
       Limit: limit,
       ScanIndexForward: false,
       ExclusiveStartKey: exclusiveStartKey,
-      KeyConditionExpression: '#pk = :pk and begins_with(#lsi, :sortKeyPrefix) ',
+      KeyConditionExpression: '#pk = :pk and #lsi BETWEEN :startDate AND :endDate',
       FilterExpression: filterExpression,
       ExpressionAttributeNames: {
         '#pk': this.transformer.attrName('PK'),
@@ -77,7 +84,8 @@ export class DDBAthleteContestsRepository extends DDBRepository {
       },
       ExpressionAttributeValues: {
         ':pk': this.transformer.itemToAttrsTransformer.PK(athleteId),
-        ':sortKeyPrefix': this.transformer.itemToAttrsTransformer.LSI((opts.year || '').toString()),
+        ':startDate': this.transformer.itemToAttrsTransformer.LSI(startDate),
+        ':endDate': this.transformer.itemToAttrsTransformer.LSI(endDate),
         ...filterExpAttrValues,
       },
     };
