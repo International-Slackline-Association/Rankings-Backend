@@ -187,20 +187,29 @@ export class RankingsService {
         gender: combination.gender,
         year: combination.year,
       };
-      let points = pointsDict[`${combination.discipline}-${combination.year}`];
-      if (Utils.isNil(points)) {
-        points = await this.calculateNewPointsForTopScore(
-          athlete.id,
-          combination.discipline,
-          combination.year || undefined,
-        );
-        pointsDict[`${combination.discipline}-${combination.year}`] = points;
-      }
-      if (points) {
-        promises.push(this.updateTopScoreAthleteRanking(pk, athlete, combination, points));
-      }
+      promises.push(this.updateTopScoreRankingForCombination(pk, athlete, combination, pointsDict));
     }
     await Promise.all(promises);
+  }
+
+  private async updateTopScoreRankingForCombination(
+    pk: DDBAthleteRankingsItemPrimaryKey,
+    athlete: AthleteDetail,
+    combination: RankingCombination,
+    pointsDict: {},
+  ) {
+    let points = pointsDict[`${combination.discipline}-${combination.year}`];
+    if (Utils.isNil(points)) {
+      points = await this.calculateNewPointsForTopScore(
+        athlete.id,
+        combination.discipline,
+        combination.year || undefined,
+      );
+      pointsDict[`${combination.discipline}-${combination.year}`] = points;
+    }
+    if (points) {
+      await this.updateTopScoreAthleteRanking(pk, athlete, combination, points);
+    }
   }
 
   private async updateTopScoreAthleteRanking(
@@ -229,7 +238,7 @@ export class RankingsService {
 
   private async calculateNewPointsForTopScore(athleteId: string, discipline: Discipline, year?: number) {
     let betweenDates;
-    if (year && DisciplineUtility.getType(discipline) === DisciplineType.Competition) {
+    if (year) {
       betweenDates = { start: new Date(year, 0), end: new Date(year + 1, 0) };
     } else {
       betweenDates = {
