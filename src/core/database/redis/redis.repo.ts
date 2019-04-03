@@ -73,6 +73,18 @@ export class RedisRepository {
     return Utils.omitReject(zrevrank);
   }
 
+  public async getTopScoreRankingsCronJobOffset() {
+    const key = this.redisKeyOfTopScoreRankingsOffset();
+    const get = this.redis.get(key);
+    return Utils.omitReject(get);
+  }
+
+  public async setTopScoreRankingsCronJobOffset(offset: number) {
+    const key = this.redisKeyOfTopScoreRankingsOffset();
+    const get = this.redis.set(key, offset.toString());
+    return Utils.omitReject(get);
+  }
+
   protected redisKeyOfRankingCategory(pk: DDBAthleteRankingsItemPrimaryKey): string {
     return this.concatWithKeynamePrefix(
       'Rankings',
@@ -92,6 +104,9 @@ export class RedisRepository {
     return this.concatWithKeynamePrefix('Contest', contesId, discipline.toString());
   }
 
+  protected redisKeyOfTopScoreRankingsOffset(): string {
+    return this.concatWithKeynamePrefix('TopScoreRankingsOffset');
+  }
   protected concatWithKeynamePrefix(keySpace: string, ...params: string[]): string {
     const finalKey = this.keyNamePrefix + this.seperator + keySpace;
     return this.concat(finalKey, ...params);

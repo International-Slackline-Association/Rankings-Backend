@@ -44,36 +44,31 @@ export class ResultsController {
   }
   @Post('fixrankings/:id')
   public async fixAthleteRankings(@Param('id') id: string): Promise<string> {
-    const allAthletes = await this.databaseService.queryAthletes(undefined);
-    console.log(`Total Athlete Count: ${allAthletes.items.length}`);
+    // const allAthletes = await this.databaseService.queryAthletes(undefined);
+    // console.log(`Total Athlete Count: ${allAthletes.items.length}`);
 
-    // const athlete = await this.databaseService.getAthleteDetails(id);
-    // if (!athlete) {
-    //   return 'Athlete Not Found';
-    // }
-    let counter = 0;
-    for (const athlete of allAthletes.items) {
-      console.log(`Fix: ${counter++}, ${athlete.id}`);
-      await this.databaseService.deleteAthleteRankings(athlete.id);
-      // const disciplineDict = {};
-      const contestResults = await this.databaseService.queryAthleteContestsByDate(athlete.id, undefined);
-      for (const contestResult of contestResults.items) {
-        const year = Utils.dateToMoment(contestResult.contestDate).year();
-        // const disciplineSeenBefore = disciplineDict[contestResult.contestDiscipline];
-        // if (disciplineSeenBefore) {
-        //   continue;
-        // }
-        // disciplineDict[contestResult.contestDiscipline] = true;
-
-        await this.rankingsService.updateRankings(
-          athlete.id,
-          contestResult.contestDiscipline,
-          year,
-          contestResult.points,
-          RankingsUpdateReason.NewContest,
-        );
-      }
+    const athlete = await this.databaseService.getAthleteDetails(id);
+    if (!athlete) {
+      return 'Athlete Not Found';
     }
+    let counter = 0;
+    // for (const athlete of allAthletes.items) {
+    console.log(`Fix: ${counter++}, ${athlete.id}`);
+    await this.databaseService.deleteAthleteRankings(athlete.id);
+    const contestResults = await this.databaseService.queryAthleteContestsByDate(athlete.id, undefined);
+    for (const contestResult of contestResults.items) {
+      const year = Utils.dateToMoment(contestResult.contestDate).year();
+
+      await this.rankingsService.updateRankings(
+        athlete.id,
+        contestResult.contestDiscipline,
+        year,
+        contestResult.points,
+        RankingsUpdateReason.NewContest,
+      );
+    }
+    await new Promise(done => setTimeout(done, 4000));
+    // }
     console.log('done');
     return 'done';
   }

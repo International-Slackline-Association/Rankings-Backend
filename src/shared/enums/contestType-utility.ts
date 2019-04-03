@@ -7,7 +7,7 @@ export namespace ContestTypeUtility {
     ContestType.WorldGames,
     ContestType.WorldCup,
     ContestType.Masters,
-    ContestType.NationalChampionship,
+    ContestType.GrandSlam,
     ContestType.Open,
     ContestType.Challenge,
   ];
@@ -16,7 +16,7 @@ export namespace ContestTypeUtility {
     ContestType.WorldGames,
     ContestType.WorldCup,
     ContestType.Masters,
-    ContestType.NationalChampionship,
+    ContestType.GrandSlam,
     ContestType.Open,
     ContestType.Challenge,
   ];
@@ -29,8 +29,8 @@ export namespace ContestTypeUtility {
         return 'World Cup';
       case ContestType.Masters:
         return 'Masters';
-      case ContestType.NationalChampionship:
-        return 'National Championship';
+      case ContestType.GrandSlam:
+        return 'Grand Slam';
       case ContestType.Open:
         return 'Open';
       case ContestType.Challenge:

@@ -166,7 +166,7 @@ export class RankingsService {
   //#endregion
 
   //#region TopScore
-  private async updateTopScoreRankings(athlete: AthleteDetail, discipline: Discipline, year: number) {
+  public async updateTopScoreRankings(athlete: AthleteDetail, discipline: Discipline, year: number) {
     const rankingType = RankingType.TopScore;
 
     const pointsDict = {};

@@ -31,7 +31,12 @@ export class DatabaseService {
       this.redisRepo.redisConfig.redisClient.quit();
     }
   }
-
+  public async getTopScoreRankingsCronJobOffset() {
+    return this.redisRepo.getTopScoreRankingsCronJobOffset();
+  }
+  public async setTopScoreRankingsCronJobOffset(offset: number) {
+    return this.redisRepo.setTopScoreRankingsCronJobOffset(offset);
+  }
   //#region Athlete
   public async isAthleteExists(athleteId: string) {
     return this.athleteDetailsRepo.isExists(athleteId);

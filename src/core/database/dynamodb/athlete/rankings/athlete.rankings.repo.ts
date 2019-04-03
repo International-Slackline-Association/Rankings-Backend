@@ -131,6 +131,8 @@ export class DDBAthleteRankingsRepository extends DDBRepository {
   }
   public async deleteAthleteRankings(athleteId: string) {
     const allRankings = await this.getAllAthleteRankings(athleteId);
+    const promises = [];
+
     for (const ranking of allRankings.items) {
       const params: AWS.DynamoDB.DocumentClient.DeleteItemInput = {
         TableName: this._tableName,
@@ -143,12 +145,15 @@ export class DDBAthleteRankingsRepository extends DDBRepository {
           ranking.ageCategory,
         ),
       };
-      await this.client
-        .delete(params)
-        .promise()
-        .then(data => {})
-        .catch(logThrowDynamoDBError('DDBAthleteRankingsRepository delete', params));
+      promises.push(
+        this.client
+          .delete(params)
+          .promise()
+          .then(data => {})
+          .catch(logThrowDynamoDBError('DDBAthleteRankingsRepository delete', params)),
+      );
     }
+    await Promise.all(promises);
   }
 
   public async queryRankings(

@@ -11,16 +11,21 @@ export class AthleteDetail {
   public readonly thumbnailUrl: string;
   public readonly gender: Gender;
   public readonly country: string;
-  public readonly birthdate: Date;
+  public readonly birthdate?: Date;
   public readonly email: string;
   public readonly city: string;
   public readonly infoUrl: string;
   public readonly createdAt?: number;
 
-  public get age(): number {
+  public get age(): number | null {
     const birthDate = Utils.dateToMoment(this.birthdate);
-    const age = moment().utc().diff(birthDate, 'years');
-    return age;
+    if (birthDate) {
+      const age = moment()
+        .utc()
+        .diff(birthDate, 'years');
+      return age;
+    }
+    return null;
   }
 
   public get ageCategory(): AgeCategory {
@@ -35,7 +40,7 @@ export class AthleteDetail {
     thumbnailUrl: string;
     gender: Gender;
     country: string;
-    birthdate: Date;
+    birthdate?: Date;
     email: string;
     city: string;
     infoUrl: string;

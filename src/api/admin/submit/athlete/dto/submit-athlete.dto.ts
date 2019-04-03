@@ -12,7 +12,7 @@ export class SubmitAthleteDto {
   public readonly thumbnailUrl: string;
   public readonly country: string;
   public readonly gender: Gender;
-  public readonly birthdate: string;
+  public readonly birthdate?: string;
   public readonly email: string;
   public readonly city: string;
   public readonly infoUrl: string;
@@ -53,6 +53,7 @@ export const submitAthleteDtoSchema = Joi.object().keys({
     .valid(GenderUtility.ValidGenders)
     .error(new APIErrors.JoiValidationError('Invalid gender')),
   birthdate: Joi.string()
+    .allow('')
     .isoDate()
     .error(new APIErrors.JoiValidationError('Invalid birthdate')),
   email: Joi.string()
@@ -60,7 +61,8 @@ export const submitAthleteDtoSchema = Joi.object().keys({
     .required()
     .error(new APIErrors.JoiValidationError('Unknown email')),
   city: Joi.string()
-    .required()
+    .optional()
+    .allow('')
     .error(new APIErrors.JoiValidationError('Unknown city')),
   infoUrl: Joi.string()
     .allow('')

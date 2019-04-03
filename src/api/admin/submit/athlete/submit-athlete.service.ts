@@ -14,7 +14,7 @@ export class SubmitAthleteService {
     const athleteDetail = new AthleteDetail({
       ...dto,
       id: id,
-      birthdate: new Date(dto.birthdate),
+      birthdate: dto.birthdate ? new Date(dto.birthdate) : undefined,
     });
     await this.db.putAthlete(athleteDetail);
     return id;
@@ -23,7 +23,7 @@ export class SubmitAthleteService {
   public async modifyAthlete(dto: SubmitAthleteDto) {
     const athleteDetail = new AthleteDetail({
       ...dto,
-      birthdate: new Date(dto.birthdate),
+      birthdate: dto.birthdate ? new Date(dto.birthdate) : undefined,
     });
     await this.db.putAthlete(athleteDetail);
     return dto.id;

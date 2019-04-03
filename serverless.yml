@@ -145,6 +145,14 @@ functions:
           event: s3:ObjectCreated:*
           rules:
             - prefix: public/
+  Cron-Job:
+    handler: src/cron-job/index.handler
+    description: Rankings CronJob
+    timeout: 300
+    memorySize: 256
+    environment: ${self:custom.environmentVars}
+    events:
+      - schedule: rate(3 days)
 resources:
   Resources:
     ISARankingsTable:

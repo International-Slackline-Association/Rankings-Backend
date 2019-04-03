@@ -10,6 +10,6 @@ export class AthleteController {
   public async getAthlete(@Param() params): Promise<AthleteResponse> {
     const athleteDetail = await this.athleteService.getAthlete(params.id);
     const { createdAt, thumbnailUrl, ...rest } = athleteDetail;
-    return new AthleteResponse({ ...rest, birthdate: athleteDetail.birthdate.toISODate() });
+    return new AthleteResponse({ ...rest, birthdate: athleteDetail.birthdate && athleteDetail.birthdate.toISODate() });
   }
 }

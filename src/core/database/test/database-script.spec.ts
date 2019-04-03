@@ -25,19 +25,10 @@ describe('Database Script', () => {
     it('', async () => {
       // const allAthletes = await databaseService.queryAthletes(undefined);
       // for (const athlete of allAthletes.items) {
-      //   if (
-      //     athlete.id.includes('_') &&
-      //     (athlete.id.includes('1') || athlete.id.includes('2') || athlete.id.includes('3'))
-      //   ) {
-      //     const originalAthlete = allAthletes.items.find(a => a.email === athlete.email && !a.id.includes('_'));
-      //     if (originalAthlete) {
-      //       if (athlete.infoUrl && !originalAthlete.infoUrl) {
-      //         const modifiedAthlete = new AthleteDetail({ ...originalAthlete, infoUrl: athlete.infoUrl });
-      //         await databaseService.putAthlete(modifiedAthlete);
-      //       }
-      //       await databaseService.deleteAthlete(athlete.id);
-      //       console.log('Deleted: ', athlete);
-      //     }
+      //   if (athlete.city === '' || athlete.city === 'unknown') {
+      //     const modifiedAthlete = new AthleteDetail({ ...athlete, city: '' });
+      //     await databaseService.putAthlete(modifiedAthlete);
+      //     console.log('Modified: ', athlete);
       //   }
       // }
     });

@@ -9,7 +9,7 @@ export class AthleteRanking {
   public readonly surname: string;
   public readonly gender: Gender;
   public readonly country: string;
-  public readonly birthdate: Date;
+  public readonly birthdate?: Date;
   public readonly ageCategory: AgeCategory;
   public readonly lastUpdatedAt?: number;
   public readonly points: number;
@@ -20,10 +20,13 @@ export class AthleteRanking {
 
   public get age(): number {
     const birthDate = Utils.dateToMoment(this.birthdate);
-    const age = moment()
-      .utc()
-      .diff(birthDate, 'years');
-    return age;
+    if (birthDate) {
+      const age = moment()
+        .utc()
+        .diff(birthDate, 'years');
+      return age;
+    }
+    return null;
   }
 
   constructor(init: {

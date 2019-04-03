@@ -11,7 +11,7 @@ export class EntityTransformer {
   public toDBItem(athlete: AthleteDetail): DDBAthleteDetailItem {
     return {
       athleteId: athlete.id,
-      birthdate: athlete.birthdate.toISODate(),
+      birthdate: athlete.birthdate && athlete.birthdate.toISODate(),
       country: athlete.country,
       createdAt: athlete.createdAt || moment().unix(),
       gender: athlete.gender,
@@ -21,7 +21,7 @@ export class EntityTransformer {
       profileUrl: athlete.profileUrl || undefined,
       thumbnailUrl: athlete.thumbnailUrl || undefined,
       surname: athlete.surname,
-      city: athlete.city,
+      city: athlete.city || undefined,
       email: athlete.email,
       infoUrl: athlete.infoUrl || undefined,
     };
@@ -33,7 +33,7 @@ export class EntityTransformer {
     }
     return new AthleteDetail({
       id: athlete.athleteId,
-      birthdate: new Date(athlete.birthdate),
+      birthdate: athlete.birthdate && new Date(athlete.birthdate),
       country: athlete.country,
       createdAt: athlete.createdAt,
       gender: athlete.gender,
@@ -41,7 +41,7 @@ export class EntityTransformer {
       profileUrl: athlete.profileUrl || '',
       thumbnailUrl: athlete.thumbnailUrl || '',
       surname: athlete.surname,
-      city: athlete.city,
+      city: athlete.city || '',
       email: athlete.email,
       infoUrl: athlete.infoUrl || '',
     });

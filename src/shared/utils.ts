@@ -29,7 +29,10 @@ export namespace Utils {
   }
 
   export function dateToMoment(date: Date): moment.Moment {
-    return moment(date);
+    if (date) {
+      return moment(date);
+    }
+    return null;
   }
 
   export function normalizeString(str: string) {

@@ -16,7 +16,7 @@ export namespace Constants {
         return 1500;
       case ContestType.Masters:
         return 900;
-      case ContestType.NationalChampionship:
+      case ContestType.GrandSlam:
         return 600;
       case ContestType.Open:
         return 300;
@@ -35,7 +35,7 @@ export namespace Constants {
         return 16;
       case ContestType.Masters:
         return 14;
-      case ContestType.NationalChampionship:
+      case ContestType.GrandSlam:
         return 12;
       case ContestType.Open:
         return 10;
@@ -57,7 +57,7 @@ export namespace Constants {
         return 9;
       case ContestType.Masters:
         return 7;
-      case ContestType.NationalChampionship:
+      case ContestType.GrandSlam:
         return 5;
       case ContestType.Open:
         return 3;

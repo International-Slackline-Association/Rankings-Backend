@@ -94,11 +94,11 @@ export namespace AgeCategoryUtility {
     }
   }
 
-  export function getAgeCategoryOfAge(age: number): AgeCategory {
-    if (age < 18) {
+  export function getAgeCategoryOfAge(age: number | null): AgeCategory {
+    if (age > 0 && age < 18) {
       return AgeCategory.Youth;
     }
-    if (age > 35) {
+    if (age > 35 && age < 70) {
       return AgeCategory.Senior;
     }
     return AgeCategory.All;

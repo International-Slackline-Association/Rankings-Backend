@@ -14,6 +14,8 @@
         "deploy:admin": "serverless deploy -f AdminAPI",
         "deploy:streams": "serverless deploy -f Streams",
         "deploy:image-resizer": "serverless deploy -f Image-Resizer",
+        "deploy:cron-job": "serverless deploy -f Cron-Job",
+
         "test": "export ENVIRONMENT=Local; jest",
         "test:cov": "jest --coverage",
         "test:e2e": "jest --config ./test/jest-e2e.json",

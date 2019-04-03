@@ -48,7 +48,7 @@ export enum ContestType {
   WorldGames = 0,
   WorldCup = 1,
   Masters = 2,
-  NationalChampionship = 3,
+  GrandSlam = 3,
   Open = 4,
   Challenge = 5,
 }
