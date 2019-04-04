@@ -73,7 +73,7 @@ export class DatabaseService {
   ) {
     let queryLimit: number = limit;
     if (opts.filter && opts.filter.fullName) {
-      queryLimit = 30; // random paginator;
+      queryLimit = 100; // random paginator;
     }
     const queryResult = await this.athleteDetailsRepo.queryAthletes(queryLimit, opts);
     let items = queryResult.items.map(dbItem => this.athleteDetailsRepo.entityTransformer.fromDBItem(dbItem));
@@ -200,8 +200,8 @@ export class DatabaseService {
     } = {},
   ) {
     let queryLimit: number = limit;
-    if (opts.filter && opts.filter.country) {
-      queryLimit = 30; // random paginator;
+    if (opts.filter && ( opts.filter.country || opts.filter.id)) {
+      queryLimit = 100; // random paginator;
     }
     const queryResult = await this.athleteRankingsRepo.queryRankings(queryLimit, category, {
       after: opts.after,
@@ -258,7 +258,7 @@ export class DatabaseService {
         queryLimit = Math.round(limit * (DisciplineUtility.CompetitionDisciplines.length / filter!.disciplines.length));
       }
       if (filter.name || filter.id) {
-        queryLimit = 30; // random paginator;
+        queryLimit = 50; // random paginator;
       }
     }
     const queryResult = await this.contestRepo.queryContestsByDate(queryLimit, opts);
