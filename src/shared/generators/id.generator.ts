@@ -1,16 +1,15 @@
-import { APIErrors } from 'shared/exceptions/api.exceptions';
+import * as crypto from 'crypto';
 import { Utils } from 'shared/utils';
 
 export class IdGenerator {
-  /** contestName + year is a unique human readable entity */
-  public static generateContestId(name: string, year: number): string {
-    // example swiss-open_2018, slackline_2019,
-    const urlName = this.replaceUnsafeUrlCharacters(name);
-    const dashedName = Utils.normalizeString(urlName)
-      .split(' ')
-      .join('-');
-    const id = `${dashedName}_${year}`;
-    return id;
+  public static generateContestId(): string {
+    return this.generateRandomId();
+  }
+
+  // Random 6 hex characters generator
+  private static generateRandomId(): string {
+    const result = crypto.randomBytes(3).toString('hex');
+    return result;
   }
 
   /** name-surname + suffix (if collision happens) is a unique human readable entity */
@@ -20,9 +19,8 @@ export class IdGenerator {
     const n = urlName.split(' ').join('-');
 
     const urlSurname = this.replaceUnsafeUrlCharacters(Utils.normalizeString(surname));
-    const s = urlSurname
-      .split(' ')
-      .join('-');
+    const s = urlSurname.split(' ').join('-');
+
     const id = suffix ? `${n}-${s}_${suffix}` : `${n}-${s}`;
     return id;
   }

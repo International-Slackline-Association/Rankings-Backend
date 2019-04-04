@@ -21,7 +21,7 @@ export class EntityTransformer {
     if (!dbItem) {
       return null;
     }
-    return {
+    return new AthleteContestResult({
       contestDate: new Date(dbItem.date),
       contestDiscipline: dbItem.discipline,
       contestId: dbItem.contestId,
@@ -29,6 +29,6 @@ export class EntityTransformer {
       athleteId: dbItem.athleteId,
       place: dbItem.place,
       points: dbItem.points,
-    };
+    });
   }
 }

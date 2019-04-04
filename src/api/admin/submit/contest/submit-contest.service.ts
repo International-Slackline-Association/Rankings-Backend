@@ -11,7 +11,7 @@ export class SubmitContestService {
   constructor(private readonly db: DatabaseService) {}
   public async createContest(dto: SubmitContestDto) {
     const contestDate = new Date(dto.date);
-    const id = IdGenerator.generateContestId(dto.name, Utils.dateToMoment(contestDate).year());
+    const id = IdGenerator.generateContestId();
     const contest = new Contest({
       ...dto,
       id: id,

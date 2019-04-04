@@ -47,6 +47,18 @@ export class DDBAthleteContestsRepository extends DDBRepository {
       .catch(logThrowDynamoDBError('DDBAthleteContestsRepository Put', params));
   }
 
+  public async delete(athleteId: string, contestId: string, discipline: Discipline) {
+    const params: DocumentClient.DeleteItemInput = {
+      TableName: this._tableName,
+      Key: this.transformer.primaryKey(athleteId, discipline, contestId),
+    };
+    return this.client
+      .delete(params)
+      .promise()
+      .then(data => data)
+      .catch(logThrowDynamoDBError('DDBAthleteContestsRepository Delete', params));
+  }
+
   public async queryAthleteContestsByDate(
     athleteId: string,
     limit: number,

@@ -41,14 +41,14 @@ export class SubmitContestResultService {
     const dbFailedAthleteResults: AthleteContestResult[] = [];
     for (const athlete of contestResults.places) {
       const { points, place } = athletePointsDict[athlete.athleteId];
-      const athleteResult: AthleteContestResult = {
+      const athleteResult = new AthleteContestResult({
         contestId: contest.id,
         athleteId: athlete.athleteId,
         place: place,
         points: points,
         contestDate: contest.date,
         contestDiscipline: contest.discipline,
-      };
+      });
       await this.db
         .putContestResult(athleteResult)
         .then(data => data)

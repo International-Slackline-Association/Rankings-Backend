@@ -107,7 +107,11 @@ export class DatabaseService {
     await this.athleteContestsRepo.put(dbItem);
   }
 
-  public async getContestResults(
+  public async deleteContestResult(athleteId: string, contestId: string, discipline: Discipline) {
+    await this.athleteContestsRepo.delete(athleteId, contestId, discipline);
+  }
+
+  public async queryContestResults(
     contestId: string,
     discipline: Discipline,
     limit: number,
@@ -185,9 +189,11 @@ export class DatabaseService {
     await this.redisRepo.updatePointsOfAthleteInRankingCategory(pk, points);
     return this.athleteRankingsRepo.updatePointsAndCount(pk, points, contestCount);
   }
+
   public async deleteAthleteRankings(athleteId: string) {
     await this.athleteRankingsRepo.deleteAthleteRankings(athleteId);
   }
+
   public async queryAthleteRankings(
     limit: number,
     category: DDBRankingsItemPrimaryKey,
@@ -200,7 +206,7 @@ export class DatabaseService {
     } = {},
   ) {
     let queryLimit: number = limit;
-    if (opts.filter && ( opts.filter.country || opts.filter.id)) {
+    if (opts.filter && (opts.filter.country || opts.filter.id)) {
       queryLimit = 100; // random paginator;
     }
     const queryResult = await this.athleteRankingsRepo.queryRankings(queryLimit, category, {
@@ -279,6 +285,11 @@ export class DatabaseService {
     const dbItem = this.contestRepo.entityTransformer.toDBItem(contest);
     await this.contestRepo.put(dbItem);
   }
+
+  public async deleteContest(contestId: string, discipline: Discipline) {
+    await this.contestRepo.delete(contestId, discipline);
+  }
+
   public async updateContestProfileUrl(contestId: string, discipline: Discipline, url: string) {
     return this.contestRepo.updateProfileUrl(contestId, discipline, url);
   }

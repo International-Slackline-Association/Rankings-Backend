@@ -62,7 +62,7 @@ export class ContestService {
     limit: number,
     after?: { athleteId: string; points: number },
   ) {
-    const results = await this.db.getContestResults(id, discipline, limit, after);
+    const results = await this.db.queryContestResults(id, discipline, limit, after);
     return results;
   }
 }

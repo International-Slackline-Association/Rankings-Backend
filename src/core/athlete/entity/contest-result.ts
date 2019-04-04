@@ -8,4 +8,18 @@ export class AthleteContestResult {
   public readonly points: number;
   public readonly place: number;
   public readonly createdAt?: number;
+
+  constructor(init: {
+    athleteId: string;
+    contestId: string;
+    contestDate: Date;
+    contestDiscipline: Discipline;
+    points: number;
+    place: number;
+    createdAt?: number;
+  }) {
+    if (init) {
+      Object.assign(this, init);
+    }
+  }
 }

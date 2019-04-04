@@ -66,6 +66,17 @@ export class DDBContestRepository extends DDBRepository {
       .then(data => data)
       .catch(logThrowDynamoDBError('DDBContestRepository Put', params));
   }
+  public async delete(contestId: string, discipline: Discipline) {
+    const params: DocumentClient.DeleteItemInput = {
+      TableName: this._tableName,
+      Key: this.transformer.primaryKey(discipline, contestId),
+    };
+    return this.client
+      .delete(params)
+      .promise()
+      .then(data => data)
+      .catch(logThrowDynamoDBError('DDBContestRepository Delete', params));
+  }
 
   public async updateProfileUrl(contestId: string, discipline: Discipline, url: string) {
     const params: DocumentClient.UpdateItemInput = {
@@ -102,7 +113,7 @@ export class DDBContestRepository extends DDBRepository {
         date: string;
       };
       filter?: { disciplines?: Discipline[]; name?: string; id?: string };
-    } = {descending: true},
+    } = { descending: true },
   ) {
     const exclusiveStartKey = this.createLSIExclusiveStartKey(opts.after);
     const { filterExpression, filterExpAttrNames, filterExpAttrValues } = this.createFilterExpression(opts.filter);
