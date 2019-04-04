@@ -27,20 +27,6 @@ describe('Database Script', () => {
 
   describe('fix', () => {
     it('', async () => {
-      let counter = 0;
-      const contests = await databaseService.queryContestsByDate(undefined);
-      for (const contest of contests.items) {
-        if (contest.name.toLowerCase().includes('female')) {
-          const newContest = new Contest({ ...contest, contestGender: ContestGender.WomenOnly });
-          await databaseService.putContest(newContest);
-        } else if (contest.name.toLowerCase().includes('male')) {
-          const newContest = new Contest({ ...contest, contestGender: ContestGender.MenOnly });
-          await databaseService.putContest(newContest);
-        } else {
-          const newContest = new Contest({ ...contest, contestGender: ContestGender.Mixed });
-          await databaseService.putContest(newContest);
-        }
-      }
       //     let counter = 0;
       //     const contests = await databaseService.queryContestsByDate(undefined);
       //     for (const contest of contests.items) {
@@ -51,6 +37,7 @@ describe('Database Script', () => {
       //       for (const result of results.items) {
       //         const newResult = new AthleteContestResult({ ...result, contestId: newId });
       //         await databaseService.putContestResult(newResult);
+      // tslint:disable-next-line:max-line-length
       //         await databaseService.deleteContestResult(result.athleteId, result.contestId, result.contestDiscipline);
       //       }
       //       await databaseService.putContest(newContest);
