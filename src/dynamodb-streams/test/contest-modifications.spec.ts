@@ -18,6 +18,7 @@ describe('DynamoDB Streams', () => {
     it('', async () => {
       const newImage = contestRepo.transformToDynamoDBType({
         category: undefined,
+        gender: undefined,
         city: undefined,
         contestId: 'bern-city-slack-9_2018',
         country: undefined,

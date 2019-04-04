@@ -1,12 +1,10 @@
-export interface INamedDiscipline {
+export interface INameIdEntity {
   id: number;
   name: string;
 }
+export interface INamedDiscipline extends INameIdEntity {}
 
-export interface INamedContestType {
-  id: number;
-  name: string;
-}
+export interface INamedContestType extends INameIdEntity {}
 
 export interface ISelectOption {
   value: string;

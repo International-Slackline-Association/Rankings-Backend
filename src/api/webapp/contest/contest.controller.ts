@@ -4,7 +4,7 @@ import { AthleteService } from 'core/athlete/athlete.service';
 import { CategoriesService } from 'core/category/categories.service';
 import { ContestService } from 'core/contest/contest.service';
 import { Discipline } from 'shared/enums';
-import { ContestTypeUtility, DisciplineUtility, YearUtility } from 'shared/enums/enums-utility';
+import { ContestGenderUtility, ContestTypeUtility, DisciplineUtility, YearUtility } from 'shared/enums/enums-utility';
 import { JoiValidationPipe } from 'shared/pipes/JoiValidation.pipe';
 import { Utils } from 'shared/utils';
 import { CountryService } from '../country/country.service';
@@ -45,6 +45,7 @@ export class ContestController {
       city: contest.city,
       discipline: DisciplineUtility.getNamedDiscipline(contest.discipline),
       contestType: ContestTypeUtility.getNamedContestType(contest.contestType),
+      contestGender: ContestGenderUtility.getNamedContestGender(contest.contestGender),
       country: countryName || contest.country,
       date: Utils.dateToMoment(contest.date).format('DD/MM/YYYY'),
       infoUrl: contest.infoUrl,
@@ -88,6 +89,7 @@ export class ContestController {
           year: obj.contest.year,
           prize: obj.contest.prizeString,
           contestType: ContestTypeUtility.getNamedContestType(obj.contest.contestType),
+          contestGender: ContestGenderUtility.getNamedContestGender(obj.contest.contestGender),
           thumbnailUrl: obj.contest.thumbnailUrl || obj.contest.profileUrl,
           date: Utils.dateToMoment(obj.contest.date).format('DD/MM/YYYY'),
           country: obj.contest.country,
@@ -109,7 +111,7 @@ export class ContestController {
 
     const discipline = categories[0];
     const year = categories[1];
-    const contests = await this.contestService.queryContests(5, {
+    const contests = await this.contestService.queryContests(dto.returnCount || 5, {
       descending: false,
       year: year,
       discipline: discipline,

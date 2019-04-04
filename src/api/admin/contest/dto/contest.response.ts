@@ -1,4 +1,4 @@
-import { INamedContestType, INamedDiscipline } from 'shared/types/shared';
+import { INamedContestType, INamedDiscipline, INameIdEntity } from 'shared/types/shared';
 
 export interface IContestResponseItem {
   readonly id: string;
@@ -8,6 +8,7 @@ export interface IContestResponseItem {
   readonly country: string;
   readonly discipline: INamedDiscipline;
   readonly contestType: INamedContestType;
+  readonly contestGender: INameIdEntity;
   readonly prize: number;
   readonly profileUrl: string;
   readonly infoUrl: string;

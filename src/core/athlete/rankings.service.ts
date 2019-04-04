@@ -55,9 +55,6 @@ export class RankingsService {
       };
     } = {},
   ) {
-    if (opts.athleteId) {
-      limit = 1;
-    }
 
     const rankings = await this.db.queryAthleteRankings(limit, category, {
       after: opts.after,

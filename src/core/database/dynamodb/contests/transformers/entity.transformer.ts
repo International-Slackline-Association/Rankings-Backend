@@ -10,6 +10,7 @@ export class EntityTransformer {
     return {
       contestId: contest.id,
       category: contest.contestType,
+      gender: contest.contestGender,
       city: contest.city,
       country: contest.country,
       createdAt: contest.createdAt || moment().unix(),
@@ -35,6 +36,7 @@ export class EntityTransformer {
       createdAt: contest.createdAt,
       date: new Date(contest.date),
       contestType: contest.category,
+      contestGender: contest.gender,
       discipline: contest.discipline,
       name: contest.name,
       prize: contest.prize,

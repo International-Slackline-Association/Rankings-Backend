@@ -1,8 +1,9 @@
 import * as moment from 'moment';
 
 import { Constants } from 'shared/constants';
+import { INameIdEntity } from 'shared/types/shared';
 import { Utils } from 'shared/utils';
-import { AgeCategory, Gender, RankingType, Year } from '.';
+import { AgeCategory, ContestGender, Gender, RankingType, Year } from '.';
 import { ContestTypeUtility } from './contestType-utility';
 import { DisciplineUtility } from './discipline-utility';
 
@@ -122,5 +123,31 @@ export namespace RankingTypeUtility {
       default:
         return [];
     }
+  }
+}
+
+// tslint:disable-next-line:no-namespace
+export namespace ContestGenderUtility {
+  export const ContestGenders = [ContestGender.Mixed, ContestGender.MenOnly, ContestGender.WomenOnly];
+
+  export function getName(gender: ContestGender) {
+    switch (gender) {
+      case ContestGender.Mixed:
+        return 'Mixed';
+      case ContestGender.MenOnly:
+        return 'Men';
+      case ContestGender.WomenOnly:
+        return 'Women';
+    }
+  }
+  export function getParents(gender: ContestGender) {
+    switch (gender) {
+      default:
+        return [];
+    }
+  }
+
+  export function getNamedContestGender(gender: ContestGender): INameIdEntity {
+    return { id: gender, name: getName(gender) };
   }
 }

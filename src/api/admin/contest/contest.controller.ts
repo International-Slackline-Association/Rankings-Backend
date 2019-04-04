@@ -1,11 +1,12 @@
 import { Controller, Get, Param, ParseIntPipe, Req } from '@nestjs/common';
 import { Discipline } from 'shared/enums';
-import { ContestTypeUtility, DisciplineUtility } from 'shared/enums/enums-utility';
+import { ContestGenderUtility, ContestTypeUtility, DisciplineUtility } from 'shared/enums/enums-utility';
 import { ISelectOption } from 'shared/types/shared';
 import { ContestService } from './contest.service';
 import { CategoriesResponse } from './dto/categories.response';
 import { ContestResponse, IContestResponseItem } from './dto/contest.response';
 import { DisciplinesResponse } from './dto/disciplines.response';
+import { GendersResponse } from './dto/genders.response';
 
 @Controller('contest')
 export class ContestController {
@@ -18,10 +19,11 @@ export class ContestController {
     disciplineParam: Discipline,
   ): Promise<ContestResponse> {
     const contest = await this.contestService.getContest(id, disciplineParam);
-    const { createdAt, date, discipline, contestType, thumbnailUrl, ...rest } = contest;
+    const { createdAt, date, discipline, contestType, contestGender, thumbnailUrl, ...rest } = contest;
     const item: IContestResponseItem = {
       discipline: DisciplineUtility.getNamedDiscipline(discipline),
       contestType: ContestTypeUtility.getNamedContestType(contestType),
+      contestGender: ContestGenderUtility.getNamedContestGender(contestGender),
       date: date.toISODate(),
       ...rest,
     };
@@ -46,5 +48,15 @@ export class ContestController {
     });
 
     return new CategoriesResponse(options);
+  }
+
+  @Get('genders')
+  public getGenders(): GendersResponse {
+    const categories = this.contestService.getGenders();
+    const options = categories.map<ISelectOption>(d => {
+      return { label: d.name, value: d.id.toString() };
+    });
+
+    return new GendersResponse(options);
   }
 }

@@ -35,9 +35,6 @@ export class ContestService {
       );
     }
 
-    if (opts.contestId) {
-      limit = 1;
-    }
     const contests = await this.db.queryContestsByDate(limit, {
       descending: opts.descending,
       year: opts.year,

@@ -53,6 +53,12 @@ export enum ContestType {
   Challenge = 5,
 }
 
+export enum ContestGender {
+  Mixed = 0,
+  MenOnly = 1,
+  WomenOnly = 2,
+}
+
 export enum AuthenticationRole {
   admin = 'admin',
 }

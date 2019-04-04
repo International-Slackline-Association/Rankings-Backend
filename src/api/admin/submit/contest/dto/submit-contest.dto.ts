@@ -1,5 +1,5 @@
 import * as Joi from 'joi';
-import { ContestTypeUtility, DisciplineUtility } from 'shared/enums/enums-utility';
+import { ContestGenderUtility, ContestTypeUtility, DisciplineUtility } from 'shared/enums/enums-utility';
 import { APIErrors } from 'shared/exceptions/api.exceptions';
 
 export class SubmitContestDto {
@@ -10,6 +10,7 @@ export class SubmitContestDto {
   public readonly country: string;
   public readonly discipline: number;
   public readonly contestType: number;
+  public readonly contestGender: number;
   public readonly prize: number;
   public readonly profileUrl: string;
   public readonly thumbnailUrl: string;
@@ -47,6 +48,10 @@ export const submitContestDtoSchema = Joi.object().keys({
     .required()
     .valid(ContestTypeUtility.ContestTypes)
     .error(new APIErrors.JoiValidationError('Invalid category')),
+  contestGender: Joi.number()
+    .required()
+    .valid(ContestGenderUtility.ContestGenders)
+    .error(new APIErrors.JoiValidationError('Invalid gender')),
   prize: Joi.number()
     .required()
     .allow(0)

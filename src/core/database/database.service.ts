@@ -135,14 +135,14 @@ export class DatabaseService {
       filter?: { disciplines?: Discipline[] };
     } = {},
   ) {
-    let queryLimit: number = limit;
-    if (opts.filter) {
-      if ((opts.filter.disciplines || []).length > 0) {
-        queryLimit = Math.round(
-          limit * (DisciplineUtility.CompetitionDisciplines.length / opts.filter.disciplines.length),
-        );
-      }
-    }
+    const queryLimit: number = limit;
+    // if (opts.filter) {
+    //   if ((opts.filter.disciplines || []).length > 0) {
+    //     queryLimit = Math.round(
+    //       limit * (DisciplineUtility.CompetitionDisciplines.length / opts.filter.disciplines.length),
+    //     );
+    //   }
+    // }
     const queryResult = await this.athleteContestsRepo.queryAthleteContestsByDate(athleteId, queryLimit, opts);
     let items = queryResult.items.map(dbItem => this.athleteContestsRepo.entityTransformer.fromDBItem(dbItem));
     let lastKey = queryResult.lastKey;
@@ -263,7 +263,7 @@ export class DatabaseService {
       if ((filter.disciplines || []).length > 0) {
         queryLimit = Math.round(limit * (DisciplineUtility.CompetitionDisciplines.length / filter!.disciplines.length));
       }
-      if (filter.name || filter.id) {
+      if (filter.id || filter.name) {
         queryLimit = 50; // random paginator;
       }
     }
@@ -277,6 +277,9 @@ export class DatabaseService {
       });
       items = items.concat(moreQueryResults.items);
       lastKey = moreQueryResults.lastKey;
+    }
+    if (opts.filter && opts.filter.name && items.length > limit) {
+      items = items.slice(0, limit);
     }
     return { items, lastKey: lastKey };
   }
