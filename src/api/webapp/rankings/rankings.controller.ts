@@ -7,6 +7,7 @@ import { CategoriesService } from 'core/category/categories.service';
 import { AgeCategory, Discipline, Gender, RankingType } from 'shared/enums';
 import { YearUtility } from 'shared/enums/enums-utility';
 import { JoiValidationPipe } from 'shared/pipes/JoiValidation.pipe';
+import { CategoriesDto } from './dto/categories.dto';
 import { CategoriesResponse } from './dto/categories.response';
 import { RankingsListDto, rankingsListDtoSchema } from './dto/rankings-list.dto';
 import { IRankingsListItem, RankingsListResponse } from './dto/rankings-list.response';
@@ -18,10 +19,25 @@ export class RankingsController {
     private readonly categoriesService: CategoriesService,
     private readonly athleteService: AthleteService,
   ) {}
+  private defaultCategories = [
+    RankingType.TopScore,
+    Discipline.Overall,
+    YearUtility.AllYears[0],
+    Gender.All,
+    AgeCategory.All,
+  ];
 
-  @Get('categories')
-  public getCategories(): CategoriesResponse {
+  @Post('categories')
+  public getCategories(@Body() dto: CategoriesDto): CategoriesResponse {
+    let selectedCategories = dto.selectedCategories || [];
+    if (selectedCategories.length < 5) {
+      selectedCategories = this.defaultCategories;
+    }
+    const rankingType = selectedCategories[0];
     const categories = this.categoriesService.getCategories();
+    if (rankingType === RankingType.TopScore) {
+      categories.year.options[0].label = 'Last 2';
+    }
     return new CategoriesResponse([
       categories.rankingType,
       categories.discipline,
@@ -36,7 +52,7 @@ export class RankingsController {
   public async getRankingsList(@Body() dto: RankingsListDto): Promise<RankingsListResponse> {
     let categories = dto.selectedCategories || [];
     if (categories.length < 5) {
-      categories = [RankingType.TopScore, Discipline.Overall, YearUtility.AllYears[0], Gender.All, AgeCategory.All];
+      categories = this.defaultCategories;
     }
     const rankingType = categories[0];
     const discipline = categories[1];
