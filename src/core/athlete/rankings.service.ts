@@ -55,7 +55,6 @@ export class RankingsService {
       };
     } = {},
   ) {
-
     const rankings = await this.db.queryAthleteRankings(limit, category, {
       after: opts.after,
       filter: {
@@ -246,29 +245,15 @@ export class RankingsService {
     }
 
     const athleteContests = await this.athleteService.getContests(athleteId, discipline, undefined, betweenDates);
-    const contests = await Promise.all(
-      athleteContests.items.map(async athleteContest => {
-        const c = await this.db.getContest(athleteContest.contestId, athleteContest.contestDiscipline);
-        return c;
-      }),
-    );
-    const contestsBySizes = contests.sort((a, b) => {
-      if (a.contestType === b.contestType) {
-        return a.date < b.date ? 1 : -1;
-      } else {
-        return (
-          ContestTypeUtility.ContestTypesBySize.indexOf(a.contestType) -
-          ContestTypeUtility.ContestTypesBySize.indexOf(b.contestType)
-        );
-      }
+
+    const contestsByPoints = athleteContests.items.sort((a, b) => {
+      return b.points - a.points;
     });
-    const contestsToConsider = contestsBySizes.slice(0, Constants.TopScoreContestSampleCount);
-    if (contestsToConsider.length === 0) {
+
+    if (contestsByPoints.length === 0) {
       return null;
     }
-    const totalPoints = athleteContests.items
-      .filter(i => contestsToConsider.find(c => c.id === i.contestId))
-      .sort((a, b) => b.points - a.points)
+    const totalPoints = contestsByPoints
       .slice(0, Constants.TopScoreContestCount)
       .map(c => c.points)
       .reduce((acc, b) => acc + b);

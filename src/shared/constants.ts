@@ -4,7 +4,6 @@ import env_variables from './env_variables';
 // tslint:disable-next-line:no-namespace
 export namespace Constants {
   export const BaseYear = 2017;
-  export const TopScoreContestSampleCount = 3;
   export const TopScoreContestCount = 2;
   export const TopScoreYearRange = 2;
 

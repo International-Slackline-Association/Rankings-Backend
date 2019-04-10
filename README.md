@@ -23,7 +23,7 @@ Server-side client of [isa-rankings.org]
 ### Why `serverless`?
 
 * **Pay as you go:** You only pay for the resources you actively use, not when they are sitting idle. Perfect for low|inconsistent traffic applications.
-* **Costs:** Extremely **cheap** . This applications costs less than 3 dolar/month.
+* **Costs:** Extremely **cheap** . This application costs less than 1 dolar/month.
 * **Maintenance & Operation:** You never manage infrastructure or any problem that comes with it. Only write the code and it works. Since its a volunteered project nobody wants to do anything but writing the application code
 
 ----
