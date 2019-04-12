@@ -124,6 +124,7 @@ export class ContestController {
           name: contest.name,
           discipline: DisciplineUtility.getNamedDiscipline(contest.discipline),
           year: contest.year,
+          gender: ContestGenderUtility.getNamedContestGender(contest.contestGender),
         };
       }),
     );
