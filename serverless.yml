@@ -45,8 +45,6 @@ custom:
         - aws-sdk
         - typescript
     webpackConfig: ./webpack/webpack.config.${self:custom.currentStage}.js
-    package:
-      individually: true
 
 provider:
   name: aws
@@ -96,7 +94,8 @@ provider:
   deploymentBucket:
     name: isa.serverless.${self:provider.region}.deploys
 
-package:
+package:      
+  # individually: true
   exclude:
     - secrets.yml
     - .env
@@ -148,11 +147,11 @@ functions:
   Cron-Job:
     handler: src/cron-job/index.handler
     description: Rankings CronJob
-    timeout: 300
+    timeout: 600
     memorySize: 256
     environment: ${self:custom.environmentVars}
     events:
-      - schedule: rate(3 days)
+      - schedule: rate(12 hours)
 resources:
   Resources:
     ISARankingsTable:

@@ -24,7 +24,7 @@ export class CronJobService {
     // }
     let counter = 0;
     let offset = 0;
-    const iterateLimit = 150;
+    const iterateLimit = 50;
 
     // Since dynamodb capacity is set low, we update only certain amount of athletes in a run.
     // The offset is saved every round and with the next run of this it starts from the offset.
