@@ -63,8 +63,16 @@ export class RedisRepository {
 
   public async updatePointsOfAthleteInRankingCategory(pk: DDBAthleteRankingsItemPrimaryKey, points: number) {
     const key = this.redisKeyOfRankingCategory(pk);
+    const prevRank = await this.getPlaceOfAthleteInRankingCategory(pk);
     const zadd = this.redis.zadd(key, [points, pk.athleteId]);
-    return Utils.omitReject(zadd);
+    await Utils.omitReject(zadd);
+    const currentRank = await this.getPlaceOfAthleteInRankingCategory(pk);
+    // Calculate the change in the rank
+    if (Utils.isSomeNil(currentRank, prevRank)) {
+      return 0;
+    } else {
+      return -(currentRank - prevRank);
+    }
   }
 
   public async getPlaceOfAthleteInRankingCategory(pk: DDBAthleteRankingsItemPrimaryKey) {

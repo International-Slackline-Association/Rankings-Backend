@@ -162,7 +162,12 @@ export class RankingsService {
   //#endregion
 
   //#region TopScore
-  public async updateTopScoreRankings(athlete: AthleteDetail, discipline: Discipline, year: number) {
+  public async updateTopScoreRankings(
+    athlete: AthleteDetail,
+    discipline: Discipline,
+    year: number,
+    beforeContestDate?: Date,
+  ) {
     const rankingType = RankingType.TopScore;
 
     const pointsDict = {};
@@ -183,7 +188,7 @@ export class RankingsService {
         gender: combination.gender,
         year: combination.year,
       };
-      promises.push(this.updateTopScoreRankingForCombination(pk, athlete, combination, pointsDict));
+      promises.push(this.updateTopScoreRankingForCombination(pk, athlete, combination, pointsDict, beforeContestDate));
     }
     await Promise.all(promises);
   }
@@ -193,6 +198,7 @@ export class RankingsService {
     athlete: AthleteDetail,
     combination: RankingCombination,
     pointsDict: {},
+    beforeContestDate?: Date,
   ) {
     let points = pointsDict[`${combination.discipline}-${combination.year}`];
     if (Utils.isNil(points)) {
@@ -200,6 +206,7 @@ export class RankingsService {
         athlete.id,
         combination.discipline,
         combination.year || undefined,
+        beforeContestDate,
       );
       pointsDict[`${combination.discipline}-${combination.year}`] = points;
     }
@@ -232,16 +239,35 @@ export class RankingsService {
     await this.db.putAthleteRanking(item);
   }
 
-  private async calculateNewPointsForTopScore(athleteId: string, discipline: Discipline, year?: number) {
+  private async calculateNewPointsForTopScore(
+    athleteId: string,
+    discipline: Discipline,
+    year?: number,
+    beforeContestDate?: Date,
+  ) {
     let betweenDates;
     if (year) {
-      betweenDates = { start: new Date(year, 0), end: new Date(year + 1, 0) };
+      if (beforeContestDate) {
+        betweenDates = { start: new Date(year, 0), end: beforeContestDate };
+      } else {
+        betweenDates = { start: new Date(year, 0), end: new Date(year + 1, 0) };
+      }
     } else {
-      betweenDates = {
-        start: Utils.DateNow()
+      if (beforeContestDate) {
+        const startDate = Utils.DateNow()
           .add(-Constants.TopScoreYearRange, 'years')
-          .toDate(),
-      };
+          .toDate();
+        betweenDates = {
+          start: startDate,
+          end: beforeContestDate < startDate ? undefined : beforeContestDate,
+        };
+      } else {
+        betweenDates = {
+          start: Utils.DateNow()
+            .add(-Constants.TopScoreYearRange, 'years')
+            .toDate(),
+        };
+      }
     }
 
     const athleteContests = await this.athleteService.getContests(athleteId, discipline, undefined, betweenDates);

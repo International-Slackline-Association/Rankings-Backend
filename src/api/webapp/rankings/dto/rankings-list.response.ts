@@ -8,6 +8,7 @@ export interface IRankingsListItem {
   readonly points: string;
   readonly thumbnailUrl: string;
   readonly contestCount?: number;
+  readonly changeInRank: number;
 }
 
 export class RankingsListResponse {

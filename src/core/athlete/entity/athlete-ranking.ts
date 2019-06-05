@@ -17,6 +17,8 @@ export class AthleteRanking {
   public readonly year: number;
   public readonly rankingType: RankingType;
   public readonly contestCount?: number;
+  public changeInRank?: number;
+  public changeInRankUpdatedAt?: Date;
 
   public get age(): number {
     const birthDate = Utils.dateToMoment(this.birthdate);
@@ -43,6 +45,8 @@ export class AthleteRanking {
     year: number;
     rankingType: RankingType;
     contestCount?: number;
+    changeInRank?: number;
+    changeInRankUpdatedAt?: Date;
   }) {
     if (init) {
       Object.assign(this, init);

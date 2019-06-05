@@ -7,6 +7,7 @@ import { CategoriesService } from 'core/category/categories.service';
 import { AgeCategory, Discipline, Gender, RankingType } from 'shared/enums';
 import { YearUtility } from 'shared/enums/enums-utility';
 import { JoiValidationPipe } from 'shared/pipes/JoiValidation.pipe';
+import { Utils } from '../../../shared/utils';
 import { CategoriesDto } from './dto/categories.dto';
 import { CategoriesResponse } from './dto/categories.response';
 import { RankingsListDto, rankingsListDtoSchema } from './dto/rankings-list.dto';
@@ -79,6 +80,13 @@ export class RankingsController {
     );
     return new RankingsListResponse(
       rankingsWithAthletes.map<IRankingsListItem>(obj => {
+        // If change in rank longer than 6 months dont count it.
+        const changeInRank = obj.ranking.changeInRank
+          ? Utils.DateNow().diff(obj.ranking.changeInRankUpdatedAt, 'months') < 6
+            ? obj.ranking.changeInRank
+            : 0
+          : 0;
+
         return {
           id: obj.ranking.id,
           age: obj.ranking.age,
@@ -89,6 +97,7 @@ export class RankingsController {
           thumbnailUrl: obj.athlete.thumbnailUrl || obj.athlete.profileUrl,
           surname: obj.ranking.surname,
           contestCount: obj.ranking.contestCount,
+          changeInRank: changeInRank,
         };
       }),
       rankings.lastKey,

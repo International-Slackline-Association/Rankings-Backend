@@ -58,11 +58,13 @@ export class DDBAthleteRankingsRepository extends DDBRepository {
       .catch(logThrowDynamoDBError('DDBAthleteRankingsRepository Put', params));
   }
 
-  public async updatePointsAndCount(pk: DDBAthleteRankingsItemPrimaryKey, points: number, contestCount?: number) {
-    let includeContestCount = true;
-    if (Utils.isNil(contestCount)) {
-      includeContestCount = false;
-    }
+  public async updatePointsAndCount(
+    pk: DDBAthleteRankingsItemPrimaryKey,
+    points: number,
+    contestCount?: number,
+    changeInRank: number = 0,
+  ) {
+    const includeContestCount = Utils.isNil(contestCount) ? false : true;
     let exprAttrNames = {};
     if (includeContestCount) {
       exprAttrNames = {
@@ -73,19 +75,24 @@ export class DDBAthleteRankingsRepository extends DDBRepository {
     const params: DocumentClient.UpdateItemInput = {
       TableName: this._tableName,
       Key: this.transformer.primaryKey(pk.athleteId, pk.rankingType, pk.year, pk.discipline, pk.gender, pk.ageCategory),
-      UpdateExpression: `SET #gsi_sk = :points, #lastUpdatedAt = :unixTime
+      // tslint:disable-next-line:max-line-length
+      UpdateExpression: `SET #gsi_sk = :points, #lastUpdatedAt = :unixTime, #changeInRank = :changeInRank, #changeInRankUpdatedAt = :changeInRankUpdatedAt
         ${includeContestCount ? ', #contestCount = :contestCount' : ''}`,
       ConditionExpression: 'attribute_exists(#pk)',
       ExpressionAttributeNames: {
         '#pk': this.transformer.attrName('PK'),
         '#gsi_sk': this.transformer.attrName('GSI_SK'),
         '#lastUpdatedAt': this.transformer.attrName('lastUpdatedAt'),
+        '#changeInRank': this.transformer.attrName('changeInRank'),
+        '#changeInRankUpdatedAt': this.transformer.attrName('changeInRankUpdatedAt'),
         ...exprAttrNames,
       },
       ExpressionAttributeValues: {
         ':unixTime': moment().unix(),
         ':points': this.transformer.itemToAttrsTransformer.GSI_SK(points),
         ':contestCount': contestCount,
+        ':changeInRank': changeInRank,
+        ':changeInRankUpdatedAt': Utils.DateNow().toISOString(),
       },
       ReturnValues: 'UPDATED_NEW',
     };

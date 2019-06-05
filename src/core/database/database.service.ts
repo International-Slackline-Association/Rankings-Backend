@@ -6,6 +6,7 @@ import { AthleteContestResult } from 'core/athlete/entity/contest-result';
 import { Contest } from 'core/contest/entity/contest';
 import { Discipline } from 'shared/enums';
 import { DisciplineUtility } from 'shared/enums/enums-utility';
+import { Utils } from '../../shared/utils';
 import { DDBAthleteContestsRepository } from './dynamodb/athlete/contests/athlete.contests.repo';
 import { DDBAthleteDetailsRepository } from './dynamodb/athlete/details/athlete.details.repo';
 import {
@@ -176,7 +177,11 @@ export class DatabaseService {
       gender: item.gender,
       year: item.year,
     };
-    await this.redisRepo.updatePointsOfAthleteInRankingCategory(pk, item.points);
+    const changeInRank = await this.redisRepo.updatePointsOfAthleteInRankingCategory(pk, item.points);
+    if (changeInRank) {
+      item.changeInRank = changeInRank;
+      item.changeInRankUpdatedAt = Utils.DateNow().toDate();
+    }
     const dbItem = this.athleteRankingsRepo.entityTransformer.toDBItem(item);
     await this.athleteRankingsRepo.put(dbItem);
   }
@@ -186,8 +191,8 @@ export class DatabaseService {
     points: number,
     contestCount?: number,
   ) {
-    await this.redisRepo.updatePointsOfAthleteInRankingCategory(pk, points);
-    return this.athleteRankingsRepo.updatePointsAndCount(pk, points, contestCount);
+    const changeInRank = await this.redisRepo.updatePointsOfAthleteInRankingCategory(pk, points);
+    return this.athleteRankingsRepo.updatePointsAndCount(pk, points, contestCount, changeInRank);
   }
 
   public async deleteAthleteRankings(athleteId: string) {
