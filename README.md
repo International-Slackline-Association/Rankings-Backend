@@ -4,29 +4,29 @@ Server-side client of [isa-rankings.org]
 
 **Technical Overview:**
 
-* The server-side is entirely designed to be `serverless` on AWS.
-* Requires knowledge on followings
-    * [Webpack]
-    * [NestJS]
-    * Typescript
-    * [Serverless Framework] (with [Serverless-Offline] plugin)
-    * AWS DynamoDB (main database)
-    * AWS DynamoDB Streams
-    * AWS Api Gateway
-    * AWS Lambda
-    * AWS CloudFormation (infrastructure as a code)
-    * AWS IAM Management (user, roles, policies)
-    * Redis (read through cache)
+- The server-side is entirely designed to be `serverless` on AWS.
+- Requires knowledge on followings
+  - [Webpack]
+  - [NestJS]
+  - Typescript
+  - [Serverless Framework] (with [Serverless-Offline] plugin)
+  - AWS DynamoDB (main database)
+  - AWS DynamoDB Streams
+  - AWS Api Gateway
+  - AWS Lambda
+  - AWS CloudFormation (infrastructure as a code)
+  - AWS IAM Management (user, roles, policies)
+  - Redis (read through cache)
 
 ---
 
 ### Why `serverless`?
 
-* **Pay as you go:** You only pay for the resources you actively use, not when they are sitting idle. Perfect for low|inconsistent traffic applications.
-* **Costs:** Extremely **cheap** . This application costs less than 1 dolar/month.
-* **Maintenance & Operation:** You never manage infrastructure or any problem that comes with it. Only write the code and it works. Since its a volunteered project nobody wants to do anything but writing the application code
+- **Pay as you go:** You only pay for the resources you actively use, not when they are sitting idle. Perfect for low|inconsistent traffic applications.
+- **Costs:** Extremely **cheap** . This application costs less than 1 dolar/month.
+- **Maintenance & Operation:** You never manage infrastructure or any problem that comes with it. Only write the code and it works. Since its a volunteered project nobody wants to do anything but writing the application code
 
-----
+---
 
 ## Architecture Overview
 
@@ -40,16 +40,16 @@ Server-side client of [isa-rankings.org]
 
 In short, it is customized for application's access patterns.
 
-***Overview of the table:***
+**_Overview of the table:_**
 
 ### Main Table
 
-| PK           | SK_GSI                                              | LSI            | GSI_SK           | ...Attributes |
-| ------------ | --------------------------------------------------- | -------------- | ---------------- | ------------- |
-| Athlete:{id} | AthleteDetails                                      |                | {normalizedName} | ...           |
-| Athlete:{id} | Contest:{discipline}:{id}                           | Contest:{date} | {points}         | ...           |
-| Athlete:{id} | Rankings:{year}:{discipline}:{gender}:{ageCategory} |                | {points}         | ...           |
-| Contests     | Contest:{discipline}:{id}                           | Contest:{date} |                  | ...           |
+| PK           | SK_GSI                                                     | LSI            | GSI_SK           | ...Attributes |
+| ------------ | ---------------------------------------------------------- | -------------- | ---------------- | ------------- |
+| Athlete:{id} | AthleteDetails                                             |                | {normalizedName} | ...           |
+| Athlete:{id} | Contest:{discipline}:{id}                                  | Contest:{date} | {points}         | ...           |
+| Athlete:{id} | Rankings:{type}:{year}:{discipline}:{gender}:{ageCategory} |                | {points}         | ...           |
+| Contests     | Contest:{discipline}:{id}                                  | Contest:{date} |                  | ...           |
 
 **Possible Query Patterns:**
 
@@ -60,7 +60,6 @@ In short, it is customized for application's access patterns.
 - Get details of a contest
 - List details of contests sorted by date
 
-
 ### GSI Table
 
 | GSI                                                 | SK               | PK           | ...Attributes |
@@ -70,6 +69,7 @@ In short, it is customized for application's access patterns.
 | Rankings:{year}:{discipline}:{gender}:{ageCategory} | {points}         | Athlete:{id} | ...           |
 
 **Possible Query Patterns:**
+
 - List details of athlete sorted by name
 - List athletes of a contest sorted by points
 - List athletes of a ranking sorted by points
@@ -105,19 +105,18 @@ npm start
 
 API is served at `localhost:3000/`
 
-
 ### Project Folder Overview
 
 [Gource] output
 
 ![GourceImage]
 
-[NestJS]: <https://github.com/nestjs/nest>
-[Serverless-Offline]: <https://github.com/dherault/serverless-offline>
-[Webpack]: <https://webpack.js.org/>
-[DynamoDB]: <https://aws.amazon.com/dynamodb/>
-[Serverless Framework]:<https://serverless.com/framework/docs/providers/aws/guide/quick-start/>
-[isa-rankings.org]: <https://www.isa-rankings.org>
-[Architecture]: <docs/AWS_Architecture.png>
-[Gource]: <https://github.com/acaudwell/Gource>
-[GourceImage]: <docs/GourceOutput.png>
+[nestjs]: https://github.com/nestjs/nest
+[serverless-offline]: https://github.com/dherault/serverless-offline
+[webpack]: https://webpack.js.org/
+[dynamodb]: https://aws.amazon.com/dynamodb/
+[serverless framework]: https://serverless.com/framework/docs/providers/aws/guide/quick-start/
+[isa-rankings.org]: https://www.isa-rankings.org
+[architecture]: docs/AWS_Architecture.png
+[gource]: https://github.com/acaudwell/Gource
+[gourceimage]: docs/GourceOutput.png
