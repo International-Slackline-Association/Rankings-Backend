@@ -140,7 +140,7 @@ export class RankingsService {
       if (!Utils.isSomeNil(numberToAddToContestCount, athleteRanking.contestCount)) {
         updatedContestCount = athleteRanking.contestCount + numberToAddToContestCount;
       }
-      await this.db.updatePointsAndCountOfAthleteRanking(pk, updatedPoints, updatedContestCount);
+      await this.db.updateAthleteRanking(pk, updatedPoints, updatedContestCount);
     } else {
       const item = new AthleteRanking({
         rankingType: rankingType,
@@ -223,20 +223,26 @@ export class RankingsService {
   ) {
     const rankingType = RankingType.TopScore;
 
-    const item = new AthleteRanking({
-      rankingType: rankingType,
-      ageCategory: combination.ageCategory,
-      country: athlete.country,
-      discipline: combination.discipline,
-      gender: combination.gender,
-      id: athlete.id,
-      name: athlete.name,
-      birthdate: athlete.birthdate,
-      points: points,
-      surname: athlete.surname,
-      year: combination.year,
-    });
-    await this.db.putAthleteRanking(item);
+    const athleteRanking = await this.db.getAthleteRanking(pk);
+
+    if (athleteRanking) {
+      await this.db.updateAthleteRanking(pk, points);
+    } else {
+      const item = new AthleteRanking({
+        rankingType: rankingType,
+        ageCategory: combination.ageCategory,
+        country: athlete.country,
+        discipline: combination.discipline,
+        gender: combination.gender,
+        id: athlete.id,
+        name: athlete.name,
+        birthdate: athlete.birthdate,
+        points: points,
+        surname: athlete.surname,
+        year: combination.year,
+      });
+      await this.db.putAthleteRanking(item);
+    }
   }
 
   private async calculateNewPointsForTopScore(
@@ -254,12 +260,12 @@ export class RankingsService {
       }
     } else {
       if (beforeContestDate) {
-        const startDate = Utils.DateNow()
+        const startDate = Utils.dateToMoment(beforeContestDate)
           .add(-Constants.TopScoreYearRange, 'years')
           .toDate();
         betweenDates = {
           start: startDate,
-          end: beforeContestDate < startDate ? undefined : beforeContestDate,
+          end: beforeContestDate
         };
       } else {
         betweenDates = {

@@ -23,8 +23,7 @@ export class EntityTransformer {
       year: athleteRanking.year,
       rankingType: athleteRanking.rankingType,
       contestCount: athleteRanking.contestCount,
-      changeInRank: athleteRanking.changeInRank,
-      changeInRankUpdatedAt: athleteRanking.changeInRankUpdatedAt && athleteRanking.changeInRankUpdatedAt.toISODate(),
+      pointInTimeRank: athleteRanking.pointInTimeRank,
     };
   }
 
@@ -46,8 +45,7 @@ export class EntityTransformer {
       birthdate: dbItem.birthdate && new Date(dbItem.birthdate),
       rankingType: dbItem.rankingType,
       contestCount: dbItem.contestCount,
-      changeInRank: dbItem.changeInRank,
-      changeInRankUpdatedAt: dbItem.changeInRankUpdatedAt && new Date(dbItem.changeInRankUpdatedAt),
+      pointInTimeRank: dbItem.pointInTimeRank,
     });
   }
 }

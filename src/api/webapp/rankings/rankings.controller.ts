@@ -70,34 +70,27 @@ export class RankingsController {
     const rankingsWithAthletes = await Promise.all(
       rankings.items.map(async (item, index) => {
         const athlete = await this.athleteService.getAthlete(item.id);
-        let place;
+        let rank: number;
         if (dto.athleteId || dto.country) {
-          place = await this.rankingsService.getAthleteRankInCategory({ athleteId: item.id, ...category });
+          rank = await this.rankingsService.getAthleteRankInCategory({ athleteId: item.id, ...category });
         }
-        place = place === 0 ? null : place ? place + 1 : undefined;
-        return { athlete, ranking: item, place: place };
+        rank = rank === 0 ? null : rank ? rank + 1 : undefined;
+        return { athlete, ranking: item, rank: rank };
       }),
     );
     return new RankingsListResponse(
       rankingsWithAthletes.map<IRankingsListItem>(obj => {
-        // If change in rank longer than 6 months dont count it.
-        const changeInRank = obj.ranking.changeInRank
-          ? Utils.DateNow().diff(obj.ranking.changeInRankUpdatedAt, 'months') < 6
-            ? obj.ranking.changeInRank
-            : 0
-          : 0;
-
         return {
           id: obj.ranking.id,
           age: obj.ranking.age,
           country: obj.ranking.country,
           name: obj.ranking.name,
           points: obj.ranking.points.toString(),
-          rank: obj.place,
+          rank: obj.rank,
           thumbnailUrl: obj.athlete.thumbnailUrl || obj.athlete.profileUrl,
           surname: obj.ranking.surname,
           contestCount: obj.ranking.contestCount,
-          changeInRank: changeInRank,
+          changeInRank: obj.ranking.pointInTimeRank - (obj.rank ? obj.rank - 1 : obj.ranking.pointInTimeRank),
         };
       }),
       rankings.lastKey,

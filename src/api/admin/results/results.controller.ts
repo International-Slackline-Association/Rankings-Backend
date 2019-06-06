@@ -44,31 +44,54 @@ export class ResultsController {
   }
   @Post('fixrankings/:id')
   public async fixAthleteRankings(@Param('id') id: string): Promise<string> {
-    // const allAthletes = await this.databaseService.queryAthletes(undefined);
-    // console.log(`Total Athlete Count: ${allAthletes.items.length}`);
+    const allAthletes = await this.databaseService.queryAthletes(undefined);
+    console.log(`Total Athlete Count: ${allAthletes.items.length}`);
 
-    const athlete = await this.databaseService.getAthleteDetails(id);
-    if (!athlete) {
-      return 'Athlete Not Found';
-    }
-    let counter = 0;
-    // for (const athlete of allAthletes.items) {
-    console.log(`Fix: ${counter++}, ${athlete.id}`);
-    await this.databaseService.deleteAthleteRankings(athlete.id);
-    const contestResults = await this.databaseService.queryAthleteContestsByDate(athlete.id, undefined);
-    for (const contestResult of contestResults.items) {
-      const year = Utils.dateToMoment(contestResult.contestDate).year();
-
-      await this.rankingsService.updateRankings(
-        athlete.id,
-        contestResult.contestDiscipline,
-        year,
-        contestResult.points,
-        RankingsUpdateReason.NewContest,
-      );
-    }
-    await new Promise(done => setTimeout(done, 4000));
+    // const athlete = await this.databaseService.getAthleteDetails(id);
+    // if (!athlete) {
+    //   return 'Athlete Not Found';
     // }
+    let counter = 0;
+    for (const athlete of allAthletes.items) {
+      console.log(`Fix: ${counter++}, ${athlete.id}`);
+      if (counter < 127) {
+        continue;
+      }
+      // const rankings = await this.databaseService.getAllAthleteRankings(athlete.id);
+      // for (const ranking of rankings.items) {
+      //   const pk = {
+      //     rankingType: ranking.rankingType,
+      //     ageCategory: ranking.ageCategory,
+      //     athleteId: athlete.id,
+      //     discipline: ranking.discipline,
+      //     gender: ranking.gender,
+      //     year: ranking.year,
+      //   };
+      //   await this.databaseService.updateAthleteRanking(pk, ranking.points, ranking.contestCount);
+      // }
+      await this.databaseService.deleteAthleteRankings(athlete.id);
+
+      const contestResults = await this.databaseService.queryAthleteContestsByDate(athlete.id, undefined);
+
+      for (const contestResult of contestResults.items.reverse()) {
+        const year = Utils.dateToMoment(contestResult.contestDate).year();
+
+        await this.rankingsService.updateRankings(
+          athlete.id,
+          contestResult.contestDiscipline,
+          year,
+          contestResult.points,
+          RankingsUpdateReason.NewContest,
+        );
+        // await this.rankingsService.updateTopScoreRankings(
+        //   athlete,
+        //   contestResult.contestDiscipline,
+        //   year,
+        //   contestResult.contestDate,
+        // );
+      }
+      await new Promise(done => setTimeout(done, 3000));
+    }
     console.log('done');
     return 'done';
   }

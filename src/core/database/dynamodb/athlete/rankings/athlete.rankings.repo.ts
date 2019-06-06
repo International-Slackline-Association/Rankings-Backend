@@ -58,41 +58,41 @@ export class DDBAthleteRankingsRepository extends DDBRepository {
       .catch(logThrowDynamoDBError('DDBAthleteRankingsRepository Put', params));
   }
 
-  public async updatePointsAndCount(
+  public async update(
     pk: DDBAthleteRankingsItemPrimaryKey,
     points: number,
     contestCount?: number,
-    changeInRank: number = 0,
+    pointInTimeRank?: number,
   ) {
     const includeContestCount = Utils.isNil(contestCount) ? false : true;
-    let exprAttrNames = {};
+    const includepointInTimeRank = Utils.isNil(pointInTimeRank) ? false : true;
+    const exprAttrNames = {};
     if (includeContestCount) {
-      exprAttrNames = {
-        '#contestCount': this.transformer.attrName('contestCount'),
-      };
+      exprAttrNames['#contestCount'] = this.transformer.attrName('contestCount');
+    }
+    if (includepointInTimeRank) {
+      exprAttrNames['#pointInTimeRank'] = this.transformer.attrName('pointInTimeRank');
     }
 
     const params: DocumentClient.UpdateItemInput = {
       TableName: this._tableName,
       Key: this.transformer.primaryKey(pk.athleteId, pk.rankingType, pk.year, pk.discipline, pk.gender, pk.ageCategory),
       // tslint:disable-next-line:max-line-length
-      UpdateExpression: `SET #gsi_sk = :points, #lastUpdatedAt = :unixTime, #changeInRank = :changeInRank, #changeInRankUpdatedAt = :changeInRankUpdatedAt
-        ${includeContestCount ? ', #contestCount = :contestCount' : ''}`,
+      UpdateExpression: `SET #gsi_sk = :points, #lastUpdatedAt = :unixTime ${
+        includeContestCount ? ', #contestCount = :contestCount' : ''
+      } ${includepointInTimeRank ? ', #pointInTimeRank = :pointInTimeRank' : ''}`,
       ConditionExpression: 'attribute_exists(#pk)',
       ExpressionAttributeNames: {
         '#pk': this.transformer.attrName('PK'),
         '#gsi_sk': this.transformer.attrName('GSI_SK'),
         '#lastUpdatedAt': this.transformer.attrName('lastUpdatedAt'),
-        '#changeInRank': this.transformer.attrName('changeInRank'),
-        '#changeInRankUpdatedAt': this.transformer.attrName('changeInRankUpdatedAt'),
         ...exprAttrNames,
       },
       ExpressionAttributeValues: {
         ':unixTime': moment().unix(),
         ':points': this.transformer.itemToAttrsTransformer.GSI_SK(points),
         ':contestCount': contestCount,
-        ':changeInRank': changeInRank,
-        ':changeInRankUpdatedAt': Utils.DateNow().toISOString(),
+        ':pointInTimeRank': pointInTimeRank,
       },
       ReturnValues: 'UPDATED_NEW',
     };

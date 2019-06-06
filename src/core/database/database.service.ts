@@ -177,28 +177,30 @@ export class DatabaseService {
       gender: item.gender,
       year: item.year,
     };
-    const changeInRank = await this.redisRepo.updatePointsOfAthleteInRankingCategory(pk, item.points);
-    if (changeInRank) {
-      item.changeInRank = changeInRank;
-      item.changeInRankUpdatedAt = Utils.DateNow().toDate();
+    const pointInTimeRank = await this.redisRepo.updatePointsOfAthleteInRankingCategory(pk, item.points);
+    if (pointInTimeRank) {
+      item.pointInTimeRank = pointInTimeRank;
     }
     const dbItem = this.athleteRankingsRepo.entityTransformer.toDBItem(item);
     await this.athleteRankingsRepo.put(dbItem);
   }
 
-  public async updatePointsAndCountOfAthleteRanking(
+  public async updateAthleteRanking(
     pk: DDBAthleteRankingsItemPrimaryKey,
     points: number,
     contestCount?: number,
   ) {
-    const changeInRank = await this.redisRepo.updatePointsOfAthleteInRankingCategory(pk, points);
-    return this.athleteRankingsRepo.updatePointsAndCount(pk, points, contestCount, changeInRank);
+    const pointInTimeRank = await this.redisRepo.updatePointsOfAthleteInRankingCategory(pk, points);
+    return this.athleteRankingsRepo.update(pk, points, contestCount, pointInTimeRank);
   }
 
   public async deleteAthleteRankings(athleteId: string) {
     await this.athleteRankingsRepo.deleteAthleteRankings(athleteId);
   }
 
+  public async getAllAthleteRankings(athleteId: string) {
+    return this.athleteRankingsRepo.getAllAthleteRankings(athleteId);
+  }
   public async queryAthleteRankings(
     limit: number,
     category: DDBRankingsItemPrimaryKey,
