@@ -62,16 +62,16 @@ export class DDBAthleteRankingsRepository extends DDBRepository {
     pk: DDBAthleteRankingsItemPrimaryKey,
     points: number,
     contestCount?: number,
-    pointInTimeRank?: number,
+    previousRank?: number,
   ) {
     const includeContestCount = Utils.isNil(contestCount) ? false : true;
-    const includepointInTimeRank = Utils.isNil(pointInTimeRank) ? false : true;
+    const includePreviousRank = Utils.isNil(previousRank) ? false : true;
     const exprAttrNames = {};
     if (includeContestCount) {
       exprAttrNames['#contestCount'] = this.transformer.attrName('contestCount');
     }
-    if (includepointInTimeRank) {
-      exprAttrNames['#pointInTimeRank'] = this.transformer.attrName('pointInTimeRank');
+    if (includePreviousRank) {
+      exprAttrNames['#previousRank'] = this.transformer.attrName('previousRank');
     }
 
     const params: DocumentClient.UpdateItemInput = {
@@ -80,7 +80,7 @@ export class DDBAthleteRankingsRepository extends DDBRepository {
       // tslint:disable-next-line:max-line-length
       UpdateExpression: `SET #gsi_sk = :points, #lastUpdatedAt = :unixTime ${
         includeContestCount ? ', #contestCount = :contestCount' : ''
-      } ${includepointInTimeRank ? ', #pointInTimeRank = :pointInTimeRank' : ''}`,
+      } ${includePreviousRank ? ', #previousRank = :previousRank' : ''}`,
       ConditionExpression: 'attribute_exists(#pk)',
       ExpressionAttributeNames: {
         '#pk': this.transformer.attrName('PK'),
@@ -92,7 +92,7 @@ export class DDBAthleteRankingsRepository extends DDBRepository {
         ':unixTime': moment().unix(),
         ':points': this.transformer.itemToAttrsTransformer.GSI_SK(points),
         ':contestCount': contestCount,
-        ':pointInTimeRank': pointInTimeRank,
+        ':previousRank': previousRank,
       },
       ReturnValues: 'UPDATED_NEW',
     };
@@ -103,7 +103,7 @@ export class DDBAthleteRankingsRepository extends DDBRepository {
       .then(data => {
         return data.Attributes[this.transformer.attrName('GSI_SK')] as number;
       })
-      .catch(logThrowDynamoDBError('DDBAthleteRankingsRepository updatePointsAndCount', params));
+      .catch(logThrowDynamoDBError('DDBAthleteRankingsRepository update', params));
   }
 
   public async getAllAthleteRankings(athleteId: string) {

@@ -6,7 +6,7 @@ default: &default
   REDISHOST: ${self:custom.secrets.REDISHOST}
   REDISPASSWORD: ${self:custom.secrets.REDISPASSWORD}
   REDISPORT: ${self:custom.secrets.REDISPORT}
-
+  DISABLE_STREAMS: False
 Dev:
   <<: *default
   LoggerDebugLevel: debug

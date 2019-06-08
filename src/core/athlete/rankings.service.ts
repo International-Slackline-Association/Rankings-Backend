@@ -134,13 +134,15 @@ export class RankingsService {
         break;
     }
 
+    const rankBeforeUpdate = await this.db.getAthleteRankingPlace(pk);
+
     if (athleteRanking) {
       const updatedPoints = athleteRanking.points + pointsToAdd;
       let updatedContestCount: number;
       if (!Utils.isSomeNil(numberToAddToContestCount, athleteRanking.contestCount)) {
         updatedContestCount = athleteRanking.contestCount + numberToAddToContestCount;
       }
-      await this.db.updateAthleteRanking(pk, updatedPoints, updatedContestCount);
+      await this.db.updateAthleteRanking(pk, updatedPoints, updatedContestCount, rankBeforeUpdate);
     } else {
       const item = new AthleteRanking({
         rankingType: rankingType,
@@ -155,6 +157,7 @@ export class RankingsService {
         surname: athlete.surname,
         year: combination.year,
         contestCount: numberToAddToContestCount,
+        previousRank: rankBeforeUpdate,
       });
       await this.db.putAthleteRanking(item);
     }
@@ -223,10 +226,12 @@ export class RankingsService {
   ) {
     const rankingType = RankingType.TopScore;
 
+    const rankBeforeUpdate = await this.db.getAthleteRankingPlace(pk);
+
     const athleteRanking = await this.db.getAthleteRanking(pk);
 
     if (athleteRanking) {
-      await this.db.updateAthleteRanking(pk, points);
+      await this.db.updateAthleteRanking(pk, points, undefined, rankBeforeUpdate);
     } else {
       const item = new AthleteRanking({
         rankingType: rankingType,
@@ -240,6 +245,7 @@ export class RankingsService {
         points: points,
         surname: athlete.surname,
         year: combination.year,
+        previousRank: rankBeforeUpdate
       });
       await this.db.putAthleteRanking(item);
     }
@@ -265,7 +271,7 @@ export class RankingsService {
           .toDate();
         betweenDates = {
           start: startDate,
-          end: beforeContestDate
+          end: beforeContestDate,
         };
       } else {
         betweenDates = {

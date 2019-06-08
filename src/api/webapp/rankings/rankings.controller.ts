@@ -70,27 +70,32 @@ export class RankingsController {
     const rankingsWithAthletes = await Promise.all(
       rankings.items.map(async (item, index) => {
         const athlete = await this.athleteService.getAthlete(item.id);
-        let rank: number;
-        if (dto.athleteId || dto.country) {
-          rank = await this.rankingsService.getAthleteRankInCategory({ athleteId: item.id, ...category });
-        }
-        rank = rank === 0 ? null : rank ? rank + 1 : undefined;
-        return { athlete, ranking: item, rank: rank };
+        let currentRank: number;
+        // if (dto.athleteId || dto.country) {
+        currentRank = await this.rankingsService.getAthleteRankInCategory({ athleteId: item.id, ...category });
+        // }
+        // currentRank = currentRank === 0 ? null : currentRank ? currentRank + 1 : undefined;
+        return { athlete, ranking: item, currentRank: currentRank };
       }),
     );
     return new RankingsListResponse(
       rankingsWithAthletes.map<IRankingsListItem>(obj => {
+        let changeInRank = 0;
+        if (obj.ranking.previousRank && obj.currentRank) {
+          changeInRank = obj.ranking.previousRank - obj.currentRank;
+        }
         return {
           id: obj.ranking.id,
           age: obj.ranking.age,
           country: obj.ranking.country,
           name: obj.ranking.name,
           points: obj.ranking.points.toString(),
-          rank: obj.rank,
+          // tslint:disable-next-line:max-line-length
+          rank: dto.athleteId || dto.country ? obj.currentRank : undefined, // let website decide the rank because its sequential
           thumbnailUrl: obj.athlete.thumbnailUrl || obj.athlete.profileUrl,
           surname: obj.ranking.surname,
           contestCount: obj.ranking.contestCount,
-          changeInRank: obj.ranking.pointInTimeRank - (obj.rank ? obj.rank - 1 : obj.ranking.pointInTimeRank),
+          changeInRank: changeInRank,
         };
       }),
       rankings.lastKey,

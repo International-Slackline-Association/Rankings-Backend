@@ -28,19 +28,19 @@ export class AthleteContestRecordService {
 
     if (record.eventName === 'INSERT') {
       const item = this.athleteContestsRepo.transformFromDynamoDBType(record.dynamodb.NewImage);
-      logger.info('New Contest Record ', { data: item });
+      // logger.info('New Contest Record ', { data: item });
       await this.processNewContestResult(item);
     }
     if (record.eventName === 'MODIFY') {
       const oldItem = this.athleteContestsRepo.transformFromDynamoDBType(record.dynamodb.OldImage);
       const newItem = this.athleteContestsRepo.transformFromDynamoDBType(record.dynamodb.NewImage);
-      logger.info('Modified Contest Record ', { data: { oldItem, newItem } });
+      // logger.info('Modified Contest Record ', { data: { oldItem, newItem } });
 
       await this.processModifiedContestResult(oldItem, newItem);
     }
     if (record.eventName === 'REMOVE') {
       const oldItem = this.athleteContestsRepo.transformFromDynamoDBType(record.dynamodb.OldImage);
-      logger.info('Removed Contest Record ', { data: oldItem });
+      // logger.info('Removed Contest Record ', { data: oldItem });
       await this.processRemovedContestResult(oldItem);
     }
   }

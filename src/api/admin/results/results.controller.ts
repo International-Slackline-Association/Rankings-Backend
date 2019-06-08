@@ -54,9 +54,9 @@ export class ResultsController {
     let counter = 0;
     for (const athlete of allAthletes.items) {
       console.log(`Fix: ${counter++}, ${athlete.id}`);
-      if (counter < 127) {
-        continue;
-      }
+      // if (counter < 53) {
+      //   continue;
+      // }
       // const rankings = await this.databaseService.getAllAthleteRankings(athlete.id);
       // for (const ranking of rankings.items) {
       //   const pk = {
@@ -90,7 +90,7 @@ export class ResultsController {
         //   contestResult.contestDate,
         // );
       }
-      await new Promise(done => setTimeout(done, 3000));
+      // await new Promise(done => setTimeout(done, 5000));
     }
     console.log('done');
     return 'done';

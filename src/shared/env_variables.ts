@@ -13,9 +13,7 @@ class EnvironmentVariables {
   }
 
   get IS_OFFLINE(): boolean {
-    return (
-      process.env.IS_OFFLINE === 'true' || process.env.ENVIRONMENT === 'Local'
-    );
+    return process.env.IS_OFFLINE === 'true' || process.env.ENVIRONMENT === 'Local';
   }
 
   get morganConfig(): string {
@@ -32,6 +30,10 @@ class EnvironmentVariables {
 
   get redis_password(): string {
     return process.env.REDISPASSWORD;
+  }
+
+  get disable_streams(): boolean {
+    return process.env.DISABLE_STREAMS === 'True';
   }
 }
 

@@ -177,10 +177,7 @@ export class DatabaseService {
       gender: item.gender,
       year: item.year,
     };
-    const pointInTimeRank = await this.redisRepo.updatePointsOfAthleteInRankingCategory(pk, item.points);
-    if (pointInTimeRank) {
-      item.pointInTimeRank = pointInTimeRank;
-    }
+    await this.redisRepo.updatePointsOfAthleteInRankingCategory(pk, item.points);
     const dbItem = this.athleteRankingsRepo.entityTransformer.toDBItem(item);
     await this.athleteRankingsRepo.put(dbItem);
   }
@@ -189,9 +186,10 @@ export class DatabaseService {
     pk: DDBAthleteRankingsItemPrimaryKey,
     points: number,
     contestCount?: number,
+    previousRank?: number,
   ) {
-    const pointInTimeRank = await this.redisRepo.updatePointsOfAthleteInRankingCategory(pk, points);
-    return this.athleteRankingsRepo.update(pk, points, contestCount, pointInTimeRank);
+    await this.redisRepo.updatePointsOfAthleteInRankingCategory(pk, points);
+    return this.athleteRankingsRepo.update(pk, points, contestCount, previousRank);
   }
 
   public async deleteAthleteRankings(athleteId: string) {

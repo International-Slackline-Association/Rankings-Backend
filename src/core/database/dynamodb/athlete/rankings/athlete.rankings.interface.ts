@@ -11,7 +11,7 @@ interface Attrs {
   readonly normalizedName: string;
   readonly lastUpdatedAt?: number;
   readonly contestCount: number;
-  readonly pointInTimeRank: number;
+  readonly previousRank: number;
 }
 
 interface NonKeyAttrs extends Attrs {}
