@@ -54,41 +54,27 @@ export class ResultsController {
     let counter = 0;
     for (const athlete of allAthletes.items) {
       console.log(`Fix: ${counter++}, ${athlete.id}`);
-      // if (counter < 53) {
+      // if (counter < 473) {
       //   continue;
       // }
-      // const rankings = await this.databaseService.getAllAthleteRankings(athlete.id);
-      // for (const ranking of rankings.items) {
-      //   const pk = {
-      //     rankingType: ranking.rankingType,
-      //     ageCategory: ranking.ageCategory,
-      //     athleteId: athlete.id,
-      //     discipline: ranking.discipline,
-      //     gender: ranking.gender,
-      //     year: ranking.year,
-      //   };
-      //   await this.databaseService.updateAthleteRanking(pk, ranking.points, ranking.contestCount);
-      // }
-      await this.databaseService.deleteAthleteRankings(athlete.id);
+
+      // await this.databaseService.deleteAthleteRankings(athlete.id);
 
       const contestResults = await this.databaseService.queryAthleteContestsByDate(athlete.id, undefined);
 
       for (const contestResult of contestResults.items.reverse()) {
-        const year = Utils.dateToMoment(contestResult.contestDate).year();
-
         await this.rankingsService.updateRankings(
           athlete.id,
-          contestResult.contestDiscipline,
-          year,
           contestResult.points,
-          RankingsUpdateReason.NewContest,
+          {
+            id: contestResult.contestId,
+            discipline: contestResult.contestDiscipline,
+            date: contestResult.contestDate,
+          },
+          {
+            reason: RankingsUpdateReason.NewContest,
+          },
         );
-        // await this.rankingsService.updateTopScoreRankings(
-        //   athlete,
-        //   contestResult.contestDiscipline,
-        //   year,
-        //   contestResult.contestDate,
-        // );
       }
       // await new Promise(done => setTimeout(done, 5000));
     }

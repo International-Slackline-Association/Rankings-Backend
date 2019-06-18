@@ -50,10 +50,15 @@ export class AthleteContestRecordService {
     const year = Utils.dateToMoment(newItem.contestDate).year();
     await this.rankingsService.updateRankings(
       newItem.athleteId,
-      newItem.contestDiscipline,
-      year,
       pointsToAdd,
-      RankingsUpdateReason.NewContest,
+      {
+        id: newItem.contestId,
+        discipline: newItem.contestDiscipline,
+        date: newItem.contestDate,
+      },
+      {
+        reason: RankingsUpdateReason.NewContest,
+      },
     );
   }
 
@@ -66,10 +71,15 @@ export class AthleteContestRecordService {
 
     await this.rankingsService.updateRankings(
       newItem.athleteId,
-      newItem.contestDiscipline,
-      year,
       pointsToAdd,
-      RankingsUpdateReason.PointsChanged,
+      {
+        id: newItem.contestId,
+        discipline: newItem.contestDiscipline,
+        date: newItem.contestDate,
+      },
+      {
+        reason: RankingsUpdateReason.PointsChanged,
+      },
     );
   }
 
@@ -79,10 +89,15 @@ export class AthleteContestRecordService {
 
     await this.rankingsService.updateRankings(
       oldItem.athleteId,
-      oldItem.contestDiscipline,
-      year,
       pointsToAdd,
-      RankingsUpdateReason.DeletedContest,
+      {
+        id: oldItem.contestId,
+        discipline: oldItem.contestDiscipline,
+        date: oldItem.contestDate,
+      },
+      {
+        reason: RankingsUpdateReason.DeletedContest,
+      },
     );
   }
 }

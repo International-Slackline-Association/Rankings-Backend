@@ -185,11 +185,12 @@ export class DatabaseService {
   public async updateAthleteRanking(
     pk: DDBAthleteRankingsItemPrimaryKey,
     points: number,
+    latestContest?: string,
+    rankBeforeLatestContest?: number,
     contestCount?: number,
-    previousRank?: number,
   ) {
     await this.redisRepo.updatePointsOfAthleteInRankingCategory(pk, points);
-    return this.athleteRankingsRepo.update(pk, points, contestCount, previousRank);
+    return this.athleteRankingsRepo.update(pk, points, latestContest, rankBeforeLatestContest, contestCount);
   }
 
   public async deleteAthleteRankings(athleteId: string) {

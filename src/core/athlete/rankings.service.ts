@@ -67,32 +67,30 @@ export class RankingsService {
 
   public async updateRankings(
     athleteId: string,
-    discipline: Discipline,
-    year: number,
     pointsToAdd: number,
-    reason: RankingsUpdateReason,
+    contest: { id: string; discipline: Discipline; date: Date },
+    meta: { reason: RankingsUpdateReason },
   ) {
     const athlete = await this.db.getAthleteDetails(athleteId);
     if (!athlete) {
       return;
     }
-    const p1 = this.updatePointScoreRankings(athlete, discipline, year, pointsToAdd, reason);
-    const p2 = this.updateTopScoreRankings(athlete, discipline, year);
+    const p1 = this.updatePointScoreRankings(athlete, pointsToAdd, contest, meta);
+    const p2 = this.updateTopScoreRankings(athlete, contest);
     await Promise.all([p1, p2]);
   }
 
   //#region Point Score
   private async updatePointScoreRankings(
     athlete: AthleteDetail,
-    discipline: Discipline,
-    year: number,
     pointsToAdd: number,
-    reason?: RankingsUpdateReason,
+    contest: { id: string; discipline: Discipline; date: Date },
+    meta: { reason: RankingsUpdateReason },
   ) {
     const rankingType = RankingType.PointScore;
     const combinations = this.generateAllCombinationsWithParentCategories(
-      year,
-      discipline,
+      Utils.dateToMoment(contest.date).year(),
+      contest.discipline,
       athlete.gender,
       athlete.ageCategory,
     );
@@ -106,7 +104,12 @@ export class RankingsService {
         gender: combination.gender,
         year: combination.year,
       };
-      promises.push(this.updatePointScoreAthleteRanking(pk, athlete, combination, pointsToAdd, reason));
+      promises.push(
+        this.updatePointScoreAthleteRanking(pk, athlete, combination, pointsToAdd, {
+          contestId: contest.id,
+          reason: meta.reason,
+        }),
+      );
     }
     await Promise.all(promises);
   }
@@ -116,13 +119,16 @@ export class RankingsService {
     athlete: AthleteDetail,
     combination: RankingCombination,
     pointsToAdd: number,
-    reason?: RankingsUpdateReason,
+    meta: {
+      reason?: RankingsUpdateReason;
+      contestId: string;
+    },
   ) {
     const rankingType = RankingType.PointScore;
 
     const athleteRanking = await this.db.getAthleteRanking(pk);
     let numberToAddToContestCount: number;
-    switch (reason) {
+    switch (meta.reason) {
       case RankingsUpdateReason.NewContest:
         numberToAddToContestCount = 1;
         break;
@@ -134,7 +140,8 @@ export class RankingsService {
         break;
     }
 
-    const rankBeforeUpdate = await this.db.getAthleteRankingPlace(pk);
+    // let rankBeforeUpdate = await this.db.getAthleteRankingPlace(pk);
+    let rankBeforeUpdate = await this.db.getAthleteRankingPlace(pk);
 
     if (athleteRanking) {
       const updatedPoints = athleteRanking.points + pointsToAdd;
@@ -142,7 +149,16 @@ export class RankingsService {
       if (!Utils.isSomeNil(numberToAddToContestCount, athleteRanking.contestCount)) {
         updatedContestCount = athleteRanking.contestCount + numberToAddToContestCount;
       }
-      await this.db.updateAthleteRanking(pk, updatedPoints, updatedContestCount, rankBeforeUpdate);
+      if (athleteRanking.points === updatedPoints || athleteRanking.latestUpdateWithContest === meta.contestId) {
+        rankBeforeUpdate = undefined; // Dont change rank if the update is with same contest
+      }
+      if (
+        athleteRanking.points !== updatedPoints ||
+        athleteRanking.latestUpdateWithContest !== meta.contestId ||
+        athleteRanking.contestCount !== updatedContestCount
+      ) {
+        await this.db.updateAthleteRanking(pk, updatedPoints, meta.contestId, rankBeforeUpdate, updatedContestCount);
+      }
     } else {
       const item = new AthleteRanking({
         rankingType: rankingType,
@@ -157,7 +173,8 @@ export class RankingsService {
         surname: athlete.surname,
         year: combination.year,
         contestCount: numberToAddToContestCount,
-        previousRank: rankBeforeUpdate,
+        rankBeforeLatestContest: rankBeforeUpdate,
+        latestUpdateWithContest: meta.contestId,
       });
       await this.db.putAthleteRanking(item);
     }
@@ -167,17 +184,18 @@ export class RankingsService {
   //#region TopScore
   public async updateTopScoreRankings(
     athlete: AthleteDetail,
-    discipline: Discipline,
-    year: number,
-    beforeContestDate?: Date,
+    contest: { id: string; discipline: Discipline; date: Date },
+    meta?: {
+      beforeContestDate?: Date;
+    },
   ) {
     const rankingType = RankingType.TopScore;
 
     const pointsDict = {};
 
     const combinations = this.generateAllCombinationsWithParentCategories(
-      year,
-      discipline,
+      Utils.dateToMoment(contest.date).year(),
+      contest.discipline,
       athlete.gender,
       athlete.ageCategory,
     );
@@ -191,31 +209,18 @@ export class RankingsService {
         gender: combination.gender,
         year: combination.year,
       };
-      promises.push(this.updateTopScoreRankingForCombination(pk, athlete, combination, pointsDict, beforeContestDate));
-    }
-    await Promise.all(promises);
-  }
-
-  private async updateTopScoreRankingForCombination(
-    pk: DDBAthleteRankingsItemPrimaryKey,
-    athlete: AthleteDetail,
-    combination: RankingCombination,
-    pointsDict: {},
-    beforeContestDate?: Date,
-  ) {
-    let points = pointsDict[`${combination.discipline}-${combination.year}`];
-    if (Utils.isNil(points)) {
-      points = await this.calculateNewPointsForTopScore(
+      const points = await this.calculateNewPointsForTopScore(
         athlete.id,
         combination.discipline,
+        pointsDict,
         combination.year || undefined,
-        beforeContestDate,
+        meta && meta.beforeContestDate,
       );
-      pointsDict[`${combination.discipline}-${combination.year}`] = points;
+      if (points) {
+        promises.push(this.updateTopScoreAthleteRanking(pk, athlete, combination, points, { contestId: contest.id }));
+      }
     }
-    if (points) {
-      await this.updateTopScoreAthleteRanking(pk, athlete, combination, points);
-    }
+    await Promise.all(promises);
   }
 
   private async updateTopScoreAthleteRanking(
@@ -223,15 +228,21 @@ export class RankingsService {
     athlete: AthleteDetail,
     combination: RankingCombination,
     points: number,
+    meta: { contestId: string },
   ) {
     const rankingType = RankingType.TopScore;
 
-    const rankBeforeUpdate = await this.db.getAthleteRankingPlace(pk);
+    let rankBeforeUpdate = await this.db.getAthleteRankingPlace(pk);
 
     const athleteRanking = await this.db.getAthleteRanking(pk);
 
     if (athleteRanking) {
-      await this.db.updateAthleteRanking(pk, points, undefined, rankBeforeUpdate);
+      if (athleteRanking.points === points || athleteRanking.latestUpdateWithContest === meta.contestId) {
+        rankBeforeUpdate = undefined; // Dont change rank if the update is with same contest
+      }
+      if (athleteRanking.points !== points || athleteRanking.latestUpdateWithContest !== meta.contestId) {
+        await this.db.updateAthleteRanking(pk, points, meta.contestId, rankBeforeUpdate, undefined);
+      }
     } else {
       const item = new AthleteRanking({
         rankingType: rankingType,
@@ -245,7 +256,8 @@ export class RankingsService {
         points: points,
         surname: athlete.surname,
         year: combination.year,
-        previousRank: rankBeforeUpdate
+        rankBeforeLatestContest: rankBeforeUpdate,
+        latestUpdateWithContest: meta.contestId,
       });
       await this.db.putAthleteRanking(item);
     }
@@ -254,9 +266,15 @@ export class RankingsService {
   private async calculateNewPointsForTopScore(
     athleteId: string,
     discipline: Discipline,
+    pointsDict: {},
     year?: number,
     beforeContestDate?: Date,
   ) {
+    const points = pointsDict[`${discipline}-${year}`];
+    if (!Utils.isNil(points)) {
+      return points;
+    }
+
     let betweenDates;
     if (year) {
       if (beforeContestDate) {
@@ -295,6 +313,8 @@ export class RankingsService {
       .slice(0, Constants.TopScoreContestCount)
       .map(c => c.points)
       .reduce((acc, b) => acc + b);
+
+    pointsDict[`${discipline}-${year}`] = totalPoints;
     return totalPoints;
   }
 

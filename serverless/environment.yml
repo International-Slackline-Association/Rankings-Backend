@@ -7,6 +7,7 @@ default: &default
   REDISPASSWORD: ${self:custom.secrets.REDISPASSWORD}
   REDISPORT: ${self:custom.secrets.REDISPORT}
   DISABLE_STREAMS: False
+  DISABLE_CRONJOB: True
 Dev:
   <<: *default
   LoggerDebugLevel: debug

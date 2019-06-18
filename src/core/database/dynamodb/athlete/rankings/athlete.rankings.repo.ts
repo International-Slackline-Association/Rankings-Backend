@@ -61,26 +61,32 @@ export class DDBAthleteRankingsRepository extends DDBRepository {
   public async update(
     pk: DDBAthleteRankingsItemPrimaryKey,
     points: number,
+    latestContest?: string,
+    rankBeforeLatestContest?: number,
     contestCount?: number,
-    previousRank?: number,
   ) {
     const includeContestCount = Utils.isNil(contestCount) ? false : true;
-    const includePreviousRank = Utils.isNil(previousRank) ? false : true;
+    const includeRankBeforeLatestContest = Utils.isNil(rankBeforeLatestContest) ? false : true;
+    const includeLatestContest = Utils.isNil(latestContest) ? false : true;
+
     const exprAttrNames = {};
     if (includeContestCount) {
       exprAttrNames['#contestCount'] = this.transformer.attrName('contestCount');
     }
-    if (includePreviousRank) {
-      exprAttrNames['#previousRank'] = this.transformer.attrName('previousRank');
+    if (includeRankBeforeLatestContest) {
+      exprAttrNames['#rankBeforeLatestContest'] = this.transformer.attrName('rankBeforeLatestContest');
     }
-
+    if (includeLatestContest) {
+      exprAttrNames['#latestUpdateWithContest'] = this.transformer.attrName('latestUpdateWithContest');
+    }
     const params: DocumentClient.UpdateItemInput = {
       TableName: this._tableName,
       Key: this.transformer.primaryKey(pk.athleteId, pk.rankingType, pk.year, pk.discipline, pk.gender, pk.ageCategory),
       // tslint:disable-next-line:max-line-length
       UpdateExpression: `SET #gsi_sk = :points, #lastUpdatedAt = :unixTime ${
         includeContestCount ? ', #contestCount = :contestCount' : ''
-      } ${includePreviousRank ? ', #previousRank = :previousRank' : ''}`,
+      } ${includeLatestContest ? ', #latestUpdateWithContest = :latestUpdateWithContest ' : ''}
+      ${includeRankBeforeLatestContest ? ', #rankBeforeLatestContest = :rankBeforeLatestContest' : ''}`,
       ConditionExpression: 'attribute_exists(#pk)',
       ExpressionAttributeNames: {
         '#pk': this.transformer.attrName('PK'),
@@ -92,7 +98,8 @@ export class DDBAthleteRankingsRepository extends DDBRepository {
         ':unixTime': moment().unix(),
         ':points': this.transformer.itemToAttrsTransformer.GSI_SK(points),
         ':contestCount': contestCount,
-        ':previousRank': previousRank,
+        ':rankBeforeLatestContest': rankBeforeLatestContest,
+        ':latestUpdateWithContest': latestContest,
       },
       ReturnValues: 'UPDATED_NEW',
     };

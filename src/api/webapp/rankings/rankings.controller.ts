@@ -81,8 +81,8 @@ export class RankingsController {
     return new RankingsListResponse(
       rankingsWithAthletes.map<IRankingsListItem>(obj => {
         let changeInRank = 0;
-        if (obj.ranking.previousRank && obj.currentRank) {
-          changeInRank = obj.ranking.previousRank - obj.currentRank;
+        if (obj.ranking.rankBeforeLatestContest && obj.currentRank) {
+          changeInRank = obj.ranking.rankBeforeLatestContest - obj.currentRank;
         }
         return {
           id: obj.ranking.id,

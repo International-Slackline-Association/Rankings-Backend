@@ -33,7 +33,10 @@ class EnvironmentVariables {
   }
 
   get disable_streams(): boolean {
-    return process.env.DISABLE_STREAMS === 'True';
+    return process.env.DISABLE_STREAMS === 'true';
+  }
+  get disable_cronjob(): boolean {
+    return process.env.DISABLE_CRONJOB === 'true';
   }
 }
 

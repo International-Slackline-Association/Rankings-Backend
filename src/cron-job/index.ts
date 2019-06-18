@@ -28,6 +28,10 @@ async function bootstrap() {
 export const handler = async (event, context, callback) => {
   context.callbackWaitsForEmptyEventLoop = false;
 
+  if (env_variables.disable_cronjob) {
+    return;
+  }
+
   await bootstrap();
 
   await waitForLogger();
