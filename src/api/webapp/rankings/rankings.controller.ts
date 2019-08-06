@@ -62,7 +62,7 @@ export class RankingsController {
     const ageCategory = categories[4];
 
     const category: RankingsCategory = { rankingType, discipline, year, gender, ageCategory };
-    const rankings = await this.rankingsService.queryRankings(10, category, {
+    const rankings = await this.rankingsService.queryRankings(20, category, {
       athleteId: dto.athleteId,
       after: dto.next,
       country: dto.country,
