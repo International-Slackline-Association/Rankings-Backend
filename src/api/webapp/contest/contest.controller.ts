@@ -65,16 +65,25 @@ export class ContestController {
     const discipline = categories[0];
     const year = categories[1];
 
-    const contests = await this.contestService.queryContests(10, {
-      descending: Utils.DateNow().month() > 6,
+    const contests = await this.contestService.queryContests(undefined, {
+      descending: false,
       year: year,
       contestId: dto.contestId,
       after: dto.next,
       discipline: discipline,
     });
+    let sliceIndex = 0;
+    for (const contest of contests.items) {
+      if (contest.date > Utils.DateNow().toDate()) {
+        break;
+      }
+      sliceIndex ++;
+    }
+
+    const items = contests.items.slice(sliceIndex).concat(contests.items.slice(0, sliceIndex));
 
     const contestWithResultsStatus = await Promise.all(
-      contests.items.map(async (item, index) => {
+      items.map(async (item, index) => {
         const results = await this.contestService.getResults(item.id, item.discipline, 1);
         return { contest: item, resultsAvailable: results.items.length > 0 };
       }),
