@@ -65,6 +65,62 @@ export class RankingsService {
     return rankings;
   }
 
+  public async refreshAllRankingsOfAthlete(athleteId: string) {
+    // const athlete = await this.db.getAthleteDetails(athleteId);
+    const allRankings = await this.db.getAllAthleteRankings(athleteId);
+    const contestResults = await this.db.queryAthleteContestsByDate(athleteId, undefined);
+
+    const allUpdatedRankings: AthleteRanking[] = [];
+    for (const contestResult of contestResults.items.reverse()) {
+      const updatedRankings = await this.updateRankings(
+        athleteId,
+        contestResult.points,
+        {
+          id: contestResult.contestId,
+          discipline: contestResult.contestDiscipline,
+          date: contestResult.contestDate,
+        },
+        {
+          reason: RankingsUpdateReason.RecalculatedContest,
+        },
+      );
+      allUpdatedRankings.push(...updatedRankings);
+    }
+    const tobeRemovedRankings = allRankings.filter(
+      r => !allUpdatedRankings.find(r2 => this.isAthleteRankingsEqual(r, r2)),
+    );
+    for (const rankingItem of tobeRemovedRankings) {
+      const pk = {
+        rankingType: rankingItem.rankingType,
+        ageCategory: rankingItem.ageCategory,
+        athleteId: rankingItem.id,
+        discipline: rankingItem.discipline,
+        gender: rankingItem.gender,
+        year: rankingItem.year,
+      };
+      await this.db.deleteAthleteRankingsItem(pk);
+    }
+  }
+
+  private isAthleteRankingsEqual(r1: AthleteRanking, r2: AthleteRanking) {
+    if (r1.rankingType !== r2.rankingType) {
+      return false;
+    }
+    if (r1.year !== r2.year) {
+      return false;
+    }
+    if (r1.gender !== r2.gender) {
+      return false;
+    }
+    if (r1.ageCategory !== r2.ageCategory) {
+      return false;
+    }
+    if (r1.discipline !== r2.discipline) {
+      return false;
+    }
+    return true;
+  }
+
   public async updateRankings(
     athleteId: string,
     pointsToAdd: number,
@@ -76,8 +132,10 @@ export class RankingsService {
       return;
     }
     const p1 = this.updatePointScoreRankings(athlete, pointsToAdd, contest, meta);
-    const p2 = this.updateTopScoreRankings(athlete, contest);
-    await Promise.all([p1, p2]);
+    const p2 = this.updateTopScoreRankings(athlete, contest, meta);
+    const updateRankings = await Promise.all([p1, p2]);
+    return updateRankings[0].concat(updateRankings[1]);
+    // return p2;
   }
 
   //#region Point Score
@@ -94,7 +152,7 @@ export class RankingsService {
       athlete.gender,
       athlete.ageCategory,
     );
-    const promises = [];
+    const promises: Promise<AthleteRanking>[] = [];
     for (const combination of combinations) {
       const pk = {
         rankingType: rankingType,
@@ -111,7 +169,8 @@ export class RankingsService {
         }),
       );
     }
-    await Promise.all(promises);
+    const updatedRankings = await Promise.all(promises);
+    return updatedRankings;
   }
 
   private async updatePointScoreAthleteRanking(
@@ -123,44 +182,44 @@ export class RankingsService {
       reason?: RankingsUpdateReason;
       contestId: string;
     },
-  ) {
+  ): Promise<AthleteRanking> {
     const rankingType = RankingType.PointScore;
 
     const athleteRanking = await this.db.getAthleteRanking(pk);
-    let numberToAddToContestCount: number;
-    switch (meta.reason) {
-      case RankingsUpdateReason.NewContest:
-        numberToAddToContestCount = 1;
-        break;
-      case RankingsUpdateReason.PointsChanged:
-        numberToAddToContestCount = 0;
-        break;
-      case RankingsUpdateReason.DeletedContest:
-        numberToAddToContestCount = -1;
-        break;
-    }
-
-    // let rankBeforeUpdate = await this.db.getAthleteRankingPlace(pk);
+    const numberToAddToContestCount = this.calculateContestCountIncrement(meta.reason);
     let rankBeforeUpdate = await this.db.getAthleteRankingPlace(pk);
+
+    let rankingItem: AthleteRanking;
 
     if (athleteRanking) {
       const updatedPoints = athleteRanking.points + pointsToAdd;
-      let updatedContestCount: number;
-      if (!Utils.isSomeNil(numberToAddToContestCount, athleteRanking.contestCount)) {
-        updatedContestCount = athleteRanking.contestCount + numberToAddToContestCount;
+
+      const isContestRecalculated = meta.reason === RankingsUpdateReason.RecalculatedContest;
+      const shouldNotUpdateRank =
+        athleteRanking.points === updatedPoints || athleteRanking.latestUpdateWithContest === meta.contestId;
+
+      if (isContestRecalculated || shouldNotUpdateRank) {
+        rankBeforeUpdate = athleteRanking.rankBeforeLatestContest;
       }
-      if (athleteRanking.points === updatedPoints || athleteRanking.latestUpdateWithContest === meta.contestId) {
-        rankBeforeUpdate = undefined; // Dont change rank if the update is with same contest
-      }
-      if (
-        athleteRanking.points !== updatedPoints ||
-        athleteRanking.latestUpdateWithContest !== meta.contestId ||
-        athleteRanking.contestCount !== updatedContestCount
-      ) {
-        await this.db.updateAthleteRanking(pk, updatedPoints, meta.contestId, rankBeforeUpdate, updatedContestCount);
-      }
+
+      rankingItem = new AthleteRanking({
+        rankingType: athleteRanking.rankingType,
+        ageCategory: athleteRanking.ageCategory,
+        country: athlete.country,
+        discipline: athleteRanking.discipline,
+        gender: athleteRanking.gender,
+        id: athleteRanking.id,
+        name: athlete.name,
+        birthdate: athlete.birthdate,
+        surname: athlete.surname,
+        year: athleteRanking.year,
+        contestCount: numberToAddToContestCount || athleteRanking.contestCount,
+        points: isContestRecalculated ? athleteRanking.points : updatedPoints,
+        rankBeforeLatestContest: rankBeforeUpdate,
+        latestUpdateWithContest: isContestRecalculated ? athleteRanking.latestUpdateWithContest : meta.contestId,
+      });
     } else {
-      const item = new AthleteRanking({
+      rankingItem = new AthleteRanking({
         rankingType: rankingType,
         ageCategory: combination.ageCategory,
         country: athlete.country,
@@ -176,8 +235,51 @@ export class RankingsService {
         rankBeforeLatestContest: rankBeforeUpdate,
         latestUpdateWithContest: meta.contestId,
       });
-      await this.db.putAthleteRanking(item);
     }
+    await this.db.putAthleteRanking(rankingItem);
+    return rankingItem;
+
+    // if (meta.reason === RankingsUpdateReason.RecalculatedContest) {
+    //   pointsToAdd = 0;
+    // }
+
+    // let rankBeforeUpdate = await this.db.getAthleteRankingPlace(pk);
+
+    // if (athleteRanking) {
+    //   const updatedPoints = athleteRanking.points + pointsToAdd;
+    //   let updatedContestCount: number;
+    //   if (!Utils.isSomeNil(numberToAddToContestCount, athleteRanking.contestCount)) {
+    //     updatedContestCount = athleteRanking.contestCount + numberToAddToContestCount;
+    //   }
+    //   if (athleteRanking.points === updatedPoints || athleteRanking.latestUpdateWithContest === meta.contestId) {
+    //     rankBeforeUpdate = undefined; // Dont change rank if the update is with same contest
+    //   }
+    //   if (
+    //     athleteRanking.points !== updatedPoints ||
+    //     athleteRanking.latestUpdateWithContest !== meta.contestId ||
+    //     athleteRanking.contestCount !== updatedContestCount
+    //   ) {
+    //     await this.db.updateAthleteRanking(pk, updatedPoints, meta.contestId, rankBeforeUpdate, updatedContestCount);
+    //   }
+    // } else {
+    //   const item = new AthleteRanking({
+    //     rankingType: rankingType,
+    //     ageCategory: combination.ageCategory,
+    //     country: athlete.country,
+    //     discipline: combination.discipline,
+    //     gender: combination.gender,
+    //     id: athlete.id,
+    //     name: athlete.name,
+    //     birthdate: athlete.birthdate,
+    //     points: pointsToAdd,
+    //     surname: athlete.surname,
+    //     year: combination.year,
+    //     contestCount: numberToAddToContestCount,
+    //     rankBeforeLatestContest: rankBeforeUpdate,
+    //     latestUpdateWithContest: meta.contestId,
+    //   });
+    // await this.db.putAthleteRanking(item);
+    // }
   }
   //#endregion
 
@@ -185,9 +287,7 @@ export class RankingsService {
   public async updateTopScoreRankings(
     athlete: AthleteDetail,
     contest: { id: string; discipline: Discipline; date: Date },
-    meta?: {
-      beforeContestDate?: Date;
-    },
+    meta: { reason: RankingsUpdateReason },
   ) {
     const rankingType = RankingType.TopScore;
 
@@ -199,7 +299,7 @@ export class RankingsService {
       athlete.gender,
       athlete.ageCategory,
     );
-    const promises = [];
+    const promises: Promise<AthleteRanking>[] = [];
     for (const combination of combinations) {
       const pk = {
         rankingType: rankingType,
@@ -214,13 +314,18 @@ export class RankingsService {
         combination.discipline,
         pointsDict,
         combination.year || undefined,
-        meta && meta.beforeContestDate,
       );
       if (points) {
-        promises.push(this.updateTopScoreAthleteRanking(pk, athlete, combination, points, { contestId: contest.id }));
+        promises.push(
+          this.updateTopScoreAthleteRanking(pk, athlete, combination, points, {
+            contestId: contest.id,
+            reason: meta.reason,
+          }),
+        );
       }
     }
-    await Promise.all(promises);
+    const updatedRankings = await Promise.all(promises);
+    return updatedRankings;
   }
 
   private async updateTopScoreAthleteRanking(
@@ -228,23 +333,24 @@ export class RankingsService {
     athlete: AthleteDetail,
     combination: RankingCombination,
     points: number,
-    meta: { contestId: string },
+    meta: { contestId: string; reason: RankingsUpdateReason },
   ) {
     const rankingType = RankingType.TopScore;
 
     let rankBeforeUpdate = await this.db.getAthleteRankingPlace(pk);
 
     const athleteRanking = await this.db.getAthleteRanking(pk);
+    let rankingItem: AthleteRanking;
 
     if (athleteRanking) {
-      if (athleteRanking.points === points || athleteRanking.latestUpdateWithContest === meta.contestId) {
-        rankBeforeUpdate = undefined; // Dont change rank if the update is with same contest
+      const isContestRecalculated = meta.reason === RankingsUpdateReason.RecalculatedContest;
+      const shouldNotUpdateRank =
+        athleteRanking.points === points || athleteRanking.latestUpdateWithContest === meta.contestId;
+
+      if (isContestRecalculated || shouldNotUpdateRank) {
+        rankBeforeUpdate = athleteRanking.rankBeforeLatestContest;
       }
-      if (athleteRanking.points !== points || athleteRanking.latestUpdateWithContest !== meta.contestId) {
-        await this.db.updateAthleteRanking(pk, points, meta.contestId, rankBeforeUpdate, undefined);
-      }
-    } else {
-      const item = new AthleteRanking({
+      rankingItem = new AthleteRanking({
         rankingType: rankingType,
         ageCategory: combination.ageCategory,
         country: athlete.country,
@@ -257,10 +363,52 @@ export class RankingsService {
         surname: athlete.surname,
         year: combination.year,
         rankBeforeLatestContest: rankBeforeUpdate,
-        latestUpdateWithContest: meta.contestId,
+        latestUpdateWithContest: isContestRecalculated ? athleteRanking.latestUpdateWithContest : meta.contestId,
       });
-      await this.db.putAthleteRanking(item);
     }
+    rankingItem = new AthleteRanking({
+      rankingType: rankingType,
+      ageCategory: combination.ageCategory,
+      country: athlete.country,
+      discipline: combination.discipline,
+      gender: combination.gender,
+      id: athlete.id,
+      name: athlete.name,
+      birthdate: athlete.birthdate,
+      points: points,
+      surname: athlete.surname,
+      year: combination.year,
+      rankBeforeLatestContest: rankBeforeUpdate,
+      latestUpdateWithContest: meta.contestId,
+    });
+    await this.db.putAthleteRanking(rankingItem);
+    return rankingItem;
+
+    // if (athleteRanking) {
+    //   if (athleteRanking.points === points || athleteRanking.latestUpdateWithContest === meta.contestId) {
+    //     rankBeforeUpdate = undefined; // Dont change rank if the update is with same contest
+    //   }
+    //   if (athleteRanking.points !== points || athleteRanking.latestUpdateWithContest !== meta.contestId) {
+    //     await this.db.updateAthleteRanking(pk, points, meta.contestId, rankBeforeUpdate, undefined);
+    //   }
+    // } else {
+    //   const item = new AthleteRanking({
+    //     rankingType: rankingType,
+    //     ageCategory: combination.ageCategory,
+    //     country: athlete.country,
+    //     discipline: combination.discipline,
+    //     gender: combination.gender,
+    //     id: athlete.id,
+    //     name: athlete.name,
+    //     birthdate: athlete.birthdate,
+    //     points: points,
+    //     surname: athlete.surname,
+    //     year: combination.year,
+    //     rankBeforeLatestContest: rankBeforeUpdate,
+    //     latestUpdateWithContest: meta.contestId,
+    //   });
+    //   await this.db.putAthleteRanking(item);
+    // }
   }
 
   private async calculateNewPointsForTopScore(
@@ -344,5 +492,20 @@ export class RankingsService {
       }
     }
     return combinations;
+  }
+  private calculateContestCountIncrement(reason: RankingsUpdateReason): number | undefined {
+    let numberToAddToContestCount: number;
+    switch (reason) {
+      case RankingsUpdateReason.NewContest:
+        numberToAddToContestCount = 1;
+        break;
+      case RankingsUpdateReason.PointsChanged:
+        numberToAddToContestCount = 0;
+        break;
+      case RankingsUpdateReason.DeletedContest:
+        numberToAddToContestCount = -1;
+        break;
+    }
+    return numberToAddToContestCount;
   }
 }

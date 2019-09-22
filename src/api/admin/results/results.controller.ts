@@ -44,40 +44,41 @@ export class ResultsController {
   }
   @Post('fixrankings/:id')
   public async fixAthleteRankings(@Param('id') id: string): Promise<string> {
-    const allAthletes = await this.databaseService.queryAthletes(undefined);
-    console.log(`Total Athlete Count: ${allAthletes.items.length}`);
+    // const allAthletes = await this.databaseService.queryAthletes(undefined);
+    // console.log(`Total Athlete Count: ${allAthletes.items.length}`);
 
-    // const athlete = await this.databaseService.getAthleteDetails(id);
-    // if (!athlete) {
-    //   return 'Athlete Not Found';
-    // }
-    let counter = 0;
-    for (const athlete of allAthletes.items) {
-      console.log(`Fix: ${counter++}, ${athlete.id}`);
-      // if (counter < 473) {
-      //   continue;
-      // }
-
-      // await this.databaseService.deleteAthleteRankings(athlete.id);
-
-      const contestResults = await this.databaseService.queryAthleteContestsByDate(athlete.id, undefined);
-
-      for (const contestResult of contestResults.items.reverse()) {
-        await this.rankingsService.updateRankings(
-          athlete.id,
-          contestResult.points,
-          {
-            id: contestResult.contestId,
-            discipline: contestResult.contestDiscipline,
-            date: contestResult.contestDate,
-          },
-          {
-            reason: RankingsUpdateReason.NewContest,
-          },
-        );
-      }
-      // await new Promise(done => setTimeout(done, 5000));
+    const athlete = await this.databaseService.getAthleteDetails(id);
+    if (!athlete) {
+      return 'Athlete Not Found';
     }
+    await this.rankingsService.refreshAllRankingsOfAthlete(id);
+    let counter = 0;
+    // for (const athlete of allAthletes.items) {
+    // console.log(`Fix: ${counter++}, ${athlete.id}`);
+    // if (counter < 473) {
+    //   continue;
+    // }
+
+    // await this.databaseService.deleteAthleteRankings(athlete.id);
+
+    // const contestResults = await this.databaseService.queryAthleteContestsByDate(athlete.id, undefined);
+
+    // for (const contestResult of contestResults.items.reverse()) {
+    //   await this.rankingsService.updateRankings(
+    //     athlete.id,
+    //     contestResult.points,
+    //     {
+    //       id: contestResult.contestId,
+    //       discipline: contestResult.contestDiscipline,
+    //       date: contestResult.contestDate,
+    //     },
+    //     {
+    //       reason: RankingsUpdateReason.NewContest,
+    //     },
+    //   );
+    // }
+    // await new Promise(done => setTimeout(done, 5000));
+    // }
     console.log('done');
     return 'done';
   }

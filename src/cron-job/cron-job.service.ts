@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { RankingsService } from 'core/athlete/rankings.service';
 import { DatabaseService } from 'core/database/database.service';
 import { Utils } from 'shared/utils';
+import { RankingsUpdateReason } from 'core/athlete/interfaces/rankings.interface';
 
 @Injectable()
 export class CronJobService {
@@ -42,11 +43,15 @@ export class CronJobService {
           // if updated before
           continue;
         }
-        await this.rankingsService.updateTopScoreRankings(athlete, {
-          id: contestResult.contestId,
-          discipline: contestResult.contestDiscipline,
-          date: contestResult.contestDate,
-        });
+        await this.rankingsService.updateTopScoreRankings(
+          athlete,
+          {
+            id: contestResult.contestId,
+            discipline: contestResult.contestDiscipline,
+            date: contestResult.contestDate,
+          },
+          { reason: RankingsUpdateReason.RecalculatedContest },
+        );
         disciplineYearDict[`${contestResult.contestDiscipline}-${year}`] = true;
         contestCounter++;
       }

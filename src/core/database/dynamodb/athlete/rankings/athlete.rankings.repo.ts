@@ -169,6 +169,17 @@ export class DDBAthleteRankingsRepository extends DDBRepository {
     }
     await Promise.all(promises);
   }
+  public async deleteAthleteRankingsItem(pk: DDBAthleteRankingsItemPrimaryKey) {
+    const params: AWS.DynamoDB.DocumentClient.DeleteItemInput = {
+      TableName: this._tableName,
+      Key: this.transformer.primaryKey(pk.athleteId, pk.rankingType, pk.year, pk.discipline, pk.gender, pk.ageCategory),
+    };
+    await this.client
+      .delete(params)
+      .promise()
+      .then(data => {})
+      .catch(logThrowDynamoDBError('DDBAthleteRankingsRepository deleteAthleteRankingsItem', params));
+  }
 
   public async queryRankings(
     limit: number,

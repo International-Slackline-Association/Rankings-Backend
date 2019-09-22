@@ -197,9 +197,16 @@ export class DatabaseService {
     await this.athleteRankingsRepo.deleteAthleteRankings(athleteId);
   }
 
-  public async getAllAthleteRankings(athleteId: string) {
-    return this.athleteRankingsRepo.getAllAthleteRankings(athleteId);
+  public async deleteAthleteRankingsItem(pk: DDBAthleteRankingsItemPrimaryKey) {
+    await this.athleteRankingsRepo.deleteAthleteRankingsItem(pk);
   }
+
+  public async getAllAthleteRankings(athleteId: string) {
+    const dbItems = await this.athleteRankingsRepo.getAllAthleteRankings(athleteId);
+    const items = dbItems.items.map(dbItem => this.athleteRankingsRepo.entityTransformer.fromDBItem(dbItem));
+    return items;
+  }
+
   public async queryAthleteRankings(
     limit: number,
     category: DDBRankingsItemPrimaryKey,
