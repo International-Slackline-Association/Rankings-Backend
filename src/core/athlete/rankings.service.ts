@@ -102,25 +102,6 @@ export class RankingsService {
     }
   }
 
-  private isAthleteRankingsEqual(r1: AthleteRanking, r2: AthleteRanking) {
-    if (r1.rankingType !== r2.rankingType) {
-      return false;
-    }
-    if (r1.year !== r2.year) {
-      return false;
-    }
-    if (r1.gender !== r2.gender) {
-      return false;
-    }
-    if (r1.ageCategory !== r2.ageCategory) {
-      return false;
-    }
-    if (r1.discipline !== r2.discipline) {
-      return false;
-    }
-    return true;
-  }
-
   public async updateRankings(
     athleteId: string,
     pointsToAdd: number,
@@ -507,5 +488,24 @@ export class RankingsService {
         break;
     }
     return numberToAddToContestCount;
+  }
+
+  private isAthleteRankingsEqual(r1: AthleteRanking, r2: AthleteRanking) {
+    if (r1.rankingType !== r2.rankingType) {
+      return false;
+    }
+    if (r1.year !== r2.year) {
+      return false;
+    }
+    if (r1.gender !== r2.gender) {
+      return false;
+    }
+    if (r1.ageCategory !== r2.ageCategory) {
+      return false;
+    }
+    if (r1.discipline !== r2.discipline) {
+      return false;
+    }
+    return true;
   }
 }

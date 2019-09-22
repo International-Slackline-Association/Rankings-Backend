@@ -2,28 +2,27 @@ import { Injectable } from '@nestjs/common';
 import { RankingsService } from 'core/athlete/rankings.service';
 import { DatabaseService } from 'core/database/database.service';
 import { Utils } from 'shared/utils';
-import { RankingsUpdateReason } from 'core/athlete/interfaces/rankings.interface';
 
 @Injectable()
 export class CronJobService {
   constructor(private readonly rankingsService: RankingsService, private readonly databaseService: DatabaseService) {}
 
   public async runCronJobs() {
-    await this.updateAllTopScoreRankings();
+    await this.refreshRankings();
   }
 
   /*
-  * TopScore rankings are valid in 2 year range so must be periodically updated for all athlets
+  * TopScore rankings are valid in 2 year range so must be periodically updated for all athletes
   */
-  private async updateAllTopScoreRankings() {
+  private async refreshRankings() {
     const allAthletes = await this.databaseService.queryAthletes(undefined);
     console.log(`Total Athlete Count: ${allAthletes.items.length}`);
 
-    let contestCounter = 0;
+    let athleteCounter = 0;
     let offset = 0;
-    const contestIterateLimit = 150;
+    const athleteIterateLimit = 100;
 
-    // Since dynamodb capacity is set low, we update only certain amount of athletes in a run.
+    // Since it takes long for lambda, we update only certain amount of athletes in a run.
     // The offset is saved every round and with the next run of this it starts from the offset.
     const cronJobOffset = await this.databaseService.getTopScoreRankingsCronJobOffset();
     if (cronJobOffset) {
@@ -31,31 +30,12 @@ export class CronJobService {
     }
     for (let index = offset; index < allAthletes.items.length; index++) {
       const athlete = allAthletes.items[index];
-      if (contestCounter > contestIterateLimit) {
+      if (athleteCounter > athleteIterateLimit) {
         break;
       }
       console.log(`Fix: ${index}, ${athlete.id}`);
-      const disciplineYearDict = {};
-      const contestResults = await this.databaseService.queryAthleteContestsByDate(athlete.id, undefined);
-      for (const contestResult of contestResults.items) {
-        const year = Utils.dateToMoment(contestResult.contestDate).year();
-        if (disciplineYearDict[`${contestResult.contestDiscipline}-${year}`]) {
-          // if updated before
-          continue;
-        }
-        await this.rankingsService.updateTopScoreRankings(
-          athlete,
-          {
-            id: contestResult.contestId,
-            discipline: contestResult.contestDiscipline,
-            date: contestResult.contestDate,
-          },
-          { reason: RankingsUpdateReason.RecalculatedContest },
-        );
-        disciplineYearDict[`${contestResult.contestDiscipline}-${year}`] = true;
-        contestCounter++;
-      }
-
+      await this.rankingsService.refreshAllRankingsOfAthlete(athlete.id);
+      athleteCounter++;
       await this.databaseService.setTopScoreRankingsCronJobOffset(index === allAthletes.items.length - 1 ? 0 : index);
     }
     console.log('done');
