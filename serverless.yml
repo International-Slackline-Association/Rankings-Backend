@@ -151,7 +151,7 @@ functions:
     memorySize: 256
     environment: ${self:custom.environmentVars}
     events:
-      - schedule: rate(6 hours)
+      - schedule: rate(3 days)
 resources:
   Resources:
     ISARankingsTable:
