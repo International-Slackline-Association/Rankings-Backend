@@ -14,13 +14,14 @@ export namespace YearUtility {
   export const Current = moment()
     .utc()
     .year();
-  // export const Current = 2018;
+  export const FutureYears = [2020];
 
   export function yearList() {
     const years: number[] = [];
     for (let year = Constants.BaseYear; year <= Current; year++) {
       years.push(year);
     }
+    years.push(...FutureYears);
     return years.reverse();
   }
 
