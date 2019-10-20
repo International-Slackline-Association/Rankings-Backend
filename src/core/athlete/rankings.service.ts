@@ -182,6 +182,7 @@ export class RankingsService {
       if (isContestRecalculated || shouldNotUpdateRank) {
         rankBeforeUpdate = athleteRanking.rankBeforeLatestContest;
       }
+      const numberOfContests = (numberToAddToContestCount || 0) + athleteRanking.contestCount;
 
       rankingItem = new AthleteRanking({
         rankingType: athleteRanking.rankingType,
@@ -194,7 +195,7 @@ export class RankingsService {
         birthdate: athlete.birthdate,
         surname: athlete.surname,
         year: athleteRanking.year,
-        contestCount: numberToAddToContestCount || athleteRanking.contestCount,
+        contestCount: numberOfContests,
         points: isContestRecalculated ? athleteRanking.points : updatedPoints,
         rankBeforeLatestContest: rankBeforeUpdate,
         latestUpdateWithContest: isContestRecalculated ? athleteRanking.latestUpdateWithContest : meta.contestId,
@@ -486,6 +487,9 @@ export class RankingsService {
       case RankingsUpdateReason.DeletedContest:
         numberToAddToContestCount = -1;
         break;
+      default:
+          numberToAddToContestCount = 0;
+          break;
     }
     return numberToAddToContestCount;
   }
