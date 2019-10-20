@@ -13,9 +13,9 @@ export namespace DisciplineUtility {
     Discipline.Trickline_Aerial,
     Discipline.Trickline_JibAndStatic,
     Discipline.Trickline_Transfer,
-    Discipline.Contact_HighLongWaterline,
+    Discipline.Freestyle_Highline,
     Discipline.Speedline_Sprint,
-    Discipline.Speedline__HighLongWaterline,
+    Discipline.Speedline__Long,
     Discipline.Endurance,
     Discipline.Blind,
     Discipline.Rigging,
@@ -28,11 +28,11 @@ export namespace DisciplineUtility {
     Discipline.Trickline_Aerial,
     Discipline.Trickline_JibAndStatic,
     Discipline.Trickline_Transfer,
-    Discipline.Contact_HighLongWaterline,
+    Discipline.Freestyle_Highline,
     Discipline.Walking,
     Discipline.Speedline,
     Discipline.Speedline_Sprint,
-    Discipline.Speedline__HighLongWaterline,
+    Discipline.Speedline__Long,
     Discipline.Endurance,
     Discipline.Blind,
     Discipline.Rigging,
@@ -64,7 +64,7 @@ export namespace DisciplineUtility {
       // 1st degree disciplines
       case Discipline.Trickline:
         return Discipline.Freestyle;
-      case Discipline.Contact_HighLongWaterline:
+      case Discipline.Freestyle_Highline:
         return Discipline.Freestyle;
       case Discipline.Speedline:
         return Discipline.Walking;
@@ -81,7 +81,7 @@ export namespace DisciplineUtility {
       case Discipline.Trickline_Transfer:
         return Discipline.Trickline;
       case Discipline.Speedline_Sprint:
-      case Discipline.Speedline__HighLongWaterline:
+      case Discipline.Speedline__Long:
         return Discipline.Speedline;
 
       default:
@@ -104,16 +104,16 @@ export namespace DisciplineUtility {
         return [Discipline.Freestyle, Discipline.Walking, Discipline.Rigging];
 
       case Discipline.Freestyle:
-        return [Discipline.Trickline, Discipline.Contact_HighLongWaterline];
+        return [Discipline.Trickline, Discipline.Freestyle_Highline];
       case Discipline.Walking:
         return [Discipline.Speedline, Discipline.Endurance, Discipline.Blind];
 
       case Discipline.Trickline:
         return [Discipline.Trickline_Aerial, Discipline.Trickline_JibAndStatic, Discipline.Trickline_Transfer];
       case Discipline.Speedline:
-        return [Discipline.Speedline_Sprint, Discipline.Speedline__HighLongWaterline];
+        return [Discipline.Speedline_Sprint, Discipline.Speedline__Long];
 
-      case Discipline.Contact_HighLongWaterline:
+      case Discipline.Freestyle_Highline:
       case Discipline.Endurance:
       case Discipline.Blind:
       case Discipline.Rigging:
@@ -124,7 +124,7 @@ export namespace DisciplineUtility {
       case Discipline.Trickline_Transfer:
         return [];
       case Discipline.Speedline_Sprint:
-      case Discipline.Speedline__HighLongWaterline:
+      case Discipline.Speedline__Long:
         return [];
       default:
         throw new Error(`Children discipline not found: ${discipline}`);
@@ -155,14 +155,14 @@ export namespace DisciplineUtility {
         return withoutParent ? 'Transfer' : 'Trickline - Transfer';
       case Discipline.Speedline_Sprint:
         return withoutParent ? 'Sprint' : 'Speedline - Sprint';
-      case Discipline.Speedline__HighLongWaterline:
-        return withoutParent ? 'High-/Long-/Waterline' : 'Speedline - High-/Long-/Waterline';
+      case Discipline.Speedline__Long:
+        return withoutParent ? 'Long' : 'Speedline - Long';
 
       // 1st degree disciplines
       case Discipline.Trickline:
         return 'Trickline';
-      case Discipline.Contact_HighLongWaterline:
-        return withoutParent ? 'High-/Long-/Waterline' : 'Contact - High-/Long-/Waterline' ;
+      case Discipline.Freestyle_Highline:
+        return withoutParent ? 'Highline' : 'Freestyle - Highline' ;
       case Discipline.Speedline:
         return 'Speedline';
       case Discipline.Endurance:
