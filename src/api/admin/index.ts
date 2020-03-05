@@ -45,7 +45,7 @@ export const handler: Handler = async (event: APIGatewayEvent, context: Context)
 
 function succeedWaitsLogger(succeed: Context['succeed']): Context['succeed'] {
   return (messageObject: any) => {
-    waitForLogger()
+    return waitForLogger()
       .then(() => {
         succeed(messageObject);
       })

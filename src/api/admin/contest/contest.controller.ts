@@ -1,4 +1,4 @@
-import { Controller, Get, Param, ParseIntPipe, Req } from '@nestjs/common';
+import { Controller, Delete, Get, Param, ParseIntPipe } from '@nestjs/common';
 import { Discipline } from 'shared/enums';
 import { ContestGenderUtility, ContestTypeUtility, DisciplineUtility } from 'shared/enums/enums-utility';
 import { ISelectOption } from 'shared/types/shared';
@@ -58,5 +58,15 @@ export class ContestController {
     });
 
     return new GendersResponse(options);
+  }
+
+  @Delete(':id/:discipline')
+  public async deleteContest(
+    @Param('id') id: string,
+    @Param('discipline', new ParseIntPipe())
+    disciplineParam: Discipline,
+  ) {
+    const resp = await this.contestService.deleteContest(id, disciplineParam);
+    return resp;
   }
 }

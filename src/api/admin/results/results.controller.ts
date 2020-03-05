@@ -44,6 +44,7 @@ export class ResultsController {
   }
   @Post('fixrankings/:id')
   public async fixAthleteRankings(@Param('id') id: string): Promise<string> {
+    return 'aa';
     const allAthletes = await this.databaseService.queryAthletes(undefined);
     console.log(`Total Athlete Count: ${allAthletes.items.length}`);
 

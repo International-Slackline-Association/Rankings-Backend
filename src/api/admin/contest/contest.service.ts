@@ -30,6 +30,15 @@ export class ContestService {
     return namedCategories;
   }
 
+  public async deleteContest(id: string, discipline: Discipline) {
+    const results = await this.db.queryContestResults(id, discipline, undefined);
+    if (results.items.length <= 0) {
+      await this.db.deleteContest(id, discipline);
+      return true;
+    }
+    return false;
+  }
+
   public getGenders() {
     const genders = ContestGenderUtility.ContestGenders;
     const namedGenders = genders.map<INameIdEntity>(d => {

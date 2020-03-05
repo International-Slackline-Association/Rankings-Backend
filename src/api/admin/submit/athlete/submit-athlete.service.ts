@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { AthleteDetail } from 'core/athlete/entity/athlete-detail';
+import { RankingsService } from 'core/athlete/rankings.service';
 import { DatabaseService } from 'core/database/database.service';
 import { APIErrors } from 'shared/exceptions/api.exceptions';
 import { IdGenerator } from 'shared/generators/id.generator';
 import { SubmitAthleteDto } from './dto/submit-athlete.dto';
-import { RankingsService } from 'core/athlete/rankings.service';
 
 @Injectable()
 export class SubmitAthleteService {
