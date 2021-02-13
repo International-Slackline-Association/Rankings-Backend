@@ -37,7 +37,7 @@ export class RankingsController {
     const rankingType = selectedCategories[0];
     const categories = this.categoriesService.getCategories();
     if (rankingType === RankingType.TopScore) {
-      categories.year.options[0].label = 'Last 2';
+      categories.year.options[0].label = 'Last 3';
     }
     return new CategoriesResponse([
       categories.rankingType,

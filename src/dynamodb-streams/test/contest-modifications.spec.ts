@@ -16,37 +16,37 @@ describe('DynamoDB Streams', () => {
 
   describe('Contest Modifications', () => {
     it('', async () => {
-      const newImage = contestRepo.transformToDynamoDBType({
-        category: undefined,
-        gender: undefined,
-        city: undefined,
-        contestId: 'bern-city-slack-9_2018',
-        country: undefined,
-        createdAt: undefined,
-        date: '2018-08-25',
-        discipline: 7,
-        infoUrl: undefined,
-        name: undefined,
-        normalizedName: undefined,
-        prize: undefined,
-        profileUrl: undefined,
-        thumbnailUrl: undefined,
-      });
-      const dynamobRecord: StreamRecord = {
-        Keys: {
-          PK: newImage.PK,
-          SK_GSI: newImage.SK_GSI,
-          LSI: newImage.LSI,
-          GSI_SK: newImage.GSI_SK,
-        },
-        NewImage: newImage,
-        StreamViewType: 'NEW_AND_OLD_IMAGES',
-        SequenceNumber: '111',
-        SizeBytes: 26,
-      };
-      const event = createDynamoDBEvent('MODIFY', dynamobRecord);
+      // const newImage = contestRepo.transformToDynamoDBType({
+      //   category: undefined,
+      //   gender: undefined,
+      //   city: undefined,
+      //   contestId: 'bern-city-slack-9_2018',
+      //   country: undefined,
+      //   createdAt: undefined,
+      //   date: '2018-08-25',
+      //   discipline: 7,
+      //   infoUrl: undefined,
+      //   name: undefined,
+      //   normalizedName: undefined,
+      //   prize: undefined,
+      //   profileUrl: undefined,
+      //   thumbnailUrl: undefined,
+      // });
+      // const dynamobRecord: StreamRecord = {
+      //   Keys: {
+      //     PK: newImage.PK,
+      //     SK_GSI: newImage.SK_GSI,
+      //     LSI: newImage.LSI,
+      //     GSI_SK: newImage.GSI_SK,
+      //   },
+      //   NewImage: newImage,
+      //   StreamViewType: 'NEW_AND_OLD_IMAGES',
+      //   SequenceNumber: '111',
+      //   SizeBytes: 26,
+      // };
+      // const event = createDynamoDBEvent('MODIFY', dynamobRecord);
 
-      await triggerLambdaHandlerWithEvent(handler, event);
+      // await triggerLambdaHandlerWithEvent(handler, event);
     });
   });
 });

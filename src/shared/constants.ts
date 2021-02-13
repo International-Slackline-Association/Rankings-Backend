@@ -5,7 +5,7 @@ import env_variables from './env_variables';
 export namespace Constants {
   export const BaseYear = 2017;
   export const TopScoreContestCount = 2;
-  export const TopScoreYearRange = 2;
+  export const TopScoreYearRange = 3;
 
   export function ContestTypeTopPoints(category: ContestType): number {
     switch (category) {

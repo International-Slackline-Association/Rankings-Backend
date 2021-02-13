@@ -25,7 +25,7 @@ const winstonCloudWatchTransport = new WinstonCloudWatch({
 });
 
 export const waitForLogger = async () => {
-  return new Promise((r, j) => {
+  return new Promise<void>((r, j) => {
     winstonCloudWatchTransport.kthxbye(err => {
       // waitForTransports(logger).then(() => {
       r();
