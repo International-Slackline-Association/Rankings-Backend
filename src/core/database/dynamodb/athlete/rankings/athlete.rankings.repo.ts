@@ -58,61 +58,6 @@ export class DDBAthleteRankingsRepository extends DDBRepository {
       .catch(logThrowDynamoDBError('DDBAthleteRankingsRepository Put', params));
   }
 
-  public async update(
-    pk: DDBAthleteRankingsItemPrimaryKey,
-    points: number,
-    latestContest?: string,
-    rankBeforeLatestContest?: number,
-    contestCount?: number,
-  ) {
-    const includeContestCount = Utils.isNil(contestCount) ? false : true;
-    const includeRankBeforeLatestContest = Utils.isNil(rankBeforeLatestContest) ? false : true;
-    const includeLatestContest = Utils.isNil(latestContest) ? false : true;
-
-    const exprAttrNames = {};
-    if (includeContestCount) {
-      exprAttrNames['#contestCount'] = this.transformer.attrName('contestCount');
-    }
-    if (includeRankBeforeLatestContest) {
-      exprAttrNames['#rankBeforeLatestContest'] = this.transformer.attrName('rankBeforeLatestContest');
-    }
-    if (includeLatestContest) {
-      exprAttrNames['#latestUpdateWithContest'] = this.transformer.attrName('latestUpdateWithContest');
-    }
-    const params: DocumentClient.UpdateItemInput = {
-      TableName: this._tableName,
-      Key: this.transformer.primaryKey(pk.athleteId, pk.rankingType, pk.year, pk.discipline, pk.gender, pk.ageCategory),
-      // tslint:disable-next-line:max-line-length
-      UpdateExpression: `SET #gsi_sk = :points, #lastUpdatedAt = :unixTime ${
-        includeContestCount ? ', #contestCount = :contestCount' : ''
-      } ${includeLatestContest ? ', #latestUpdateWithContest = :latestUpdateWithContest ' : ''}
-      ${includeRankBeforeLatestContest ? ', #rankBeforeLatestContest = :rankBeforeLatestContest' : ''}`,
-      ConditionExpression: 'attribute_exists(#pk)',
-      ExpressionAttributeNames: {
-        '#pk': this.transformer.attrName('PK'),
-        '#gsi_sk': this.transformer.attrName('GSI_SK'),
-        '#lastUpdatedAt': this.transformer.attrName('lastUpdatedAt'),
-        ...exprAttrNames,
-      },
-      ExpressionAttributeValues: {
-        ':unixTime': moment().unix(),
-        ':points': this.transformer.itemToAttrsTransformer.GSI_SK(points),
-        ':contestCount': contestCount,
-        ':rankBeforeLatestContest': rankBeforeLatestContest,
-        ':latestUpdateWithContest': latestContest,
-      },
-      ReturnValues: 'UPDATED_NEW',
-    };
-
-    return this.client
-      .update(params)
-      .promise()
-      .then(data => {
-        return data.Attributes[this.transformer.attrName('GSI_SK')] as number;
-      })
-      .catch(logThrowDynamoDBError('DDBAthleteRankingsRepository update', params));
-  }
-
   public async getAllAthleteRankings(athleteId: string) {
     const params: AWS.DynamoDB.DocumentClient.QueryInput = {
       TableName: this._tableName,

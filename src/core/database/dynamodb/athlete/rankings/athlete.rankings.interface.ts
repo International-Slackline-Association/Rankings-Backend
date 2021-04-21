@@ -10,9 +10,6 @@ interface Attrs {
   readonly country: string;
   readonly normalizedName: string;
   readonly lastUpdatedAt?: number;
-  readonly contestCount: number;
-  readonly rankBeforeLatestContest: number;
-  readonly latestUpdateWithContest: string;
 }
 
 interface NonKeyAttrs extends Attrs {}

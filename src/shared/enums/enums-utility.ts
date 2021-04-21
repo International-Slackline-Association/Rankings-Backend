@@ -14,7 +14,7 @@ export namespace YearUtility {
   export const Current = moment()
     .utc()
     .year();
-  export const FutureYears = [2020];
+  export const FutureYears = [];
 
   export function yearList() {
     const years: number[] = [];

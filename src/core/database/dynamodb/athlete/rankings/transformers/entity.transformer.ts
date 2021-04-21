@@ -22,9 +22,6 @@ export class EntityTransformer {
       points: athleteRanking.points,
       year: athleteRanking.year,
       rankingType: athleteRanking.rankingType,
-      contestCount: athleteRanking.contestCount,
-      rankBeforeLatestContest: athleteRanking.rankBeforeLatestContest,
-      latestUpdateWithContest: athleteRanking.latestUpdateWithContest,
     };
   }
 
@@ -45,9 +42,6 @@ export class EntityTransformer {
       year: dbItem.year,
       birthdate: dbItem.birthdate && new Date(dbItem.birthdate),
       rankingType: dbItem.rankingType,
-      contestCount: dbItem.contestCount,
-      rankBeforeLatestContest: dbItem.rankBeforeLatestContest,
-      latestUpdateWithContest: dbItem.latestUpdateWithContest,
     });
   }
 }

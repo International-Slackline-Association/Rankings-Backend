@@ -9,7 +9,7 @@
       "request": "launch",
       "name": "Debug Offline",
       "cwd": "${workspaceFolder}",
-      "program": "/usr/local/bin/serverless",
+      "program": "node_modules/serverless/bin/serverless",
       "args": ["offline", "--noTimeout", "--dontPrintOutput"],
       "sourceMaps": true,
       "runtimeArgs": ["--lazy"],

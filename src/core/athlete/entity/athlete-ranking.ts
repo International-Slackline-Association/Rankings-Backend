@@ -16,9 +16,6 @@ export class AthleteRanking {
   public readonly discipline: Discipline;
   public readonly year: number;
   public readonly rankingType: RankingType;
-  public readonly contestCount?: number;
-  public readonly rankBeforeLatestContest?: number;
-  public readonly latestUpdateWithContest?: string;
 
   public get age(): number {
     const birthDate = Utils.dateToMoment(this.birthdate);
@@ -44,9 +41,6 @@ export class AthleteRanking {
     discipline: Discipline;
     year: number;
     rankingType: RankingType;
-    contestCount?: number;
-    rankBeforeLatestContest?: number;
-    latestUpdateWithContest?: string;
   }) {
     if (init) {
       Object.assign(this, init);

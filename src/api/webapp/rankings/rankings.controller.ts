@@ -80,10 +80,6 @@ export class RankingsController {
     );
     return new RankingsListResponse(
       rankingsWithAthletes.map<IRankingsListItem>(obj => {
-        let changeInRank = 0;
-        if (obj.ranking.rankBeforeLatestContest && obj.currentRank) {
-          changeInRank = obj.ranking.rankBeforeLatestContest - obj.currentRank;
-        }
         return {
           id: obj.ranking.id,
           age: obj.ranking.age,
@@ -94,8 +90,6 @@ export class RankingsController {
           rank: dto.athleteId || dto.country ? obj.currentRank : undefined, // let website decide the rank because its sequential
           thumbnailUrl: obj.athlete.thumbnailUrl || obj.athlete.profileUrl,
           surname: obj.ranking.surname,
-          contestCount: obj.ranking.contestCount,
-          changeInRank: changeInRank,
         };
       }),
       rankings.lastKey,

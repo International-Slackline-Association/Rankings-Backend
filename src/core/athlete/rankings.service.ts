@@ -113,7 +113,7 @@ export class RankingsService {
       return;
     }
     const p1 = this.updatePointScoreRankings(athlete, pointsToAdd, contest, meta);
-    const p2 = this.updateTopScoreRankings(athlete, contest, meta);
+    const p2 = this.updateTopScoreRankings(athlete, contest);
     const updateRankings = await Promise.all([p1, p2]);
     return updateRankings[0].concat(updateRankings[1]);
     // return p2;
@@ -167,8 +167,6 @@ export class RankingsService {
     const rankingType = RankingType.PointScore;
 
     const athleteRanking = await this.db.getAthleteRanking(pk);
-    const numberToAddToContestCount = this.calculateContestCountIncrement(meta.reason);
-    let rankBeforeUpdate = await this.db.getAthleteRankingPlace(pk);
 
     let rankingItem: AthleteRanking;
 
@@ -176,13 +174,6 @@ export class RankingsService {
       const updatedPoints = athleteRanking.points + pointsToAdd;
 
       const isContestRecalculated = meta.reason === RankingsUpdateReason.RecalculatedContest;
-      const shouldNotUpdateRank =
-        athleteRanking.points === updatedPoints || athleteRanking.latestUpdateWithContest === meta.contestId;
-
-      if (isContestRecalculated || shouldNotUpdateRank) {
-        rankBeforeUpdate = athleteRanking.rankBeforeLatestContest;
-      }
-      const numberOfContests = (numberToAddToContestCount || 0) + athleteRanking.contestCount;
 
       rankingItem = new AthleteRanking({
         rankingType: athleteRanking.rankingType,
@@ -195,10 +186,7 @@ export class RankingsService {
         birthdate: athlete.birthdate,
         surname: athlete.surname,
         year: athleteRanking.year,
-        contestCount: numberOfContests,
         points: isContestRecalculated ? athleteRanking.points : updatedPoints,
-        rankBeforeLatestContest: rankBeforeUpdate,
-        latestUpdateWithContest: isContestRecalculated ? athleteRanking.latestUpdateWithContest : meta.contestId,
       });
     } else {
       rankingItem = new AthleteRanking({
@@ -213,9 +201,6 @@ export class RankingsService {
         points: pointsToAdd,
         surname: athlete.surname,
         year: combination.year,
-        contestCount: numberToAddToContestCount,
-        rankBeforeLatestContest: rankBeforeUpdate,
-        latestUpdateWithContest: meta.contestId,
       });
     }
     await this.db.putAthleteRanking(rankingItem);
@@ -227,7 +212,6 @@ export class RankingsService {
   public async updateTopScoreRankings(
     athlete: AthleteDetail,
     contest: { id: string; discipline: Discipline; date: Date },
-    meta: { reason: RankingsUpdateReason },
   ) {
     const rankingType = RankingType.TopScore;
 
@@ -257,10 +241,7 @@ export class RankingsService {
       );
       if (points) {
         promises.push(
-          this.updateTopScoreAthleteRanking(pk, athlete, combination, points, {
-            contestId: contest.id,
-            reason: meta.reason,
-          }),
+          this.updateTopScoreAthleteRanking(pk, athlete, combination, points),
         );
       }
     }
@@ -273,23 +254,13 @@ export class RankingsService {
     athlete: AthleteDetail,
     combination: RankingCombination,
     points: number,
-    meta: { contestId: string; reason: RankingsUpdateReason },
   ) {
     const rankingType = RankingType.TopScore;
-
-    let rankBeforeUpdate = await this.db.getAthleteRankingPlace(pk);
 
     const athleteRanking = await this.db.getAthleteRanking(pk);
     let rankingItem: AthleteRanking;
 
-    if (athleteRanking) {
-      const isContestRecalculated = meta.reason === RankingsUpdateReason.RecalculatedContest;
-      const shouldNotUpdateRank =
-        athleteRanking.points === points || athleteRanking.latestUpdateWithContest === meta.contestId;
-
-      if (isContestRecalculated || shouldNotUpdateRank) {
-        rankBeforeUpdate = athleteRanking.rankBeforeLatestContest;
-      }
+    if (athleteRanking) {     
       rankingItem = new AthleteRanking({
         rankingType: rankingType,
         ageCategory: combination.ageCategory,
@@ -302,8 +273,6 @@ export class RankingsService {
         points: points,
         surname: athlete.surname,
         year: combination.year,
-        rankBeforeLatestContest: rankBeforeUpdate,
-        latestUpdateWithContest: isContestRecalculated ? athleteRanking.latestUpdateWithContest : meta.contestId,
       });
     }
     rankingItem = new AthleteRanking({
@@ -318,8 +287,6 @@ export class RankingsService {
       points: points,
       surname: athlete.surname,
       year: combination.year,
-      rankBeforeLatestContest: rankBeforeUpdate,
-      latestUpdateWithContest: meta.contestId,
     });
     await this.db.putAthleteRanking(rankingItem);
     return rankingItem;
@@ -406,24 +373,6 @@ export class RankingsService {
       }
     }
     return combinations;
-  }
-  private calculateContestCountIncrement(reason: RankingsUpdateReason): number | undefined {
-    let numberToAddToContestCount: number;
-    switch (reason) {
-      case RankingsUpdateReason.NewContest:
-        numberToAddToContestCount = 1;
-        break;
-      case RankingsUpdateReason.PointsChanged:
-        numberToAddToContestCount = 0;
-        break;
-      case RankingsUpdateReason.DeletedContest:
-        numberToAddToContestCount = -1;
-        break;
-      default:
-          numberToAddToContestCount = 0;
-          break;
-    }
-    return numberToAddToContestCount;
   }
 
   private isAthleteRankingsEqual(r1: AthleteRanking, r2: AthleteRanking) {

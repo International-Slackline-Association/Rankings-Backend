@@ -182,17 +182,6 @@ export class DatabaseService {
     await this.athleteRankingsRepo.put(dbItem);
   }
 
-  public async updateAthleteRanking(
-    pk: DDBAthleteRankingsItemPrimaryKey,
-    points: number,
-    latestContest?: string,
-    rankBeforeLatestContest?: number,
-    contestCount?: number,
-  ) {
-    await this.redisRepo.updatePointsOfAthleteInRankingCategory(pk, points);
-    return this.athleteRankingsRepo.update(pk, points, latestContest, rankBeforeLatestContest, contestCount);
-  }
-
   public async deleteAthleteRankings(athleteId: string) {
     await this.athleteRankingsRepo.deleteAthleteRankings(athleteId);
   }
