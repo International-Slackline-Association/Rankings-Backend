@@ -16,5 +16,4 @@ export enum RankingsUpdateReason {
   NewContest = 1,
   PointsChanged = 2,
   DeletedContest = 3,
-  RecalculatedContest = 4,
 }

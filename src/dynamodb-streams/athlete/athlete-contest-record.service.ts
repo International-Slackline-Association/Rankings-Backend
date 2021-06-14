@@ -56,9 +56,6 @@ export class AthleteContestRecordService {
         discipline: newItem.contestDiscipline,
         date: newItem.contestDate,
       },
-      {
-        reason: RankingsUpdateReason.NewContest,
-      },
     );
   }
 
@@ -77,9 +74,6 @@ export class AthleteContestRecordService {
         discipline: newItem.contestDiscipline,
         date: newItem.contestDate,
       },
-      {
-        reason: RankingsUpdateReason.PointsChanged,
-      },
     );
   }
 
@@ -94,9 +88,6 @@ export class AthleteContestRecordService {
         id: oldItem.contestId,
         discipline: oldItem.contestDiscipline,
         date: oldItem.contestDate,
-      },
-      {
-        reason: RankingsUpdateReason.DeletedContest,
       },
     );
   }

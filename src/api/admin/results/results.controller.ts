@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, ParseIntPipe, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, ParseIntPipe, Post, Put } from '@nestjs/common';
 import { AthleteService } from 'core/athlete/athlete.service';
 import { RankingsUpdateReason } from 'core/athlete/interfaces/rankings.interface';
 import { RankingsService } from 'core/athlete/rankings.service';
@@ -42,25 +42,27 @@ export class ResultsController {
       })),
     );
   }
-  @Post('fixrankings/:id')
-  public async fixAthleteRankings(@Param('id') id: string): Promise<string> {
-    return 'aa';
-    const allAthletes = await this.databaseService.queryAthletes(undefined);
-    console.log(`Total Athlete Count: ${allAthletes.items.length}`);
+  @Get('fixrankings')
+  public async fixAthleteRankings(): Promise<string> {
+    const id = '';
+    return id;
+    // return 'aa';
+    // const allAthletes = await this.databaseService.queryAthletes(undefined);
+    // console.log(`Total Athlete Count: ${allAthletes.items.length}`);
 
     // const athlete = await this.databaseService.getAthleteDetails(id);
     // if (!athlete) {
     //   return 'Athlete Not Found';
     // }
     let counter = 0;
-    for (const athlete of allAthletes.items) {
-      console.log(`Fix: ${counter++}, ${athlete.id}`);
+    // for (const athlete of allAthletes.items) {
+      // console.log(`Fix: ${counter++}, ${athlete.id}`);
       // if (counter < 473) {
       //   continue;
       // }
-      await this.rankingsService.refreshAllRankingsOfAthlete(athlete.id);
 
-      // await this.databaseService.deleteAthleteRankings(athlete.id);
+      await this.rankingsService.refreshAllRankingsOfAthlete(id);
+
 
       // const contestResults = await this.databaseService.queryAthleteContestsByDate(athlete.id, undefined);
 
@@ -79,7 +81,7 @@ export class ResultsController {
       //   );
       // }
       // await new Promise(done => setTimeout(done, 5000));
-    }
+    // }
     console.log('done');
     return 'done';
   }

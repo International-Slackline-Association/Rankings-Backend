@@ -66,39 +66,16 @@ export class RankingsService {
   }
 
   public async refreshAllRankingsOfAthlete(athleteId: string) {
-    // const athlete = await this.db.getAthleteDetails(athleteId);
-    const allRankings = await this.db.getAllAthleteRankings(athleteId);
+    await this.db.deleteAthleteRankings(athleteId);
+
     const contestResults = await this.db.queryAthleteContestsByDate(athleteId, undefined);
 
-    const allUpdatedRankings: AthleteRanking[] = [];
     for (const contestResult of contestResults.items.reverse()) {
-      const updatedRankings = await this.updateRankings(
-        athleteId,
-        contestResult.points,
-        {
-          id: contestResult.contestId,
-          discipline: contestResult.contestDiscipline,
-          date: contestResult.contestDate,
-        },
-        {
-          reason: RankingsUpdateReason.RecalculatedContest,
-        },
-      );
-      allUpdatedRankings.push(...updatedRankings);
-    }
-    const tobeRemovedRankings = allRankings.filter(
-      r => !allUpdatedRankings.find(r2 => this.isAthleteRankingsEqual(r, r2)),
-    );
-    for (const rankingItem of tobeRemovedRankings) {
-      const pk = {
-        rankingType: rankingItem.rankingType,
-        ageCategory: rankingItem.ageCategory,
-        athleteId: rankingItem.id,
-        discipline: rankingItem.discipline,
-        gender: rankingItem.gender,
-        year: rankingItem.year,
-      };
-      await this.db.deleteAthleteRankingsItem(pk);
+      await this.updateRankings(athleteId, contestResult.points, {
+        id: contestResult.contestId,
+        discipline: contestResult.contestDiscipline,
+        date: contestResult.contestDate,
+      });
     }
   }
 
@@ -106,13 +83,12 @@ export class RankingsService {
     athleteId: string,
     pointsToAdd: number,
     contest: { id: string; discipline: Discipline; date: Date },
-    meta: { reason: RankingsUpdateReason },
   ) {
     const athlete = await this.db.getAthleteDetails(athleteId);
     if (!athlete) {
       return;
     }
-    const p1 = this.updatePointScoreRankings(athlete, pointsToAdd, contest, meta);
+    const p1 = this.updatePointScoreRankings(athlete, pointsToAdd, contest);
     const p2 = this.updateTopScoreRankings(athlete, contest);
     const updateRankings = await Promise.all([p1, p2]);
     return updateRankings[0].concat(updateRankings[1]);
@@ -124,7 +100,6 @@ export class RankingsService {
     athlete: AthleteDetail,
     pointsToAdd: number,
     contest: { id: string; discipline: Discipline; date: Date },
-    meta: { reason: RankingsUpdateReason },
   ) {
     const rankingType = RankingType.PointScore;
     const combinations = this.generateAllCombinationsWithParentCategories(
@@ -146,7 +121,6 @@ export class RankingsService {
       promises.push(
         this.updatePointScoreAthleteRanking(pk, athlete, combination, pointsToAdd, {
           contestId: contest.id,
-          reason: meta.reason,
         }),
       );
     }
@@ -160,7 +134,6 @@ export class RankingsService {
     combination: RankingCombination,
     pointsToAdd: number,
     meta: {
-      reason?: RankingsUpdateReason;
       contestId: string;
     },
   ): Promise<AthleteRanking> {
@@ -173,8 +146,6 @@ export class RankingsService {
     if (athleteRanking) {
       const updatedPoints = athleteRanking.points + pointsToAdd;
 
-      const isContestRecalculated = meta.reason === RankingsUpdateReason.RecalculatedContest;
-
       rankingItem = new AthleteRanking({
         rankingType: athleteRanking.rankingType,
         ageCategory: athleteRanking.ageCategory,
@@ -186,7 +157,7 @@ export class RankingsService {
         birthdate: athlete.birthdate,
         surname: athlete.surname,
         year: athleteRanking.year,
-        points: isContestRecalculated ? athleteRanking.points : updatedPoints,
+        points: updatedPoints,
       });
     } else {
       rankingItem = new AthleteRanking({
@@ -240,9 +211,7 @@ export class RankingsService {
         combination.year || undefined,
       );
       if (points) {
-        promises.push(
-          this.updateTopScoreAthleteRanking(pk, athlete, combination, points),
-        );
+        promises.push(this.updateTopScoreAthleteRanking(pk, athlete, combination, points));
       }
     }
     const updatedRankings = await Promise.all(promises);
@@ -260,7 +229,7 @@ export class RankingsService {
     const athleteRanking = await this.db.getAthleteRanking(pk);
     let rankingItem: AthleteRanking;
 
-    if (athleteRanking) {     
+    if (athleteRanking) {
       rankingItem = new AthleteRanking({
         rankingType: rankingType,
         ageCategory: combination.ageCategory,
