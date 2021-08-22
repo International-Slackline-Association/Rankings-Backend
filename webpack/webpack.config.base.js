@@ -15,12 +15,12 @@ const defaults = {
   target: 'node',
   // mode: slsw.lib.webpack.isLocal ? "development" : "production",
   mode: 'none',
-    node: {
+  node: {
     __filename: true,
     __dirname: true,
   },
   // externals: slsw.lib.webpack.isLocal ? nodeExternals() : { 'aws-sdk': 'commonjs aws-sdk' }, // dont bundle node_modules when running local
-  externals: nodeExternals({ whitelist: ['winston-cloudwatch'] }), // packages using awssdk are problem. Lambda has it default
+  externals: nodeExternals({ target: 'node', allowlist: ['winston-cloudwatch'] }), // packages using awssdk are problem. Lambda has it default
   plugins: [
     // new BundleAnalyzerPlugin()
     new ForkTsCheckerWebpackPlugin({ checkSyntacticErrors: true }),

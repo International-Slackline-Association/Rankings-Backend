@@ -45,6 +45,10 @@ custom:
         - aws-sdk
         - typescript
     webpackConfig: ./webpack/webpack.config.${self:custom.currentStage}.js
+    packagerOptions:
+      scripts:
+        - rm -rf node_modules/sharp
+        - npm install --arch=x64 --platform=linux sharp
 
 provider:
   name: aws

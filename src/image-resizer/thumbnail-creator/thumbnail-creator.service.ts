@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { readFileSync } from 'fs';
 
-import * as imageMagick from './imagemagick';
+import { resizeImage } from './image-resizer';
 import { S3Service } from './s3.service';
 
 @Injectable()
@@ -14,10 +14,10 @@ export class ThumbnailCreatorService {
     }
     const s3Object = await this.s3Service.getObject(s3Key, bucket);
     if (s3Object && s3Object.Body) {
-      const resizedImagePath = await imageMagick.resizeImage(s3Object.Body as string, { width: 120, height: 120 });
-      if (resizedImagePath) {
+      const resizedImage = await resizeImage(s3Object.Body as string, { width: 120, height: 120 });
+      if (resizedImage) {
         const newKey = this.composeThumbnailKey(s3Key);
-        await this.s3Service.uploadObject(newKey, bucket, readFileSync(resizedImagePath));
+        await this.s3Service.uploadObject(newKey, bucket, resizedImage);
         return newKey;
       }
     }
