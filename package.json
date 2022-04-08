@@ -36,7 +36,7 @@
         "joi": "^14.0.6",
         "latinize": "^0.4.0",
         "lodash": "^4.17.15",
-        "moment": "^2.22.2",
+        "moment": "^2.29.2",
         "redis": "^2.8.0",
         "reflect-metadata": "^0.1.12",
         "rxjs": "^6.0.0",
