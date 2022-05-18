@@ -106,6 +106,7 @@ export class AthleteController {
         name: obj.contest.name,
         rank: obj.item.place,
         thumbnailUrl: obj.contest.thumbnailUrl || obj.contest.profileUrl,
+        points: obj.item.points,
       })),
       results.lastKey,
     );
