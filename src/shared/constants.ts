@@ -9,7 +9,7 @@ export namespace Constants {
 
   export function ContestTypeTopPoints(category: ContestType): number {
     switch (category) {
-      case ContestType.WorldGames:
+      case ContestType.WorldChampionship:
         return 2000;
       case ContestType.WorldCup:
         return 1500;
@@ -28,7 +28,7 @@ export namespace Constants {
 
   export function ContestScoringRange(category: ContestType): number {
     switch (category) {
-      case ContestType.WorldGames:
+      case ContestType.WorldChampionship:
         return 18;
       case ContestType.WorldCup:
         return 16;
@@ -50,7 +50,7 @@ export namespace Constants {
       return 2;
     }
     switch (category) {
-      case ContestType.WorldGames:
+      case ContestType.WorldChampionship:
         return 11;
       case ContestType.WorldCup:
         return 9;

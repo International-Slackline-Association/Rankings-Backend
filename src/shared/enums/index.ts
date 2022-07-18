@@ -45,7 +45,7 @@ export enum RankingType {
 }
 
 export enum ContestType {
-  WorldGames = 0,
+  WorldChampionship = 0,
   WorldCup = 1,
   Masters = 2,
   GrandSlam = 3,

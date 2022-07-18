@@ -4,7 +4,7 @@ import { ContestType } from '.';
 // tslint:disable-next-line:no-namespace
 export namespace ContestTypeUtility {
   export const ContestTypes = [
-    ContestType.WorldGames,
+    ContestType.WorldChampionship,
     ContestType.WorldCup,
     ContestType.Masters,
     ContestType.GrandSlam,
@@ -13,7 +13,7 @@ export namespace ContestTypeUtility {
   ];
 
   export const ContestTypesBySize = [
-    ContestType.WorldGames,
+    ContestType.WorldChampionship,
     ContestType.WorldCup,
     ContestType.Masters,
     ContestType.GrandSlam,
@@ -23,8 +23,8 @@ export namespace ContestTypeUtility {
 
   export function getName(category: ContestType) {
     switch (category) {
-      case ContestType.WorldGames:
-        return 'World Games';
+      case ContestType.WorldChampionship:
+        return 'World Championship';
       case ContestType.WorldCup:
         return 'World Cup';
       case ContestType.Masters:
