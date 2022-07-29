@@ -42,8 +42,8 @@ export class RankingsController {
     return new CategoriesResponse([
       categories.rankingType,
       categories.discipline,
-      categories.year,
       categories.gender,
+      categories.year,
       categories.age,
     ]);
   }
@@ -57,8 +57,8 @@ export class RankingsController {
     }
     const rankingType = categories[0];
     const discipline = categories[1];
-    const year = categories[2];
-    const gender = categories[3];
+    const gender = categories[2];
+    const year = categories[3];
     const ageCategory = categories[4];
 
     const category: RankingsCategory = { rankingType, discipline, year, gender, ageCategory };
