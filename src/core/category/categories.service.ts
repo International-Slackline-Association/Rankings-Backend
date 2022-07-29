@@ -14,7 +14,7 @@ import { ICategoryItem, UISelectOption } from 'shared/types/shared';
 export class CategoriesService {
   constructor() {}
 
-  public getCategories(includeAllYears: boolean = true) {
+  public getCategories(includeAllYears: boolean = true, includeAllDisciplines = false) {
     const rankingTypes = RankingTypeUtility.AllRankingTypes;
     const disciplines = DisciplineUtility.AllDisciplines;
     const years = includeAllYears ? YearUtility.AllYears : YearUtility.Years;
@@ -36,7 +36,7 @@ export class CategoriesService {
 
     const discipline: ICategoryItem = {
       title: 'Discipline',
-      selectedValue: Discipline.Overall.toString(),
+      selectedValue: Discipline.Trickline_Aerial.toString(),
       options: disciplines.map<UISelectOption>(d => {
         const parents = DisciplineUtility.getParents(d);
         return {
@@ -47,6 +47,10 @@ export class CategoriesService {
         };
       }),
     };
+    if (includeAllDisciplines) {
+      discipline.selectedValue = '0';
+      discipline.options.unshift({ label: 'All', value: '0', inlineLevel: 0 });
+    }
 
     const year: ICategoryItem = {
       title: 'Year',

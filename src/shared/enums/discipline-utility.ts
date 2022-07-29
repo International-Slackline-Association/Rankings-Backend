@@ -5,36 +5,27 @@ import { Discipline, DisciplineType } from '.';
 
 // tslint:disable-next-line:no-namespace
 export namespace DisciplineUtility {
-  export const CategoricalDisciplines = [Discipline.Overall, Discipline.Trickline, Discipline.Speedline];
+  export const CategoricalDisciplines = [];
 
-  export const ContainerDisciplines = [Discipline.Freestyle, Discipline.Walking];
+  export const ContainerDisciplines = [Discipline.Freestyle, Discipline.Speed];
 
   export const CompetitionDisciplines = [
     Discipline.Trickline_Aerial,
     Discipline.Trickline_JibAndStatic,
-    Discipline.Trickline_Transfer,
     Discipline.Freestyle_Highline,
-    Discipline.Speedline_Sprint,
-    Discipline.Speedline__Long,
-    Discipline.Endurance,
-    Discipline.Blind,
+    Discipline.Speedline_Short,
+    Discipline.Speedline_Highline,
     Discipline.Rigging,
   ];
 
   export const AllDisciplines = [
-    Discipline.Overall,
     Discipline.Freestyle,
-    Discipline.Trickline,
     Discipline.Trickline_Aerial,
     Discipline.Trickline_JibAndStatic,
-    Discipline.Trickline_Transfer,
     Discipline.Freestyle_Highline,
-    Discipline.Walking,
-    Discipline.Speedline,
-    Discipline.Speedline_Sprint,
-    Discipline.Speedline__Long,
-    Discipline.Endurance,
-    Discipline.Blind,
+    Discipline.Speed,
+    Discipline.Speedline_Short,
+    Discipline.Speedline_Highline,
     Discipline.Rigging,
   ];
 
@@ -48,41 +39,28 @@ export namespace DisciplineUtility {
     if (CategoricalDisciplines.indexOf(discipline) > -1) {
       return DisciplineType.Category;
     }
-    throw new Error('Cannot find type of discipline: ' + discipline);
+    return undefined;
   }
 
   export function getParent(discipline: Discipline): Discipline | null {
     switch (discipline) {
-      case Discipline.Overall:
-        return null;
-
       // container disciplines
       case Discipline.Freestyle:
-      case Discipline.Walking:
-        return Discipline.Overall;
+      case Discipline.Speed:
+        return null;
 
       // 1st degree disciplines
-      case Discipline.Trickline:
-        return Discipline.Freestyle;
-      case Discipline.Freestyle_Highline:
-        return Discipline.Freestyle;
-      case Discipline.Speedline:
-        return Discipline.Walking;
-      case Discipline.Endurance:
-        return Discipline.Walking;
-      case Discipline.Blind:
-        return Discipline.Walking;
       case Discipline.Rigging:
-        return Discipline.Overall;
+        return null;
 
       // 2nd degree disciplines
       case Discipline.Trickline_Aerial:
       case Discipline.Trickline_JibAndStatic:
-      case Discipline.Trickline_Transfer:
-        return Discipline.Trickline;
-      case Discipline.Speedline_Sprint:
-      case Discipline.Speedline__Long:
-        return Discipline.Speedline;
+      case Discipline.Freestyle_Highline:
+        return Discipline.Freestyle;
+      case Discipline.Speedline_Short:
+      case Discipline.Speedline_Highline:
+        return Discipline.Speed;
 
       default:
         throw new Error(`Parant discipline not found: ${discipline}`);
@@ -101,30 +79,19 @@ export namespace DisciplineUtility {
   export function getChildren(discipline: Discipline): Discipline[] {
     switch (discipline) {
       case Discipline.Overall:
-        return [Discipline.Freestyle, Discipline.Walking, Discipline.Rigging];
-
+        return [Discipline.Freestyle, Discipline.Speed, Discipline.Rigging];
       case Discipline.Freestyle:
-        return [Discipline.Trickline, Discipline.Freestyle_Highline];
-      case Discipline.Walking:
-        return [Discipline.Speedline, Discipline.Endurance, Discipline.Blind];
-
-      case Discipline.Trickline:
-        return [Discipline.Trickline_Aerial, Discipline.Trickline_JibAndStatic, Discipline.Trickline_Transfer];
-      case Discipline.Speedline:
-        return [Discipline.Speedline_Sprint, Discipline.Speedline__Long];
-
-      case Discipline.Freestyle_Highline:
-      case Discipline.Endurance:
-      case Discipline.Blind:
+        return [Discipline.Trickline_Aerial, Discipline.Trickline_JibAndStatic, Discipline.Freestyle_Highline];
+      case Discipline.Speed:
+        return [Discipline.Speedline_Highline, Discipline.Speedline_Short];
       case Discipline.Rigging:
         return [];
-
       case Discipline.Trickline_Aerial:
       case Discipline.Trickline_JibAndStatic:
-      case Discipline.Trickline_Transfer:
+      case Discipline.Freestyle_Highline:
         return [];
-      case Discipline.Speedline_Sprint:
-      case Discipline.Speedline__Long:
+      case Discipline.Speedline_Highline:
+      case Discipline.Speedline_Short:
         return [];
       default:
         throw new Error(`Children discipline not found: ${discipline}`);
@@ -147,24 +114,20 @@ export namespace DisciplineUtility {
         return 'Freestyle';
       case Discipline.Walking:
         return 'Walking';
+      case Discipline.Speed:
+        return 'Speed';
       case Discipline.Trickline_Aerial:
-        return withoutParent ? 'Aerial' : 'Trickline - Aerial';
+        return withoutParent ? 'Trickline' : 'Freestyle - Aerial';
       case Discipline.Trickline_JibAndStatic:
-        return withoutParent ? 'Jib-Static' : 'Trickline - Jib-Static';
+        return withoutParent ? 'Jib-Static' : 'Freestyle - Jib-Static';
       case Discipline.Trickline_Transfer:
-        return withoutParent ? 'Transfer' : 'Trickline - Transfer';
-      case Discipline.Speedline_Sprint:
-        return withoutParent ? 'Sprint' : 'Speedline - Sprint';
-      case Discipline.Speedline__Long:
-        return withoutParent ? 'Long' : 'Speedline - Long';
-
-      // 1st degree disciplines
-      case Discipline.Trickline:
-        return 'Trickline';
+        return withoutParent ? 'Transfer' : 'Freestyle - Transfer';
       case Discipline.Freestyle_Highline:
-        return withoutParent ? 'Highline' : 'Freestyle - Highline' ;
-      case Discipline.Speedline:
-        return 'Speedline';
+        return withoutParent ? 'Highline' : 'Freestyle - Highline';
+      case Discipline.Speedline_Highline:
+        return withoutParent ? 'Highline' : 'Speed - Highline';
+      case Discipline.Speedline_Short:
+        return withoutParent ? 'Short' : 'Speed - Short';
       case Discipline.Endurance:
         return 'Endurance';
       case Discipline.Blind:

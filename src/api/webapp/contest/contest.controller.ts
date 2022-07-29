@@ -141,8 +141,7 @@ export class ContestController {
 
   @Get('categories')
   public getCategories(): CategoriesResponse {
-    const categories = this.categoriesService.getCategories(false);
-    categories.discipline.options[0].label = 'All';
+    const categories = this.categoriesService.getCategories(false, true);
     return new CategoriesResponse([categories.discipline, categories.year]);
   }
 

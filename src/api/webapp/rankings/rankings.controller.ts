@@ -22,9 +22,9 @@ export class RankingsController {
   ) {}
   private defaultCategories = [
     RankingType.TopScore,
-    Discipline.Overall,
+    Discipline.Trickline_Aerial,
     YearUtility.AllYears[0],
-    Gender.All,
+    Gender.Men,
     AgeCategory.All,
   ];
 

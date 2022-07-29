@@ -70,7 +70,7 @@ export class AthleteController {
 
   @Get('categories')
   public getCategories(): CategoriesResponse {
-    const categories = this.categoriesService.getCategories();
+    const categories = this.categoriesService.getCategories(false, true);
     categories.discipline.options[0].label = 'All';
     return new CategoriesResponse([categories.discipline, categories.year]);
   }
