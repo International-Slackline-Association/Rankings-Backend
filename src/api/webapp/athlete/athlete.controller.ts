@@ -70,7 +70,7 @@ export class AthleteController {
 
   @Get('categories')
   public getCategories(): CategoriesResponse {
-    const categories = this.categoriesService.getCategories(false, true);
+    const categories = this.categoriesService.getCategories(true, true);
     categories.discipline.options[0].label = 'All';
     return new CategoriesResponse([categories.discipline, categories.year]);
   }
@@ -80,7 +80,7 @@ export class AthleteController {
   public async getContests(@Body() dto: AthleteContestsDto): Promise<AthleteContestsResponse> {
     let categories = dto.selectedCategories || [];
     if (categories.length < 2) {
-      categories = [Discipline.Overall, undefined];
+      categories = [Discipline.Overall, YearUtility.AllYears[0]];
     }
     const discipline = categories[0];
     const year = categories[1];
