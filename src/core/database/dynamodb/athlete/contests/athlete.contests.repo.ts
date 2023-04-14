@@ -194,7 +194,7 @@ export class DDBAthleteContestsRepository extends DDBRepository {
     after?: { athleteId: string; points: number },
   ) {
     let startKey: GSILastEvaluatedKey;
-    if (after && after.athleteId && after.points) {
+    if (after && after.athleteId && !Utils.isNil(after.points)) {
       startKey = {
         PK: this.transformer.itemToAttrsTransformer.PK(after.athleteId),
         SK_GSI: this.transformer.itemToAttrsTransformer.SK_GSI(discipline, contestId),

@@ -117,7 +117,7 @@ export namespace DisciplineUtility {
       case Discipline.Speed:
         return 'Speed';
       case Discipline.Trickline_Aerial:
-        return withoutParent ? 'Trickline' : 'Freestyle - Aerial';
+        return withoutParent ? 'Trickline' : 'Freestyle - Trickline';
       case Discipline.Trickline_JibAndStatic:
         return withoutParent ? 'Jib-Static' : 'Freestyle - Jib-Static';
       case Discipline.Trickline_Transfer:
