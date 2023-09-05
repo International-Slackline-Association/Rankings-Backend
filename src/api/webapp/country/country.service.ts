@@ -26,7 +26,10 @@ export class CountryService {
     return new CountrySuggestionsResponse(items);
   }
 
-  public getCountryName(code): string {
+  public getCountryName(code: string): string {
+    if (code.toUpperCase() === 'TW') {
+      return 'Chinese Taipei';
+    }
     return countryLookup.byIso(code).country;
   }
 }
