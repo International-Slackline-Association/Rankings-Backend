@@ -3,7 +3,7 @@ import { Utils } from 'shared/utils';
 import { CountrySuggestionsResponse } from './dto/country-suggestions.response';
 
 // tslint:disable-next-line:no-var-requires
-const countryList = require('country-list');
+const countryLookup = require('country-code-lookup');
 
 @Injectable()
 export class CountryService {
@@ -14,16 +14,19 @@ export class CountryService {
     if (lookup.length < 3) {
       return new CountrySuggestionsResponse([]);
     }
-    const countryNames = countryList.getNames() as string[];
-    let names = countryNames.filter(name => name.toLowerCase().indexOf(lookup) !== -1);
-    names = names.slice(0, 5);
-    const items = names.map(name => {
-      return { name: name, code: countryList.getCode(name) };
+    let countries = countryLookup.countries as {
+      country: string;
+      iso2: string;
+    }[];
+    countries = countries.filter(c => c.country.toLowerCase().indexOf(lookup) !== -1);
+    countries = countries.slice(0, 5);
+    const items = countries.map(c => {
+      return { name: c.country, code: c.iso2 };
     });
     return new CountrySuggestionsResponse(items);
   }
 
   public getCountryName(code): string {
-    return countryList.getName(code);
+    return countryLookup.byIso(code).country;
   }
 }
