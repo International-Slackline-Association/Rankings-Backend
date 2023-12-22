@@ -63,7 +63,8 @@ export namespace DisciplineUtility {
         return Discipline.Speed;
 
       default:
-        throw new Error(`Parant discipline not found: ${discipline}`);
+        return null;
+      // throw new Error(`Parant discipline not found: ${discipline}`);
     }
   }
 
@@ -94,7 +95,8 @@ export namespace DisciplineUtility {
       case Discipline.Speedline_Short:
         return [];
       default:
-        throw new Error(`Children discipline not found: ${discipline}`);
+        return [];
+        // throw new Error(`Children discipline not found: ${discipline}`);
     }
   }
 

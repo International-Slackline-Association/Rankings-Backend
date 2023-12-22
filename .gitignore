@@ -47,3 +47,4 @@ serverless/secrets.yml
 ISA-Rankings_Serverless_Policy.json
 .env
 .DS_Store
+.vscode/settings.json

@@ -58,7 +58,7 @@ provider:
   logRetentionInDays: 30
   stage: ${self:custom.currentStage}
   region: ${self:custom.regions.${self:custom.currentStage}, self:custom.defaultRegion}
-  profile: ${self:custom.profiles.${self:custom.currentStage}, self:custom.defaultProfile}
+  profile: ${env:AWS_PROFILE}
   iamRoleStatements:
     - Effect: Allow
       Action:
